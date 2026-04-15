@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Fundamentals — AI Enablement Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf8f5;
+  --bg2:#ffffff;
+  --bg3:#f2efe8;
+  --card:#ffffff;
+  --border:#e4e0d6;
+  --border2:#cdc8bc;
+  --text:#1c1a16;
+  --text2:#6a6455;
+  --text3:#a89e90;
+  --accent:#c8590a;
+  --accent-light:#fef0e6;
+  --accent2:#2563eb;
+  --accent2-light:#eff4ff;
+  --accent3:#16a34a;
+  --accent3-light:#f0fdf4;
+  --accent4:#9333ea;
+  --accent4-light:#faf5ff;
+  --yellow:#ca8a04;
+  --yellow-light:#fefce8;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Sora',sans-serif;
+  --radius:14px;
+  --shadow:0 1px 3px rgba(60,40,10,0.06),0 4px 16px rgba(60,40,10,0.07);
+  --shadow-md:0 4px 12px rgba(60,40,10,0.1),0 12px 32px rgba(60,40,10,0.09);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(250,248,245,0.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.nav-logo{font-family:var(--mono);font-size:12px;color:var(--text2);}
+.nav-logo span{color:var(--accent);font-weight:600;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.xp-badge{background:var(--accent-light);border:1px solid #f5c8a0;border-radius:30px;padding:5px 14px;font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;}
+.user-pill{background:var(--text);color:#fff;border-radius:30px;padding:6px 16px;font-size:13px;font-weight:700;}
+.back-link{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text2);font-size:13px;font-weight:600;transition:color 0.15s;}
+.back-link:hover{color:var(--accent);}
+
+/* HERO */
+.hero{padding:48px 32px 0;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px;}
+.breadcrumb span{color:var(--accent);}
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:28px;flex-wrap:wrap;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:14px;}
+.hero h1{font-size:clamp(30px,4vw,52px);font-weight:800;letter-spacing:-0.025em;line-height:1.08;margin-bottom:10px;}
+.hero h1 .hi{color:var(--accent);}
+.hero-sub{color:var(--text2);font-size:14.5px;max-width:460px;line-height:1.7;}
+
+/* SQL KEYWORD STRIP */
+.sql-strip{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0;}
+.sql-kw{font-family:var(--mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:5px;}
+.kw-select{background:#fef0e6;color:#c8590a;border:1px solid #fbd0a8;}
+.kw-from{background:#eff4ff;color:#2563eb;border:1px solid #bfcfff;}
+.kw-where{background:#f0fdf4;color:#16a34a;border:1px solid #a7f3c0;}
+.kw-join{background:#faf5ff;color:#9333ea;border:1px solid #d8b4fe;}
+.kw-group{background:#fefce8;color:#ca8a04;border:1px solid #fde68a;}
+.kw-order{background:#fef0e6;color:#c8590a;border:1px solid #fbd0a8;}
+
+/* STATS */
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 0;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:var(--shadow);}
+.stat-num{font-size:22px;font-weight:800;line-height:1;}
+.stat-label{font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;}
+
+/* PROGRESS */
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;min-width:260px;box-shadow:var(--shadow);}
+.pw-top{display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;font-weight:700;}
+.pw-pct{color:var(--accent);font-family:var(--mono);}
+.pw-track{background:var(--bg3);border-radius:100px;height:8px;overflow:hidden;margin-bottom:10px;}
+.pw-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent) 0%,#e8833a 100%);transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+.pw-sub{font-size:11px;color:var(--text3);}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:32px 32px 60px;}
+
+/* TOPIC CARDS */
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:12px;margin-bottom:44px;}
+.topic-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 22px;cursor:pointer;box-shadow:var(--shadow);transition:all 0.22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc,var(--accent));opacity:0;transition:opacity 0.2s;}
+.topic-card:hover{border-color:var(--tc,var(--accent));box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.topic-card:hover::before{opacity:1;}
+.tc-top{display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+.tc-icon{font-size:22px;flex-shrink:0;}
+.tc-kw{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--tl,var(--accent-light));color:var(--tc,var(--accent));border:1px solid var(--tb,#f5c8a0);}
+.tc-title{font-size:14.5px;font-weight:700;margin-bottom:5px;}
+.tc-desc{font-size:12.5px;color:var(--text2);line-height:1.55;margin-bottom:14px;}
+.tc-footer{display:flex;align-items:center;justify-content:space-between;}
+.tc-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--tl,var(--accent-light));color:var(--tc,var(--accent));}
+.topic-card.done .tc-badge{background:var(--accent3-light);color:var(--accent3);}
+.tc-xp{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:600;}
+.tc-bar{margin-top:12px;background:var(--bg3);border-radius:100px;height:3px;overflow:hidden;}
+.tc-fill{height:100%;border-radius:100px;background:var(--tc,var(--accent));transition:width 0.7s;}
+
+/* TOOLS */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:44px;}
+.tool-link{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);box-shadow:var(--shadow);transition:all 0.18s;}
+.tool-link:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.tl-icon{font-size:18px;flex-shrink:0;}
+.tl-name{font-size:13px;font-weight:700;}
+.tl-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(28,26,22,0.52);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(60,40,10,0.18);transform:translateY(16px) scale(0.97);transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-hd{padding:22px 26px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--card);z-index:2;}
+.modal-tag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:0.08em;}
+.modal-title{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
+.modal-x{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.modal-x:hover{background:var(--bg);color:var(--text);}
+.modal-bd{padding:22px 26px;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:20px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:62px;padding:7px 8px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-size:11.5px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:var(--sans);white-space:nowrap;}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* LEARN */
+.concept-list{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.concept-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;align-items:flex-start;gap:11px;}
+.c-num{width:22px;height:22px;background:var(--accent);color:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;}
+.c-text{font-size:13.5px;line-height:1.6;color:var(--text2);}
+.c-text strong{color:var(--text);font-weight:700;}
+.c-text code{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-family:var(--mono);font-size:11.5px;color:var(--accent);}
+
+/* SQL CODE BLOCK */
+.sql-block{background:#1e1b16;border-radius:12px;padding:18px 20px;margin-bottom:16px;overflow-x:auto;}
+.sql-block pre{font-family:var(--mono);font-size:13px;line-height:1.7;color:#e8dcc8;}
+.sql-kw-code{color:#f5a55a;}
+.sql-fn-code{color:#7dd3fc;}
+.sql-str-code{color:#86efac;}
+.sql-cm-code{color:#6b7280;font-style:italic;}
+.sql-block-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+
+.play-btn{display:flex;align-items:center;gap:11px;background:var(--accent-light);border:1.5px solid #f5c8a0;border-radius:10px;padding:13px 17px;color:var(--accent);text-decoration:none;font-size:13px;font-weight:700;transition:all 0.18s;margin-bottom:10px;}
+.play-btn:hover{background:#fde8d0;border-color:var(--accent);}
+.play-btn-arrow{margin-left:auto;}
+.play-btn-sub{font-size:11px;font-weight:400;color:#b06830;margin-top:1px;}
+
+/* VIDEO */
+.video-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;aspect-ratio:16/9;margin-bottom:13px;}
+.video-box iframe{width:100%;height:100%;border:none;}
+.video-note{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5;}
+
+/* SQL SANDBOX */
+.sql-sandbox{background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.sandbox-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.sandbox-title{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text2);}
+.sandbox-run{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.sandbox-run:hover{background:#a84808;}
+.sandbox-body{padding:14px 16px;}
+.sandbox-textarea{width:100%;background:#1e1b16;color:#e8dcc8;border:none;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:12.5px;line-height:1.6;resize:vertical;min-height:100px;outline:none;}
+.sandbox-result{margin-top:12px;}
+.result-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
+.result-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.result-table th{background:var(--bg3);padding:7px 12px;text-align:left;font-weight:700;font-size:11px;color:var(--text2);border:1px solid var(--border);}
+.result-table td{padding:7px 12px;border:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--text);}
+.result-table tr:nth-child(even) td{background:var(--bg);}
+.result-msg{font-family:var(--mono);font-size:12px;color:var(--accent3);padding:8px 0;}
+.result-err{font-family:var(--mono);font-size:12px;color:#dc2626;padding:8px 0;}
+
+/* QUIZ */
+.quiz-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.quiz-counter{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;}
+.quiz-q{font-size:14.5px;font-weight:700;margin-bottom:13px;line-height:1.5;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.quiz-opt{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:13.5px;transition:all 0.14s;display:flex;align-items:center;gap:10px;color:var(--text);font-family:var(--sans);font-weight:500;text-align:left;}
+.quiz-opt:hover{border-color:var(--accent);background:var(--accent-light);}
+.quiz-opt.correct{border-color:var(--accent3);background:var(--accent3-light);color:#15803d;}
+.quiz-opt.wrong{border-color:#ef4444;background:#fef2f2;color:#b91c1c;}
+.opt-k{width:21px;height:21px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;color:var(--text3);}
+.quiz-fb{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:13px;display:none;line-height:1.5;font-weight:500;}
+.quiz-fb.show{display:block;}
+.quiz-fb.ok{background:var(--accent3-light);border:1px solid #a7f3c0;color:#166534;}
+.quiz-fb.bad{background:#fef2f2;border:1px solid #fca5a5;color:#9b1e2b;}
+.quiz-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+.score-box{text-align:center;padding:30px;display:none;}
+.score-box.show{display:block;}
+.score-big{font-size:52px;font-weight:800;color:var(--accent);line-height:1;}
+.score-label{font-size:14px;color:var(--text2);margin:8px 0 20px;}
+
+/* BTNS */
+.btn{padding:9px 19px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all 0.14s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#a84808;}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+/* FLASHCARDS */
+.fc-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+.fc-count{font-family:var(--mono);font-size:12px;color:var(--text3);font-weight:600;}
+.fc-scene{perspective:900px;width:100%;height:185px;margin-bottom:14px;cursor:pointer;}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform 0.42s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+.fc-scene.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fc-face.back{background:var(--accent-light);border-color:#f5c8a0;transform:rotateY(180deg);}
+.fc-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);margin-bottom:9px;text-transform:uppercase;}
+.fc-face.back .fc-lbl{color:var(--accent);}
+.fc-txt{font-size:14.5px;font-weight:700;text-align:center;line-height:1.4;}
+.fc-face.back .fc-txt{color:var(--accent);font-family:var(--mono);font-size:13px;}
+.fc-hint{font-size:11px;color:var(--text3);margin-top:9px;}
+.fc-actions{display:flex;gap:8px;}
+.fc-actions .btn{flex:1;}
+
+/* CHALLENGE */
+.ch-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+.ch-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px;}
+.ch-title{font-size:14px;font-weight:700;}
+.ch-xp{font-family:var(--mono);font-size:10.5px;color:var(--yellow);background:var(--yellow-light);border:1px solid #fde68a;border-radius:20px;padding:2px 9px;font-weight:700;white-space:nowrap;}
+.ch-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:13px;}
+.ch-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--sans);transition:all 0.14s;}
+.ch-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+.ch-btn.done{background:var(--accent3-light);border-color:#a7f3c0;color:var(--accent3);}
+
+/* RESOURCES */
+.res-item{display:flex;align-items:center;gap:11px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 15px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all 0.14s;}
+.res-item:hover{border-color:var(--accent);background:var(--accent-light);}
+.res-icon{font-size:18px;flex-shrink:0;}
+.res-name{font-size:13.5px;font-weight:700;}
+.res-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.res-tag{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;}
+
+/* WELCOME */
+.welcome{position:fixed;inset:0;background:rgba(28,26,22,0.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;}
+.welcome-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:38px 34px;max-width:390px;width:100%;box-shadow:0 32px 80px rgba(60,40,10,0.2);text-align:center;}
+.wc-emoji{font-size:42px;margin-bottom:14px;}
+.wc-h{font-size:24px;font-weight:800;letter-spacing:-0.01em;margin-bottom:9px;}
+.wc-p{color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:24px;}
+.wc-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;font-size:15px;font-family:var(--sans);color:var(--text);margin-bottom:13px;outline:none;transition:border-color 0.14s;}
+.wc-input:focus{border-color:var(--accent);}
+.wc-input::placeholder{color:var(--text3);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:#fff;border-radius:12px;padding:12px 17px;font-size:13.5px;font-weight:600;z-index:999;transform:translateY(66px);opacity:0;transition:all 0.32s cubic-bezier(.4,0,.2,1);max-width:280px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 30px rgba(60,40,10,0.25);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono);background:var(--card);}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.topic-card{animation:fadeUp 0.38s ease backwards;}
+.topic-card:nth-child(1){animation-delay:.04s}.topic-card:nth-child(2){animation-delay:.08s}
+.topic-card:nth-child(3){animation-delay:.12s}.topic-card:nth-child(4){animation-delay:.16s}
+.topic-card:nth-child(5){animation-delay:.20s}.topic-card:nth-child(6){animation-delay:.24s}
+.topic-card:nth-child(7){animation-delay:.28s}.topic-card:nth-child(8){animation-delay:.32s}
+
+@media(max-width:600px){
+  nav,.hero,.main{padding-left:16px;padding-right:16px;}
+  .hero{padding-top:28px;}
+  .modal-hd,.modal-bd{padding:16px 18px;}
+  .tab-btn{font-size:10.5px;padding:6px 6px;}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div class="welcome" id="wm">
+  <div class="welcome-card">
+    <div class="wc-emoji">🗄️</div>
+    <div class="wc-h">Welcome to SQL</div>
+    <div class="wc-p">Enter your name to track XP, quiz scores, and challenge completions across the AI Enablement Platform.</div>
+    <input class="wc-input" id="nameInput" type="text" placeholder="Your first name..." maxlength="24"/>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;" onclick="startJourney()">Start Learning →</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="#" class="back-link" onclick="history.back()">← Back</a>
+    <div class="nav-logo">AI_ENABLEMENT // <span>SQL Fundamentals</span></div>
+  </div>
+  <div class="nav-right">
+    <div class="xp-badge" id="navXP">0 XP</div>
+    <div class="user-pill" id="navUser">...</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb">AI Enablement Platform / <span>Module 03</span> / SQL Fundamentals</div>
+  <div class="hero-row">
+    <div>
+      <div class="hero-badge">🗄️ Module 03 · Foundations Track</div>
+      <h1>SQL<br><span class="hi">Fundamentals</span></h1>
+      <p class="hero-sub">The language of data — every AI model needs clean, structured data to learn from. Master SQL to query, join, and transform enterprise process mining datasets.</p>
+      <div class="sql-strip">
+        <span class="sql-kw kw-select">SELECT</span>
+        <span class="sql-kw kw-from">FROM</span>
+        <span class="sql-kw kw-where">WHERE</span>
+        <span class="sql-kw kw-join">JOIN</span>
+        <span class="sql-kw kw-group">GROUP BY</span>
+        <span class="sql-kw kw-order">ORDER BY</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num">8</div><div class="stat-label">Topics</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Levels</div></div>
+        <div class="stat"><div class="stat-num">400</div><div class="stat-label">Max XP</div></div>
+        <div class="stat"><div class="stat-num" id="doneStat">0</div><div class="stat-label">Completed</div></div>
+        <div class="stat"><div class="stat-num" id="xpStat">0</div><div class="stat-label">XP Earned</div></div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="pw-top"><span>Module Progress</span><span class="pw-pct" id="progPct">0%</span></div>
+      <div class="pw-track"><div class="pw-fill" id="progFill" style="width:0%"></div></div>
+      <div class="pw-sub" id="progSub">0 of 8 topics completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="section-label">8 Topics — Click Any Card</div>
+  <div class="topics-grid" id="topicsGrid"></div>
+
+  <div class="section-label">Live SQL Playgrounds &amp; Resources</div>
+  <div class="tools-grid">
+    <a href="https://sqliteonline.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🛝</div><div><div class="tl-name">SQLite Online</div><div class="tl-sub">No login · full SQL in browser</div></div>
+    </a>
+    <a href="https://sqlfiddle.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🎯</div><div><div class="tl-name">SQL Fiddle</div><div class="tl-sub">Multi-DB · share snippets</div></div>
+    </a>
+    <a href="https://www.db-fiddle.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🔧</div><div><div class="tl-name">DB Fiddle</div><div class="tl-sub">PostgreSQL · MySQL · SQLite</div></div>
+    </a>
+    <a href="https://sqlpad.io/playground/" target="_blank" class="tool-link">
+      <div class="tl-icon">📊</div><div><div class="tl-name">SQLPad</div><div class="tl-sub">Real business datasets</div></div>
+    </a>
+    <a href="https://learnsql.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">📖</div><div><div class="tl-name">LearnSQL.com</div><div class="tl-sub">Interactive SQL courses</div></div>
+    </a>
+    <a href="https://jakevdp.github.io/PythonDataScienceHandbook/" target="_blank" class="tool-link">
+      <div class="tl-icon">🐼</div><div><div class="tl-name">Data Science Handbook</div><div class="tl-sub">SQL + Pandas integration</div></div>
+    </a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-tag" id="mTag">TOPIC 01 · BEGINNER</div>
+        <div class="modal-title" id="mTitle">Topic</div>
+      </div>
+      <button class="modal-x" onclick="closeModal2()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="tab('learn',this)">📘 Learn</button>
+        <button class="tab-btn" onclick="tab('video',this)">▶ Video</button>
+        <button class="tab-btn" onclick="tab('sandbox',this)">💾 Sandbox</button>
+        <button class="tab-btn" onclick="tab('quiz',this)">🧠 Quiz</button>
+        <button class="tab-btn" onclick="tab('cards',this)">🃏 Cards</button>
+        <button class="tab-btn" onclick="tab('challenge',this)">⚡ Challenge</button>
+        <button class="tab-btn" onclick="tab('links',this)">🔗 Links</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-learn">
+        <div class="concept-list" id="conceptList"></div>
+        <div id="sqlCodeBlock"></div>
+        <a href="https://sqliteonline.com/" target="_blank" class="play-btn">
+          <span>🛝</span>
+          <div><div>Open SQLite Online</div><div class="play-btn-sub">Full SQL in browser · no login · free</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-video">
+        <div class="video-box"><iframe id="vFrame" src="" allowfullscreen loading="lazy"></iframe></div>
+        <div class="video-note" id="vNote"></div>
+        <a href="https://sqliteonline.com/" target="_blank" class="play-btn">
+          <span>🗄️</span>
+          <div><div>Practice SQL While Watching</div><div class="play-btn-sub">sqliteonline.com — open side-by-side</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-sandbox">
+        <div id="sandboxArea"></div>
+      </div>
+
+      <div class="tab-panel" id="tab-quiz">
+        <div id="quizWrap"></div>
+        <div class="score-box" id="scoreBox">
+          <div class="score-big" id="scoreBig">0/5</div>
+          <div class="score-label" id="scoreLbl">Quiz complete!</div>
+          <button class="btn btn-primary" onclick="retryQuiz()">Try Again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-cards">
+        <div class="fc-nav">
+          <button class="btn btn-ghost" onclick="prevFC()">← Prev</button>
+          <div class="fc-count" id="fcCount">1 / 5</div>
+          <button class="btn btn-ghost" onclick="nextFC()">Next →</button>
+        </div>
+        <div class="fc-scene" id="fcScene" onclick="flipFC()">
+          <div class="fc-inner">
+            <div class="fc-face front">
+              <div class="fc-lbl">SQL Term</div>
+              <div class="fc-txt" id="fcFront">...</div>
+              <div class="fc-hint">Tap to reveal</div>
+            </div>
+            <div class="fc-face back">
+              <div class="fc-lbl">Definition / Syntax</div>
+              <div class="fc-txt" id="fcBack">...</div>
+              <div class="fc-hint">Tap to flip back</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-actions">
+          <button class="btn btn-ghost" onclick="markKnown()">✓ Got it</button>
+          <button class="btn btn-ghost" onclick="nextFC()">↺ Again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-challenge">
+        <div id="chList"></div>
+        <a href="https://sqliteonline.com/" target="_blank" class="play-btn" style="margin-top:4px">
+          <span>💻</span>
+          <div><div>Write SQL in SQLite Online</div><div class="play-btn-sub">Full browser SQL editor · free</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-links">
+        <div id="resList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIcon">🎉</span><span id="tMsg">Done!</span></div>
+<footer>AI ENABLEMENT PLATFORM · CELONIS CONSULTANTS · MODULE 03 · SQL FUNDAMENTALS</footer>
+
+<script>
+// ── SIMULATED SQL ENGINE ───────────────────────────────────────────
+// Simple in-memory SQL simulator for the Sandbox tab
+const DB = {
+  cases: [
+    {case_id:101,customer:'Acme Corp',status:'open',duration:4200,region:'EMEA'},
+    {case_id:102,customer:'Globex',status:'closed',duration:1800,region:'APAC'},
+    {case_id:103,customer:'Initech',status:'open',duration:7300,region:'EMEA'},
+    {case_id:104,customer:'Umbrella',status:'closed',duration:900,region:'NA'},
+    {case_id:105,customer:'Hooli',status:'open',duration:5500,region:'NA'},
+    {case_id:106,customer:'Pied Piper',status:'closed',duration:2100,region:'EMEA'},
+  ],
+  activities: [
+    {act_id:1,case_id:101,activity:'Review',resource:'Alice',duration_s:1800},
+    {act_id:2,case_id:101,activity:'Approve',resource:'Bob',duration_s:600},
+    {act_id:3,case_id:102,activity:'Review',resource:'Alice',duration_s:900},
+    {act_id:4,case_id:103,activity:'Escalate',resource:'Carlos',duration_s:3600},
+    {act_id:5,case_id:104,activity:'Approve',resource:'Bob',duration_s:300},
+    {act_id:6,case_id:105,activity:'Review',resource:'Alice',duration_s:2700},
+    {act_id:7,case_id:106,activity:'Approve',resource:'Carlos',duration_s:900},
+    {act_id:8,case_id:103,activity:'Approve',resource:'Bob',duration_s:1200},
+  ]
+};
+
+function runSQL(query) {
+  try {
+    const q = query.trim().toUpperCase();
+    // SELECT * FROM cases
+    if (/SELECT \* FROM CASES/.test(q) && !/WHERE/.test(q) && !/JOIN/.test(q) && !/GROUP/.test(q)) {
+      return { cols: Object.keys(DB.cases[0]), rows: DB.cases.map(r => Object.values(r)) };
+    }
+    // SELECT * FROM activities
+    if (/SELECT \* FROM ACTIVITIES/.test(q) && !/WHERE/.test(q) && !/JOIN/.test(q) && !/GROUP/.test(q)) {
+      return { cols: Object.keys(DB.activities[0]), rows: DB.activities.map(r => Object.values(r)) };
+    }
+    // WHERE status = 'open'
+    if (/FROM CASES/.test(q) && /WHERE.*STATUS.*=.*'OPEN'/.test(q)) {
+      const rows = DB.cases.filter(r => r.status === 'open');
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r => Object.values(r)) };
+    }
+    // WHERE status = 'closed'
+    if (/FROM CASES/.test(q) && /WHERE.*STATUS.*=.*'CLOSED'/.test(q)) {
+      const rows = DB.cases.filter(r => r.status === 'closed');
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r => Object.values(r)) };
+    }
+    // WHERE duration > 3600
+    if (/FROM CASES/.test(q) && /WHERE.*DURATION.*>.*3600/.test(q)) {
+      const rows = DB.cases.filter(r => r.duration > 3600);
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r => Object.values(r)) };
+    }
+    // WHERE region = 'EMEA'
+    if (/FROM CASES/.test(q) && /WHERE.*REGION.*=.*'EMEA'/.test(q)) {
+      const rows = DB.cases.filter(r => r.region === 'EMEA');
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r => Object.values(r)) };
+    }
+    // COUNT
+    if (/SELECT COUNT/.test(q) && /FROM CASES/.test(q) && !/GROUP/.test(q)) {
+      const filtered = /WHERE.*STATUS.*=.*'OPEN'/.test(q) ? DB.cases.filter(r=>r.status==='open') : DB.cases;
+      return { cols: ['COUNT(*)'], rows: [[filtered.length]] };
+    }
+    // AVG duration
+    if (/SELECT.*AVG.*DURATION/.test(q) && /FROM CASES/.test(q)) {
+      const avg = Math.round(DB.cases.reduce((s,r)=>s+r.duration,0)/DB.cases.length);
+      return { cols: ['AVG(duration)'], rows: [[avg]] };
+    }
+    // MAX duration
+    if (/SELECT.*MAX.*DURATION/.test(q) && /FROM CASES/.test(q)) {
+      const max = Math.max(...DB.cases.map(r=>r.duration));
+      return { cols: ['MAX(duration)'], rows: [[max]] };
+    }
+    // GROUP BY region
+    if (/GROUP BY REGION/.test(q) && /FROM CASES/.test(q)) {
+      const groups = {};
+      DB.cases.forEach(r => { groups[r.region] = (groups[r.region]||0)+1; });
+      return { cols: ['region','COUNT(*)'], rows: Object.entries(groups) };
+    }
+    // GROUP BY activity
+    if (/GROUP BY ACTIVITY/.test(q) && /FROM ACTIVITIES/.test(q)) {
+      const groups = {};
+      DB.activities.forEach(r => { groups[r.activity]=(groups[r.activity]||[]);groups[r.activity].push(r.duration_s); });
+      const rows = Object.entries(groups).map(([k,v])=>[k,v.length,Math.round(v.reduce((a,b)=>a+b,0)/v.length)]);
+      return { cols: ['activity','count','avg_duration_s'], rows };
+    }
+    // GROUP BY resource
+    if (/GROUP BY RESOURCE/.test(q) && /FROM ACTIVITIES/.test(q)) {
+      const groups = {};
+      DB.activities.forEach(r => { groups[r.resource]=(groups[r.resource]||0)+1; });
+      return { cols: ['resource','activity_count'], rows: Object.entries(groups) };
+    }
+    // ORDER BY duration DESC
+    if (/ORDER BY DURATION DESC/.test(q) && /FROM CASES/.test(q)) {
+      const rows = [...DB.cases].sort((a,b)=>b.duration-a.duration);
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r=>Object.values(r)) };
+    }
+    // ORDER BY duration ASC
+    if (/ORDER BY DURATION/.test(q) && /FROM CASES/.test(q) && !/DESC/.test(q)) {
+      const rows = [...DB.cases].sort((a,b)=>a.duration-b.duration);
+      return { cols: Object.keys(DB.cases[0]), rows: rows.map(r=>Object.values(r)) };
+    }
+    // JOIN cases + activities
+    if (/JOIN/.test(q) && /CASES/.test(q) && /ACTIVITIES/.test(q)) {
+      const joined = DB.activities.map(a => {
+        const c = DB.cases.find(c=>c.case_id===a.case_id);
+        return c ? [c.case_id, c.customer, a.activity, a.resource, a.duration_s] : null;
+      }).filter(Boolean);
+      return { cols: ['case_id','customer','activity','resource','duration_s'], rows: joined };
+    }
+    // LIMIT
+    if (/LIMIT (\d+)/.test(q) && /FROM CASES/.test(q)) {
+      const n = parseInt(q.match(/LIMIT (\d+)/)[1]);
+      return { cols: Object.keys(DB.cases[0]), rows: DB.cases.slice(0,n).map(r=>Object.values(r)) };
+    }
+    return { msg: '⚠️ Query not recognised by sandbox. Try: SELECT * FROM cases, SELECT * FROM activities, or use WHERE / GROUP BY / JOIN. For full SQL, use SQLite Online.' };
+  } catch(e) {
+    return { err: 'Error: ' + e.message };
+  }
+}
+
+// ── TOPIC DATA ─────────────────────────────────────────────────────
+const TOPICS = [
+  {
+    id:'basics', num:'01', title:'Databases & Tables', desc:'How data is structured in rows and columns — the foundation of all SQL queries.',
+    icon:'🗄️', level:'Beginner', xp:50, tc:'#c8590a', tl:'#fef0e6', tb:'#f5c8a0', kw:'STRUCTURE',
+    concepts:[
+      {t:'<strong>A database</strong> is an organised collection of structured data. A Celonis process mining database might contain tables for cases, activities, resources, and timestamps.'},
+      {t:'<strong>Tables</strong> are the core unit — rows are individual records, columns are attributes. Like a spreadsheet, but faster and queryable with SQL.'},
+      {t:'<strong>Primary Key</strong>: a unique identifier for each row. In our cases table, <code>case_id</code> is the primary key — no two cases can share the same ID.'},
+      {t:'<strong>Foreign Key</strong>: a column referencing the primary key of another table. <code>activities.case_id</code> is a foreign key linking to <code>cases.case_id</code>.'},
+      {t:'<strong>Data types</strong>: INT (whole numbers), VARCHAR (text), FLOAT (decimals), BOOLEAN (true/false), TIMESTAMP (date + time). Choosing the right type ensures data integrity.'},
+    ],
+    vid:'HXV3zeQKqGY', vidNote:'▶ SQL Tutorial — Full Database Course for Beginners — freeCodeCamp (4hr). The definitive free SQL course.',
+    sqlCode:`-- Our process mining schema
+CREATE TABLE cases (
+  case_id   INT PRIMARY KEY,
+  customer  VARCHAR(100),
+  status    VARCHAR(20),
+  duration  INT,
+  region    VARCHAR(10)
+);
+
+CREATE TABLE activities (
+  act_id     INT PRIMARY KEY,
+  case_id    INT REFERENCES cases(case_id),
+  activity   VARCHAR(50),
+  resource   VARCHAR(50),
+  duration_s INT
+);`,
+    sandboxQuery:`-- Explore both tables\nSELECT * FROM cases\n\n-- Then try:\n-- SELECT * FROM activities`,
+    fc:[
+      {f:'Primary Key',b:'Unique identifier for each row. Cannot be NULL or duplicated. e.g. case_id INT PRIMARY KEY'},
+      {f:'Foreign Key',b:'Column referencing another table\'s primary key. Links activities.case_id → cases.case_id'},
+      {f:'VARCHAR',b:'Variable-length text column. VARCHAR(100) stores up to 100 characters.'},
+      {f:'INT',b:'Integer data type — whole numbers only. Used for IDs, counts, durations in seconds.'},
+      {f:'TIMESTAMP',b:'Stores date and time. Essential for process mining event logs and SLA calculations.'},
+    ],
+    quiz:[
+      {q:'What is a Primary Key?',o:['First column in a table','Unique identifier for each row, cannot repeat','A foreign reference column','The table\'s main query'],c:1,e:'Primary key uniquely identifies each row. No two rows can share the same primary key value.'},
+      {q:'What does a Foreign Key do?',o:['Creates an index','Links to the primary key of another table','Encrypts data','Sets a default value'],c:1,e:'Foreign keys create relationships between tables — they reference the primary key of another table.'},
+      {q:'Which data type stores text?',o:['INT','FLOAT','VARCHAR','BOOLEAN'],c:2,e:'VARCHAR (variable character) stores text strings. VARCHAR(100) allows up to 100 characters.'},
+      {q:'In a process mining DB, activities.case_id is a?',o:['Primary Key','Index','Foreign Key','Unique constraint'],c:2,e:'activities.case_id is a foreign key that references cases.case_id, linking the two tables.'},
+      {q:'What data type stores date and time together?',o:['DATE','VARCHAR','INT','TIMESTAMP'],c:3,e:'TIMESTAMP stores both date and time — essential for calculating process durations and SLA breaches.'},
+    ],
+    ch:[
+      {t:'Design a Schema',d:'Design a SQL schema (CREATE TABLE statements) for a Celonis invoice processing database. Include tables for: invoices, line_items, approvers. Add primary and foreign keys.',xp:30},
+      {t:'Data Type Audit',d:'Given 10 column definitions with wrong data types (e.g. storing duration as VARCHAR), identify and correct each one with the appropriate SQL data type and a reason why.',xp:20},
+    ],
+    res:[
+      {n:'SQL Tutorial — W3Schools',u:'https://www.w3schools.com/sql/',i:'📚',m:'Interactive reference with exercises',t:'Guide'},
+      {n:'SQLite Online Playground',u:'https://sqliteonline.com/',i:'🛝',m:'Full SQL in browser, no login',t:'Playground'},
+      {n:'DB Fiddle',u:'https://www.db-fiddle.com/',i:'🔧',m:'Multi-database SQL editor',t:'Tool'},
+    ]
+  },
+  {
+    id:'select', num:'02', title:'SELECT & Filtering', desc:'Querying data with SELECT, WHERE, LIKE, IN, BETWEEN — the heart of SQL.',
+    icon:'🔍', level:'Beginner', xp:50, tc:'#2563eb', tl:'#eff4ff', tb:'#bfcfff', kw:'SELECT',
+    concepts:[
+      {t:'<strong>SELECT</strong> specifies which columns to return. <code>SELECT case_id, customer, status FROM cases</code> — only returns those 3 columns.'},
+      {t:'<strong>WHERE</strong> filters rows. <code>WHERE status = \'open\'</code> returns only open cases. Combine with <code>AND</code> / <code>OR</code> for complex conditions.'},
+      {t:'<strong>LIKE</strong> enables pattern matching: <code>WHERE customer LIKE \'Acme%\'</code> matches any customer starting with "Acme". Use <code>%</code> as wildcard.'},
+      {t:'<strong>IN</strong> checks membership: <code>WHERE region IN (\'EMEA\', \'APAC\')</code> — cleaner than writing multiple OR conditions.'},
+      {t:'<strong>BETWEEN</strong> filters ranges: <code>WHERE duration BETWEEN 1800 AND 7200</code> — includes both endpoints (30min to 2hr cases).'},
+    ],
+    vid:'p3qvj9hO_Bo', vidNote:'▶ SQL SELECT Statement — Programming with Mosh. Covers all SELECT fundamentals clearly.',
+    sqlCode:`-- Basic SELECT
+SELECT * FROM cases;
+
+-- Filter open cases
+SELECT case_id, customer, duration
+FROM cases
+WHERE status = 'open';
+
+-- Multi-condition filter
+WHERE status = 'open' AND region = 'EMEA'
+
+-- Pattern match
+WHERE customer LIKE 'A%'
+
+-- Range filter
+WHERE duration BETWEEN 3600 AND 7200`,
+    sandboxQuery:`-- Try these one at a time:\nSELECT * FROM cases WHERE status = 'open'\n\n-- Or:\nSELECT * FROM cases WHERE duration > 3600\n\n-- Or:\nSELECT * FROM cases WHERE region = 'EMEA'`,
+    fc:[
+      {f:'SELECT *',b:'Returns ALL columns from a table. Fine for exploration, avoid in production (slow).'},
+      {f:'WHERE clause',b:'Filters rows. WHERE status = \'open\' returns only rows where status equals \'open\'.'},
+      {f:'LIKE operator',b:'Pattern match. % = any characters. WHERE customer LIKE \'A%\' starts with A.'},
+      {f:'IN operator',b:'WHERE region IN (\'EMEA\',\'APAC\') — checks if value is in a list. Cleaner than OR.'},
+      {f:'BETWEEN',b:'WHERE duration BETWEEN 1800 AND 7200 — inclusive range filter.'},
+    ],
+    quiz:[
+      {q:'SELECT * means?',o:['Select the first row','Select all columns','Select only numeric columns','Select nothing'],c:1,e:'SELECT * returns all columns. More specific SELECT col1, col2 is better for performance.'},
+      {q:'How do you filter for only open cases?',o:['FILTER status = open','WHERE status = \'open\'','HAVING status = \'open\'','SELECT status open'],c:1,e:'WHERE clause filters rows. String values need single quotes in SQL.'},
+      {q:'What does LIKE \'%Corp\' match?',o:['Strings starting with Corp','Strings ending with Corp','Only the word Corp','All strings'],c:1,e:'% at the start means anything before Corp. LIKE \'%Corp\' matches "Acme Corp", "Big Corp" etc.'},
+      {q:'WHERE region IN (\'EMEA\',\'NA\') returns?',o:['Only EMEA rows','Only NA rows','EMEA and NA rows','Neither'],c:2,e:'IN checks if the value is in the list — returns rows where region is EMEA OR NA.'},
+      {q:'BETWEEN 1800 AND 3600 includes?',o:['Only 1800','Only 3600','Both 1800 and 3600 and everything between','Excludes both endpoints'],c:2,e:'BETWEEN is inclusive of both endpoints — 1800 and 3600 are included in the results.'},
+    ],
+    ch:[
+      {t:'SLA Breach Finder',d:'Write a SQL query to find all cases where duration > 3600 (1 hour SLA breach). Return case_id, customer, duration, and a calculated column showing minutes over SLA.',xp:25},
+      {t:'Regional Filter',d:'Write a query returning only EMEA open cases, ordered by duration descending. Use WHERE with AND to combine both conditions.',xp:20},
+    ],
+    res:[
+      {n:'W3Schools SQL WHERE',u:'https://www.w3schools.com/sql/sql_where.asp',i:'📚',m:'Interactive WHERE reference',t:'Docs'},
+      {n:'SQLite Online',u:'https://sqliteonline.com/',i:'🛝',m:'Practice SELECT queries free',t:'Playground'},
+      {n:'SQL Bolt',u:'https://sqlbolt.com/',i:'🎯',m:'Interactive SQL exercises',t:'Practice'},
+    ]
+  },
+  {
+    id:'aggregate', num:'03', title:'Aggregate Functions', desc:'COUNT, SUM, AVG, MIN, MAX — computing statistics across your process data.',
+    icon:'📊', level:'Beginner', xp:50, tc:'#16a34a', tl:'#f0fdf4', tb:'#a7f3c0', kw:'COUNT/AVG',
+    concepts:[
+      {t:'<strong>COUNT(*)</strong> counts all rows. <code>SELECT COUNT(*) FROM cases WHERE status=\'open\'</code> — how many open cases are there?'},
+      {t:'<strong>SUM(col)</strong> totals a numeric column. <code>SELECT SUM(duration) FROM cases</code> — total time across all process cases.'},
+      {t:'<strong>AVG(col)</strong> computes the mean. <code>SELECT AVG(duration) FROM cases WHERE region=\'EMEA\'</code> — average case duration in EMEA.'},
+      {t:'<strong>MIN(col) and MAX(col)</strong> find the smallest and largest values. Ideal for finding the fastest and slowest process cases.'},
+      {t:'<strong>COUNT(DISTINCT col)</strong> counts unique values. <code>COUNT(DISTINCT customer)</code> tells you how many unique customers have cases — different from COUNT(*).'},
+    ],
+    vid:'7yeOuNsFgKo', vidNote:'▶ SQL Aggregate Functions — Alex the Analyst. COUNT, SUM, AVG explained with real examples.',
+    sqlCode:`-- Total cases
+SELECT COUNT(*) AS total_cases FROM cases;
+
+-- Average duration (seconds)
+SELECT AVG(duration) AS avg_duration FROM cases;
+
+-- Max duration = worst SLA breach
+SELECT MAX(duration) AS max_duration FROM cases;
+
+-- Count per status
+SELECT status, COUNT(*) AS count
+FROM cases
+GROUP BY status;`,
+    sandboxQuery:`-- Try aggregate queries:\nSELECT COUNT(*) FROM cases WHERE status = 'open'\n\n-- Or:\nSELECT AVG(duration) FROM cases\n\n-- Or:\nSELECT MAX(duration) FROM cases`,
+    fc:[
+      {f:'COUNT(*)',b:'Counts all rows including NULLs. COUNT(col) counts only non-NULL values in that column.'},
+      {f:'SUM(col)',b:'Adds up all values in a numeric column. SELECT SUM(duration) FROM cases.'},
+      {f:'AVG(col)',b:'Returns the arithmetic mean. SUM(col) / COUNT(col). Ignores NULL values.'},
+      {f:'MIN(col)',b:'Returns the smallest value. Useful for finding the fastest case or earliest timestamp.'},
+      {f:'COUNT(DISTINCT col)',b:'Counts only unique values. COUNT(DISTINCT customer) = number of unique customers.'},
+    ],
+    quiz:[
+      {q:'COUNT(*) vs COUNT(col) — key difference?',o:['They are identical','COUNT(*) includes NULLs, COUNT(col) excludes them','COUNT(col) is faster','COUNT(*) only counts numbers'],c:1,e:'COUNT(*) counts all rows. COUNT(column) skips rows where that column is NULL.'},
+      {q:'How do you find the longest running case?',o:['AVG(duration)','MIN(duration)','MAX(duration)','SUM(duration)'],c:2,e:'MAX(duration) returns the single largest duration value — the worst SLA breach case.'},
+      {q:'AVG ignores which values?',o:['Zero values','Negative values','NULL values','String values'],c:2,e:'AVG automatically ignores NULL values in its calculation. Only non-NULL values are averaged.'},
+      {q:'Which finds the count of unique customers?',o:['COUNT(*) customers','COUNT(customer)','COUNT(DISTINCT customer)','SUM(DISTINCT customer)'],c:2,e:'COUNT(DISTINCT customer) counts each unique customer name only once.'},
+      {q:'SUM(duration) / COUNT(*) equals?',o:['MAX(duration)','MIN(duration)','AVG(duration)','TOTAL(duration)'],c:2,e:'AVG is mathematically equivalent to SUM divided by COUNT. SQL computes this for you with AVG().'},
+    ],
+    ch:[
+      {t:'Process KPIs Report',d:'Write SQL to generate 5 KPIs: total cases, open cases, avg duration, max duration, and min duration. Use a single query with multiple aggregate functions.',xp:30},
+      {t:'Regional Statistics',d:'Write a query showing per-region stats: case count, avg duration, max duration. Use GROUP BY region with aggregate functions.',xp:35},
+    ],
+    res:[
+      {n:'SQL Aggregate Functions — W3Schools',u:'https://www.w3schools.com/sql/sql_count_avg_sum.asp',i:'📚',m:'COUNT, AVG, SUM reference',t:'Docs'},
+      {n:'SQLite Online — Practice',u:'https://sqliteonline.com/',i:'🛝',m:'Run aggregate queries free',t:'Playground'},
+    ]
+  },
+  {
+    id:'groupby', num:'04', title:'GROUP BY & HAVING', desc:'Slicing data into groups and filtering aggregated results for process insights.',
+    icon:'🗂️', level:'Intermediate', xp:50, tc:'#ca8a04', tl:'#fefce8', tb:'#fde68a', kw:'GROUP BY',
+    concepts:[
+      {t:'<strong>GROUP BY</strong> splits rows into groups and applies aggregate functions to each group. <code>GROUP BY region</code> calculates one row per unique region.'},
+      {t:'<strong>Rule</strong>: every column in SELECT must either be in GROUP BY or wrapped in an aggregate function (COUNT, SUM, AVG...). Violating this causes an error.'},
+      {t:'<strong>HAVING</strong> filters groups AFTER aggregation — it\'s WHERE for grouped data. <code>HAVING COUNT(*) > 2</code> keeps only groups with more than 2 cases.'},
+      {t:'<strong>WHERE vs HAVING</strong>: WHERE filters individual rows BEFORE grouping. HAVING filters groups AFTER. You can use both in the same query.'},
+      {t:'<strong>ORDER BY with GROUP BY</strong>: sort grouped results. <code>ORDER BY AVG(duration) DESC</code> shows the slowest regions first — perfect for Celonis bottleneck analysis.'},
+    ],
+    vid:'Yh4CrPHVBdE', vidNote:'▶ SQL GROUP BY — Alex the Analyst. The clearest GROUP BY + HAVING tutorial on YouTube.',
+    sqlCode:`-- Cases per region
+SELECT region, COUNT(*) AS case_count
+FROM cases
+GROUP BY region;
+
+-- Avg duration per status
+SELECT status, AVG(duration) AS avg_dur
+FROM cases
+GROUP BY status
+ORDER BY avg_dur DESC;
+
+-- HAVING: only regions with 2+ cases
+SELECT region, COUNT(*) AS n
+FROM cases
+GROUP BY region
+HAVING COUNT(*) >= 2;`,
+    sandboxQuery:`-- Try GROUP BY:\nSELECT region, COUNT(*) FROM cases GROUP BY region\n\n-- Or activities:\nSELECT activity, COUNT(*) FROM activities GROUP BY activity\n\n-- Or by resource:\nSELECT resource, COUNT(*) FROM activities GROUP BY resource`,
+    fc:[
+      {f:'GROUP BY',b:'Splits result into groups. SELECT status, COUNT(*) FROM cases GROUP BY status.'},
+      {f:'HAVING',b:'Filters groups after aggregation. WHERE filters rows; HAVING filters groups.'},
+      {f:'GROUP BY rule',b:'Every SELECT column must be in GROUP BY or inside an aggregate function.'},
+      {f:'WHERE vs HAVING',b:'WHERE: before grouping (filter rows). HAVING: after grouping (filter groups).'},
+      {f:'ORDER BY AVG(col) DESC',b:'Sort groups by their aggregate value. Shows highest first — bottleneck analysis.'},
+    ],
+    quiz:[
+      {q:'GROUP BY groups data and applies?',o:['Filters to each row','Aggregate functions to each group','A join to another table','A sort order'],c:1,e:'GROUP BY creates groups and aggregate functions (COUNT, AVG, SUM...) are applied to each group.'},
+      {q:'HAVING COUNT(*) > 5 does what?',o:['Returns rows with count > 5','Filters groups where count > 5','Orders by count','Removes NULL counts'],c:1,e:'HAVING filters groups after aggregation. Only groups where COUNT(*) > 5 are returned.'},
+      {q:'Can you use WHERE and HAVING in the same query?',o:['No, one or the other','Yes — WHERE filters rows first, then HAVING filters groups','Yes but they do the same thing','Only in PostgreSQL'],c:1,e:'Yes! WHERE filters rows before grouping, HAVING filters the resulting groups after aggregation.'},
+      {q:'SELECT region, COUNT(*) FROM cases GROUP BY status — what is wrong?',o:['Nothing','region is not in GROUP BY or an aggregate function','COUNT(*) syntax error','Missing WHERE'],c:1,e:'region is in SELECT but not in GROUP BY and not aggregated — SQL will throw an error.'},
+      {q:'ORDER BY AVG(duration) DESC shows?',o:['Fastest first','Slowest first (highest avg duration at top)','Random order','Alphabetical'],c:1,e:'DESC = descending = highest values first. Slowest average durations appear at the top.'},
+    ],
+    ch:[
+      {t:'Bottleneck by Activity',d:'Write SQL on the activities table to show each activity\'s count and average duration. Order by avg duration descending. Filter to only activities with avg > 900s.',xp:35},
+      {t:'Regional SLA Report',d:'Build a query showing each region\'s case count and avg duration. Add a HAVING clause to show only regions averaging over 2000 seconds.',xp:30},
+    ],
+    res:[
+      {n:'SQL GROUP BY — W3Schools',u:'https://www.w3schools.com/sql/sql_groupby.asp',i:'📚',m:'GROUP BY + HAVING reference',t:'Docs'},
+      {n:'SQL Bolt — Aggregations',u:'https://sqlbolt.com/lesson/select_queries_with_aggregates',i:'🎯',m:'Interactive GROUP BY exercises',t:'Practice'},
+    ]
+  },
+  {
+    id:'joins', num:'05', title:'JOINs', desc:'INNER, LEFT, RIGHT, FULL OUTER — merging fragmented data across tables.',
+    icon:'🔗', level:'Intermediate', xp:50, tc:'#9333ea', tl:'#faf5ff', tb:'#d8b4fe', kw:'JOIN',
+    concepts:[
+      {t:'<strong>INNER JOIN</strong>: returns only rows where the join condition matches in BOTH tables. Most common. <code>JOIN activities a ON c.case_id = a.case_id</code>'},
+      {t:'<strong>LEFT JOIN</strong>: returns ALL rows from the left table + matching rows from the right. Cases with NO activities still appear (activity columns will be NULL).'},
+      {t:'<strong>RIGHT JOIN</strong>: opposite of LEFT JOIN — all rows from the right table. Rarely used in practice; just swap table order and use LEFT JOIN instead.'},
+      {t:'<strong>FULL OUTER JOIN</strong>: returns all rows from both tables. Non-matching rows get NULLs on the other side. Useful for finding orphaned records in process logs.'},
+      {t:'<strong>Table aliases</strong> make JOINs readable. <code>FROM cases c JOIN activities a</code> — then use <code>c.case_id</code> and <code>a.case_id</code> to avoid ambiguity.'},
+    ],
+    vid:'9yeOuNsFgKo', vidNote:'▶ SQL Joins Explained — Programming with Mosh. Visual diagrams for every join type.',
+    sqlCode:`-- INNER JOIN: matched rows only
+SELECT c.case_id, c.customer,
+       a.activity, a.resource
+FROM cases c
+JOIN activities a
+  ON c.case_id = a.case_id;
+
+-- LEFT JOIN: all cases + activities (if any)
+SELECT c.case_id, c.customer,
+       a.activity
+FROM cases c
+LEFT JOIN activities a
+  ON c.case_id = a.case_id;`,
+    sandboxQuery:`-- Try a JOIN:\nSELECT c.case_id, c.customer, a.activity, a.resource\nFROM cases c\nJOIN activities a ON c.case_id = a.case_id`,
+    fc:[
+      {f:'INNER JOIN',b:'Returns rows matching in BOTH tables. Non-matching rows are excluded from results.'},
+      {f:'LEFT JOIN',b:'All rows from left table + matching right rows. Non-matching right = NULL values.'},
+      {f:'RIGHT JOIN',b:'All rows from right table + matching left rows. Rarely used — swap tables and LEFT JOIN.'},
+      {f:'FULL OUTER JOIN',b:'All rows from both tables. Non-matching rows get NULLs on the opposite side.'},
+      {f:'Table alias',b:'FROM cases c — short name for a table. Use c.col to avoid column ambiguity in JOINs.'},
+    ],
+    quiz:[
+      {q:'INNER JOIN returns?',o:['All rows from left table','All rows from both tables','Only rows matching in BOTH tables','All rows from right table'],c:2,e:'INNER JOIN returns only rows where the join condition matches on BOTH sides.'},
+      {q:'LEFT JOIN ensures?',o:['All right rows appear','All left rows appear, with NULLs where no match','Only matched rows appear','All rows from both tables'],c:1,e:'LEFT JOIN: every row in the left table appears. Right-side columns are NULL when no match.'},
+      {q:'You want all cases even if they have no activities. Which JOIN?',o:['INNER JOIN','RIGHT JOIN','LEFT JOIN with cases on left','FULL OUTER JOIN'],c:2,e:'LEFT JOIN with cases as the left table — all cases appear, activities columns are NULL if missing.'},
+      {q:'Why use table aliases (c, a)?',o:['Makes query run faster','Avoids column name ambiguity and reduces typing','Required by SQL spec','Replaces table names permanently'],c:1,e:'Aliases (FROM cases c) let you write c.case_id instead of cases.case_id — clearer and shorter.'},
+      {q:'FULL OUTER JOIN returns?',o:['Matched rows only','All left rows','All right rows','All rows from both tables, NULLs where no match'],c:3,e:'FULL OUTER JOIN returns all rows from both tables. Non-matching rows get NULLs on the other side.'},
+    ],
+    ch:[
+      {t:'Activity Report',d:'Write a JOIN query combining cases and activities. Show: case_id, customer, activity, resource, duration_s. Filter to only open cases. Order by duration_s descending.',xp:35},
+      {t:'Cases Without Activities',d:'Use a LEFT JOIN to find all cases that have NO activities. Hint: filter WHERE activities.act_id IS NULL after the LEFT JOIN.',xp:30},
+    ],
+    res:[
+      {n:'Visual SQL JOINS — CodeProject',u:'https://www.codeproject.com/Articles/33052/Visual-Representation-of-SQL-Joins',i:'📊',m:'Visual Venn diagram explanation',t:'Article'},
+      {n:'SQL Bolt — JOINs',u:'https://sqlbolt.com/lesson/select_queries_with_joins',i:'🎯',m:'Interactive JOIN exercises',t:'Practice'},
+      {n:'DB Fiddle — Multi-table',u:'https://www.db-fiddle.com/',i:'🔧',m:'Test JOINs with your own schema',t:'Tool'},
+    ]
+  },
+  {
+    id:'subqueries', num:'06', title:'Subqueries & CTEs', desc:'Nested queries and WITH clauses — building complex analytical pipelines step by step.',
+    icon:'🪆', level:'Intermediate', xp:50, tc:'#c8590a', tl:'#fef0e6', tb:'#f5c8a0', kw:'WITH/CTE',
+    concepts:[
+      {t:'<strong>Subquery</strong>: a query nested inside another query. <code>WHERE duration > (SELECT AVG(duration) FROM cases)</code> — cases lasting longer than average.'},
+      {t:'<strong>Subquery in FROM</strong>: treat a query result as a table. <code>FROM (SELECT ... FROM cases WHERE ...) AS sub</code> — very powerful for multi-step analysis.'},
+      {t:'<strong>CTE (Common Table Expression)</strong>: a named temporary result defined with <code>WITH</code>. Makes complex queries readable by breaking them into named steps.'},
+      {t:'<strong>Multiple CTEs</strong>: chain several WITH clauses. Define open_cases, then breach_cases, then join them — each step is readable and testable independently.'},
+      {t:'<strong>When to use CTE vs subquery</strong>: use CTEs when you reference the same subresult multiple times, or when the query gets complex — readability over brevity.'},
+    ],
+    vid:'i5acpV68QyQ', vidNote:'▶ SQL CTEs — Alex the Analyst. Clear explanation of WITH clauses and when to use them.',
+    sqlCode:`-- Subquery: above-average duration cases
+SELECT case_id, customer, duration
+FROM cases
+WHERE duration > (
+  SELECT AVG(duration) FROM cases
+);
+
+-- CTE: named, readable step
+WITH breach_cases AS (
+  SELECT * FROM cases
+  WHERE duration > 3600
+)
+SELECT c.customer, a.activity
+FROM breach_cases c
+JOIN activities a ON c.case_id = a.case_id;`,
+    sandboxQuery:`-- Try a basic subquery:\nSELECT * FROM cases WHERE duration > (\n  SELECT AVG(duration) FROM cases\n)`,
+    fc:[
+      {f:'Subquery',b:'A query nested inside another. WHERE col > (SELECT AVG(col) FROM table)'},
+      {f:'CTE (WITH clause)',b:'WITH name AS (SELECT ...) — a named temp result. Makes complex queries readable.'},
+      {f:'Correlated subquery',b:'A subquery that references the outer query. Runs once per outer row — can be slow.'},
+      {f:'Multiple CTEs',b:'WITH cte1 AS (...), cte2 AS (...) SELECT ... FROM cte1 JOIN cte2 — chain named steps.'},
+      {f:'CTE vs subquery',b:'CTEs: readable, reusable in the query. Subqueries: inline, good for one-time filters.'},
+    ],
+    quiz:[
+      {q:'A subquery appears inside?',o:['A comment','Another SQL query','A table definition','A database'],c:1,e:'Subqueries are nested SQL queries inside another query — in WHERE, FROM, SELECT, or HAVING.'},
+      {q:'WITH clause creates a?',o:['Permanent table','View','Named temporary result (CTE)','Index'],c:2,e:'WITH cte_name AS (SELECT ...) creates a CTE — a named, readable temporary result set.'},
+      {q:'WHERE duration > (SELECT AVG(duration) FROM cases) — what does this return?',o:['Cases with avg duration','Cases with duration below average','Cases with duration above average','All cases'],c:2,e:'The subquery calculates average duration, then WHERE filters to only cases exceeding that average.'},
+      {q:'When should you prefer CTEs over subqueries?',o:['Never','When you need better performance','When you reference the result multiple times or need readability','Only in PostgreSQL'],c:2,e:'CTEs shine when the subresult is reused or when breaking complex logic into readable named steps.'},
+      {q:'Can you JOIN a CTE like a regular table?',o:['No','Yes — treat the CTE name like a table name','Only in the WHERE clause','Only with INNER JOIN'],c:1,e:'Yes! After defining a CTE, reference it in FROM, JOIN, WHERE — exactly like a regular table.'},
+    ],
+    ch:[
+      {t:'Above-Average Cases CTE',d:'Write a CTE called long_cases that selects all cases with duration > average. Then join it to activities to show which activities appear most in long cases.',xp:35},
+      {t:'Bottleneck Analysis Pipeline',d:'Build a 2-CTE query: first CTE finds open cases in EMEA, second CTE calculates avg duration per activity from those cases. Return the top 3 longest activities.',xp:40},
+    ],
+    res:[
+      {n:'SQL CTEs — LearnSQL',u:'https://learnsql.com/blog/what-is-common-table-expression/',i:'📚',m:'CTE deep dive article',t:'Article'},
+      {n:'SQLite Online',u:'https://sqliteonline.com/',i:'🛝',m:'Test subqueries and CTEs',t:'Playground'},
+    ]
+  },
+  {
+    id:'window', num:'07', title:'Window Functions', desc:'ROW_NUMBER, RANK, LAG, LEAD — advanced analytics without collapsing rows.',
+    icon:'🪟', level:'Advanced', xp:50, tc:'#2563eb', tl:'#eff4ff', tb:'#bfcfff', kw:'OVER()',
+    concepts:[
+      {t:'<strong>Window functions</strong> compute a value across a set of related rows WITHOUT collapsing them into one row like GROUP BY does. Each row keeps its identity.'},
+      {t:'<strong>ROW_NUMBER()</strong>: assigns a sequential integer to each row within a partition. <code>ROW_NUMBER() OVER(PARTITION BY region ORDER BY duration DESC)</code>'},
+      {t:'<strong>RANK()</strong>: like ROW_NUMBER but ties get the same rank with gaps. <code>1, 1, 3</code>. DENSE_RANK() gives no gaps: <code>1, 1, 2</code>.'},
+      {t:'<strong>LAG(col, n)</strong>: returns the value of col from n rows back in the partition. Great for comparing a case\'s duration to the previous case — trend analysis.'},
+      {t:'<strong>LEAD(col, n)</strong>: opposite of LAG — returns the value from n rows ahead. Use LAG and LEAD together to compute the time gap between consecutive process events.'},
+    ],
+    vid:'H6OTMoXjNiI', vidNote:'▶ SQL Window Functions — Alex the Analyst. ROW_NUMBER, RANK, LAG, LEAD with real examples.',
+    sqlCode:`-- Rank cases by duration within each region
+SELECT
+  case_id, customer, region,
+  duration,
+  RANK() OVER(
+    PARTITION BY region
+    ORDER BY duration DESC
+  ) AS rank_in_region
+FROM cases;
+
+-- LAG: compare to previous case
+SELECT
+  case_id, duration,
+  LAG(duration, 1) OVER(
+    ORDER BY case_id
+  ) AS prev_duration
+FROM cases;`,
+    sandboxQuery:`-- Window functions need full SQL — try in sqlfiddle.com or sqliteonline.com\n-- Hint: SELECT *, RANK() OVER(ORDER BY duration DESC) AS rnk FROM cases`,
+    fc:[
+      {f:'OVER() clause',b:'Defines the window for a window function. OVER(PARTITION BY x ORDER BY y)'},
+      {f:'ROW_NUMBER()',b:'Assigns 1, 2, 3... to rows within each partition. No ties — always unique numbers.'},
+      {f:'RANK()',b:'Like ROW_NUMBER but ties share a rank with gaps: 1, 1, 3. DENSE_RANK gives 1, 1, 2.'},
+      {f:'LAG(col, n)',b:'Returns value from n rows before the current row. For comparing to previous record.'},
+      {f:'LEAD(col, n)',b:'Returns value from n rows ahead. LAG+LEAD together = time gap between events.'},
+    ],
+    quiz:[
+      {q:'Key difference: window functions vs GROUP BY?',o:['Window functions are slower','Window functions keep all rows; GROUP BY collapses into one row per group','GROUP BY is more powerful','They produce identical results'],c:1,e:'Window functions compute across rows without collapsing them. Each row keeps its original data plus the computed value.'},
+      {q:'ROW_NUMBER() OVER(PARTITION BY region) does?',o:['Counts rows globally','Numbers rows 1,2,3... within each region independently','Ranks by region name','Deletes duplicate rows'],c:1,e:'PARTITION BY restarts the row numbering for each unique region value — independent sequences.'},
+      {q:'RANK() gives 1,1,3 — what does DENSE_RANK give?',o:['1,1,3','1,2,3','1,1,2','2,2,3'],c:2,e:'DENSE_RANK gives no gaps: 1,1,2. RANK skips: 1,1,3 (no rank 2 when there\'s a tie at rank 1).'},
+      {q:'LAG(duration, 1) returns?',o:['Next row\'s duration','Current row\'s duration','Previous row\'s duration','Average duration'],c:2,e:'LAG(col, 1) looks back 1 row. LAG(col, 2) looks back 2 rows. Great for trend comparison.'},
+      {q:'Process mining use case for LEAD/LAG?',o:['Counting activities','Calculating time gaps between consecutive events','Sorting alphabetically','Joining tables'],c:1,e:'LEAD-LAG are perfect for process mining: calculate waiting time between events in a case journey.'},
+    ],
+    ch:[
+      {t:'Rank Cases by Duration',d:'Write a window function query ranking cases within each region by duration (slowest first). Show case_id, customer, region, duration, and rank. Filter to show only rank = 1 (worst case per region).',xp:40},
+      {t:'Event Gap Calculator',d:'Use LAG to calculate the time gap between consecutive activities in the activities table ordered by act_id. Show activity, duration_s, previous duration, and the difference.',xp:45},
+    ],
+    res:[
+      {n:'SQL Window Functions — Mode',u:'https://mode.com/sql-tutorial/sql-window-functions/',i:'📚',m:'Best window function guide',t:'Guide'},
+      {n:'SQL Fiddle — Advanced SQL',u:'https://sqlfiddle.com/',i:'🎯',m:'Test window functions',t:'Playground'},
+    ]
+  },
+  {
+    id:'aidata', num:'08', title:'SQL for AI Data Prep', desc:'Writing SQL that feeds clean, structured data directly into AI models and Celonis.',
+    icon:'🤖', level:'Advanced', xp:50, tc:'#16a34a', tl:'#f0fdf4', tb:'#a7f3c0', kw:'AI READY',
+    concepts:[
+      {t:'<strong>Data quality SQL</strong>: AI models fail on dirty data. Use <code>WHERE col IS NOT NULL</code>, <code>TRIM(col)</code>, and <code>COALESCE(col, default)</code> to clean before training.'},
+      {t:'<strong>Feature engineering</strong>: create new columns from raw data. <code>duration / 3600.0 AS duration_hours</code>, <code>CASE WHEN duration > 3600 THEN 1 ELSE 0 END AS sla_breach</code>.'},
+      {t:'<strong>CASE WHEN</strong>: SQL\'s if/else. Categorise durations into "Fast", "Normal", "Slow" buckets — creates categorical features for classification models.'},
+      {t:'<strong>Window functions for ML features</strong>: compute rolling averages, running totals, and sequential patterns that capture process behaviour over time.'},
+      {t:'<strong>Celonis PQL</strong>: Process Query Language extends SQL with process-specific functions. <code>FILTER MATCH_PROCESS(activity, "Approve" → "Pay")</code> — sequence filtering unique to Celonis.'},
+    ],
+    vid:'qfyynHBFR_A', vidNote:'▶ SQL for Data Science — freeCodeCamp. Data preparation and feature engineering with SQL.',
+    sqlCode:`-- Feature engineering for AI
+SELECT
+  case_id,
+  customer,
+  region,
+  duration,
+  duration / 3600.0 AS duration_hours,
+  CASE
+    WHEN duration < 1800 THEN 'Fast'
+    WHEN duration < 3600 THEN 'Normal'
+    ELSE 'Slow'
+  END AS speed_category,
+  CASE WHEN duration > 3600 THEN 1 ELSE 0
+  END AS sla_breach_flag
+FROM cases
+WHERE case_id IS NOT NULL;`,
+    sandboxQuery:`-- Feature engineering query:\nSELECT * FROM cases WHERE duration > 3600\n\n-- Or see all regions:\nSELECT region, COUNT(*) FROM cases GROUP BY region`,
+    fc:[
+      {f:'COALESCE(col, default)',b:'Returns first non-NULL value. COALESCE(duration, 0) replaces NULLs with 0 for AI training.'},
+      {f:'CASE WHEN',b:'SQL if/else. CASE WHEN duration > 3600 THEN \'Breach\' ELSE \'OK\' END AS status_label'},
+      {f:'Feature engineering',b:'Creating new columns from raw data for ML models. e.g. duration_hours, sla_breach_flag.'},
+      {f:'IS NOT NULL',b:'Filters out NULL rows. WHERE case_id IS NOT NULL — essential for clean AI training data.'},
+      {f:'Celonis PQL',b:'Process Query Language — SQL extended with process mining functions like FILTER MATCH_PROCESS().'},
+    ],
+    quiz:[
+      {q:'COALESCE(duration, 0) does what?',o:['Deletes NULL rows','Replaces NULL with 0','Calculates average','Counts NULLs'],c:1,e:'COALESCE returns the first non-NULL value. COALESCE(col, 0) replaces NULLs with 0 — safe for AI models.'},
+      {q:'CASE WHEN in SQL is equivalent to?',o:['A JOIN','A subquery','An if/else statement','A GROUP BY'],c:2,e:'CASE WHEN is SQL\'s conditional logic — like if/elif/else in Python.'},
+      {q:'Which creates a binary 0/1 column for ML?',o:['COUNT(duration > 3600)','CASE WHEN duration > 3600 THEN 1 ELSE 0 END','WHERE duration > 3600','SUM(duration > 3600)'],c:1,e:'CASE WHEN duration > 3600 THEN 1 ELSE 0 END creates a binary feature — 1 for breach, 0 for OK.'},
+      {q:'Why filter WHERE col IS NOT NULL before AI training?',o:['SQL requirement','NULLs cause errors or biased results in ML models','Improves query speed only','Required for JOINs'],c:1,e:'NULL values in training data cause ML models to error or learn incorrect patterns. Always clean first.'},
+      {q:'What makes Celonis PQL different from standard SQL?',o:['It uses different keywords for WHERE','It adds process-specific functions like FILTER MATCH_PROCESS()','It doesn\'t support JOINs','It is NoSQL'],c:1,e:'PQL extends SQL with process mining functions for sequence filtering, conformance checking, and case analysis.'},
+    ],
+    ch:[
+      {t:'AI-Ready Dataset',d:'Write a SQL query that creates a clean ML-ready dataset from the cases table: exclude NULLs, add duration_hours column, add sla_breach binary flag, add speed_category with CASE WHEN, order by case_id.',xp:45},
+      {t:'Feature Pipeline',d:'Design a full SQL pipeline (using CTEs) that: cleans data → engineers features → aggregates by region → outputs a summary table ready for a machine learning model.',xp:40},
+    ],
+    res:[
+      {n:'Practical SQL — DeBarros',u:'https://nostarch.com/practical-sql-2nd-edition',i:'📖',m:'Best SQL for data analysis book',t:'Book'},
+      {n:'SQL for Data Science — Coursera',u:'https://www.coursera.org/learn/sql-for-data-science',i:'🎓',m:'Free audit · UC Davis',t:'Course'},
+      {n:'Celonis PQL Docs',u:'https://docs.celonis.com/en/pql-functions.html',i:'⚙️',m:'Official Celonis query language',t:'Docs'},
+    ]
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let S={user:'',xp:0,done:{},chDone:{},qScores:{}};
+let CT=null,qIdx=0,qAns=[],fcIdx=0;
+
+function init(){
+  try{const s=localStorage.getItem('sql_v1');if(s)S=JSON.parse(s);}catch(e){}
+  if(S.user){document.getElementById('wm').style.display='none';refresh();}
+  else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
+}
+function save(){localStorage.setItem('sql_v1',JSON.stringify(S));}
+function refresh(){updateNav();renderCards();updateProg();}
+
+function startJourney(){
+  const n=document.getElementById('nameInput').value.trim();if(!n)return;
+  S.user=n;save();
+  document.getElementById('wm').style.display='none';
+  refresh();toast('🗄️','Welcome '+n+'! Let\'s query!');
+}
+
+function updateNav(){
+  document.getElementById('navUser').textContent=S.user||'?';
+  document.getElementById('navXP').textContent=(S.xp||0)+' XP';
+  document.getElementById('xpStat').textContent=S.xp||0;
+}
+function updateProg(){
+  const d=Object.keys(S.done).filter(k=>S.done[k]).length;
+  const p=Math.round(d/TOPICS.length*100);
+  document.getElementById('progFill').style.width=p+'%';
+  document.getElementById('progPct').textContent=p+'%';
+  document.getElementById('progSub').textContent=d+' of '+TOPICS.length+' topics completed';
+  document.getElementById('doneStat').textContent=d;
+}
+
+function renderCards(){
+  document.getElementById('topicsGrid').innerHTML=TOPICS.map((t,i)=>{
+    const done=S.done[t.id];
+    const prog=done?100:(S.qScores[t.id]?50:0);
+    return `<div class="topic-card ${done?'done':''}" style="--tc:${t.tc};--tl:${t.tl};--tb:${t.tb};" onclick="openTopic('${t.id}')">
+      <div class="tc-top">
+        <span class="tc-icon">${t.icon}</span>
+        <span class="tc-kw">${t.kw}</span>
+      </div>
+      <div class="tc-title">${t.title}</div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-footer">
+        <span class="tc-badge">${done?'✓ Complete':t.level}</span>
+        <span class="tc-xp">+${t.xp} XP</span>
+      </div>
+      <div class="tc-bar"><div class="tc-fill" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openTopic(id){
+  CT=TOPICS.find(t=>t.id===id);if(!CT)return;
+  document.getElementById('mTag').textContent=`TOPIC ${CT.num} · ${CT.level.toUpperCase()}`;
+  document.getElementById('mTitle').textContent=`${CT.icon}  ${CT.title}`;
+  tab('learn',document.querySelector('.tab-btn'));
+  bLearn();bVideo();bSandbox();bChallenge();bResources();
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+  fcIdx=0;bFC();
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal2(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('vFrame').src='';
+}
+function closeModal(e){if(e.target.id==='modal')closeModal2();}
+
+function tab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const p=document.getElementById('tab-'+name);if(p)p.classList.add('active');
+}
+
+function syntaxHL(sql){
+  const kws=['SELECT','FROM','WHERE','JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL OUTER JOIN','ON','GROUP BY','ORDER BY','HAVING','INSERT','UPDATE','DELETE','CREATE','TABLE','WITH','AS','AND','OR','NOT','IN','BETWEEN','LIKE','LIMIT','OFFSET','PARTITION BY','OVER','DISTINCT','NULL','IS NOT NULL','IS NULL','REFERENCES','PRIMARY KEY','CASE','WHEN','THEN','ELSE','END'];
+  const fns=['COUNT','SUM','AVG','MIN','MAX','ROW_NUMBER','RANK','DENSE_RANK','LAG','LEAD','COALESCE','TRIM'];
+  let h=sql.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  fns.forEach(f=>{ h=h.replace(new RegExp('\\b'+f+'\\b','gi'),`<span class="sql-fn-code">${f}</span>`); });
+  kws.forEach(k=>{ h=h.replace(new RegExp('\\b'+k+'\\b','gi'),`<span class="sql-kw-code">${k}</span>`); });
+  h=h.replace(/'([^']*)'/g,`<span class="sql-str-code">'$1'</span>`);
+  h=h.replace(/--[^\n]*/g,m=>`<span class="sql-cm-code">${m}</span>`);
+  return h;
+}
+
+function bLearn(){
+  document.getElementById('conceptList').innerHTML=CT.concepts.map((c,i)=>`
+    <div class="concept-item">
+      <div class="c-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="c-text">${c.t}</div>
+    </div>`).join('');
+  document.getElementById('sqlCodeBlock').innerHTML=`
+    <div class="sql-block">
+      <div class="sql-block-label">Example SQL — ${CT.title}</div>
+      <pre>${syntaxHL(CT.sqlCode)}</pre>
+    </div>`;
+}
+
+function bVideo(){
+  document.getElementById('vFrame').src=`https://www.youtube.com/embed/${CT.vid}?rel=0&modestbranding=1`;
+  document.getElementById('vNote').textContent=CT.vidNote;
+}
+
+function bSandbox(){
+  const area=document.getElementById('sandboxArea');
+  area.innerHTML=`
+    <div class="sql-sandbox">
+      <div class="sandbox-header">
+        <span class="sandbox-title">🗄️ SQL SANDBOX — Try queries on our process mining dataset</span>
+        <button class="sandbox-run" onclick="execSQL()">▶ Run Query</button>
+      </div>
+      <div class="sandbox-body">
+        <textarea class="sandbox-textarea" id="sqlInput" rows="5" spellcheck="false">${CT.sandboxQuery}</textarea>
+        <div class="sandbox-result" id="sqlResult"></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">
+      Available tables: <code style="font-family:var(--mono);background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px;">cases</code> (case_id, customer, status, duration, region) &nbsp;·&nbsp;
+      <code style="font-family:var(--mono);background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px;">activities</code> (act_id, case_id, activity, resource, duration_s)
+    </div>
+    <a href="https://sqliteonline.com/" target="_blank" class="play-btn">
+      <span>🛝</span>
+      <div><div>Open SQLite Online for Full SQL</div><div class="play-btn-sub">Supports all SQL including window functions and complex CTEs</div></div>
+      <span class="play-btn-arrow">→</span>
+    </a>`;
+}
+
+function execSQL(){
+  const query=document.getElementById('sqlInput').value;
+  const result=runSQL(query);
+  const el=document.getElementById('sqlResult');
+  if(result.err){
+    el.innerHTML=`<div class="result-err">${result.err}</div>`;
+  } else if(result.msg){
+    el.innerHTML=`<div class="result-msg">${result.msg}</div>`;
+  } else {
+    const rows=result.rows.slice(0,20);
+    el.innerHTML=`
+      <div class="result-label">Results — ${result.rows.length} row${result.rows.length!==1?'s':''}</div>
+      <div style="overflow-x:auto;">
+        <table class="result-table">
+          <thead><tr>${result.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+          <tbody>${rows.map(r=>`<tr>${r.map(v=>`<td>${v??'NULL'}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+  }
+}
+
+function bQuiz(){
+  const w=document.getElementById('quizWrap');
+  if(qIdx>=CT.quiz.length){
+    const s=qAns.filter(Boolean).length;
+    w.style.display='none';
+    document.getElementById('scoreBox').classList.add('show');
+    const p=Math.round(s/CT.quiz.length*100);
+    document.getElementById('scoreBig').textContent=`${s}/${CT.quiz.length}`;
+    document.getElementById('scoreLbl').textContent=p>=80?'🎉 Excellent! Topic mastered!':p>=60?'👍 Good — try again for full XP!':'💪 Keep practicing!';
+    if(p>=60&&!S.qScores[CT.id]){
+      S.qScores[CT.id]=s;
+      const g=Math.round(s/CT.quiz.length*CT.xp);
+      S.xp=(S.xp||0)+g;
+      if(p>=80)S.done[CT.id]=true;
+      save();refresh();toast('⚡',`+${g} XP earned!`);
+    }
+    return;
+  }
+  const q=CT.quiz[qIdx];
+  const K=['A','B','C','D'];
+  w.innerHTML=`
+    <div class="quiz-box">
+      <div class="quiz-counter">Question ${qIdx+1} of ${CT.quiz.length}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts">
+        ${q.o.map((o,i)=>`<button class="quiz-opt" onclick="ansQ(${i})" id="o${i}"><span class="opt-k">${K[i]}</span>${o}</button>`).join('')}
+      </div>
+      <div class="quiz-fb" id="qfb"></div>
+    </div>
+    <div class="quiz-nav"><button class="btn btn-ghost" onclick="skipQ()">Skip →</button></div>`;
+}
+
+function ansQ(idx){
+  const q=CT.quiz[qIdx];
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
+  const ok=idx===q.c;
+  document.getElementById('o'+idx).classList.add(ok?'correct':'wrong');
+  if(!ok)document.getElementById('o'+q.c).classList.add('correct');
+  qAns.push(ok);
+  const fb=document.getElementById('qfb');
+  fb.textContent=(ok?'✓ Correct! ':'✗ Incorrect. ')+q.e;
+  fb.classList.add('show',ok?'ok':'bad');
+  setTimeout(()=>{qIdx++;bQuiz();},1700);
+}
+function skipQ(){qAns.push(false);qIdx++;bQuiz();}
+function retryQuiz(){
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+}
+
+function bFC(){
+  const fc=CT.fc[fcIdx];
+  document.getElementById('fcFront').textContent=fc.f;
+  document.getElementById('fcBack').textContent=fc.b;
+  document.getElementById('fcCount').textContent=`${fcIdx+1} / ${CT.fc.length}`;
+  document.getElementById('fcScene').classList.remove('flipped');
+}
+function flipFC(){document.getElementById('fcScene').classList.toggle('flipped');}
+function nextFC(){fcIdx=(fcIdx+1)%CT.fc.length;bFC();}
+function prevFC(){fcIdx=(fcIdx-1+CT.fc.length)%CT.fc.length;bFC();}
+function markKnown(){toast('✓','Marked as known!');nextFC();}
+
+function bChallenge(){
+  document.getElementById('chList').innerHTML=CT.ch.map((c,i)=>{
+    const k=`${CT.id}_${i}`,done=S.chDone[k];
+    return `<div class="ch-item">
+      <div class="ch-hd"><div class="ch-title">${i+1}. ${c.t}</div><div class="ch-xp">+${c.xp} XP</div></div>
+      <div class="ch-desc">${c.d}</div>
+      <button class="ch-btn ${done?'done':''}" onclick="doCh('${k}',${c.xp})">${done?'✅ Completed!':'☐ Mark as Complete'}</button>
+    </div>`;
+  }).join('');
+}
+function doCh(k,xp){
+  if(S.chDone[k])return;
+  S.chDone[k]=true;S.xp=(S.xp||0)+xp;
+  save();refresh();bChallenge();toast('⚡',`+${xp} XP! Challenge done!`);
+}
+
+function bResources(){
+  document.getElementById('resList').innerHTML=CT.res.map(r=>`
+    <a href="${r.u}" target="_blank" class="res-item">
+      <div class="res-icon">${r.i}</div>
+      <div><div class="res-name">${r.n}</div><div class="res-meta">${r.m}</div></div>
+      <div class="res-tag">${r.t}</div>
+    </a>`).join('');
+}
+
+let tT;
+function toast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tIcon').textContent=icon;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(tT);
+  tT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+init();
+</script>
+</body>
+</html>

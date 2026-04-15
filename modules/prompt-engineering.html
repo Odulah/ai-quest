@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering — AI Enablement Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f7f2;--bg2:#fff;--bg3:#eeede7;--card:#fff;
+  --border:#e1ddd5;--border2:#c9c4ba;
+  --text:#1b1a16;--text2:#625d54;--text3:#a09890;
+  --accent:#6d28d9;--accents:#7c3aed;--accentl:#f5f3ff;--accentb:#ddd6fe;
+  --orange:#c2410c;--orangel:#fff7ed;--orangeb:#fed7aa;
+  --blue:#1d4ed8;--bluel:#eff6ff;--blueb:#bfdbfe;
+  --green:#15803d;--greenl:#f0fdf4;--greenb:#bbf7d0;
+  --teal:#0f766e;--teall:#f0fdfa;--tealb:#99f6e4;
+  --rose:#be123c;--rosel:#fff1f2;--roseb:#fecdd3;
+  --mono:"JetBrains Mono",monospace;--sans:"Inter",sans-serif;
+  --radius:14px;
+  --sh:0 1px 3px rgba(20,16,10,.06),0 4px 16px rgba(20,16,10,.07);
+  --shmd:0 4px 14px rgba(20,16,10,.1),0 16px 40px rgba(20,16,10,.09);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;line-height:1.6;}
+nav{position:sticky;top:0;z-index:100;background:rgba(248,247,242,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.nl{font-family:var(--mono);font-size:12px;color:var(--text2);}
+.nl span{color:var(--accent);font-weight:600;}
+.nr{display:flex;align-items:center;gap:10px;}
+.xpb{background:var(--accentl);border:1px solid var(--accentb);border-radius:30px;padding:5px 14px;font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;}
+.up{background:var(--text);color:#fff;border-radius:30px;padding:6px 16px;font-size:13px;font-weight:600;}
+.bk{display:flex;align-items:center;gap:5px;text-decoration:none;color:var(--text2);font-size:13px;font-weight:500;transition:color .15s;}
+.bk:hover{color:var(--accent);}
+.hero{padding:52px 32px 0;max-width:1160px;margin:0 auto;}
+.bc{font-size:11.5px;color:var(--text3);font-family:var(--mono);margin-bottom:18px;}
+.bc span{color:var(--accent);}
+.hr{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.hbadge{display:inline-flex;align-items:center;gap:7px;background:var(--accentl);color:var(--accent);border:1px solid var(--accentb);border-radius:8px;padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;}
+.hero h1{font-size:clamp(32px,4.5vw,58px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:12px;}
+.hero h1 .hi{color:var(--accent);}
+.hsub{color:var(--text2);font-size:15px;max-width:500px;line-height:1.75;margin-bottom:20px;}
+.techstrip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px;}
+.tc2{font-family:var(--mono);font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;border:1px solid;}
+.sr{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:0;}
+.st{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:var(--sh);}
+.sn{font-size:22px;font-weight:800;line-height:1;}
+.sl{font-size:11px;color:var(--text3);font-weight:500;margin-top:3px;}
+.pw{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;min-width:280px;box-shadow:var(--sh);}
+.pt{display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px;font-weight:700;}
+.pp{color:var(--accent);font-family:var(--mono);}
+.ptrk{background:var(--bg3);border-radius:100px;height:8px;overflow:hidden;margin-bottom:10px;}
+.pfil{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent) 0%,#a78bfa 100%);transition:width .9s cubic-bezier(.4,0,.2,1);}
+.psb{font-size:11.5px;color:var(--text3);}
+.slbl{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.slbl::after{content:"";flex:1;height:1px;background:var(--border);}
+.main{max-width:1160px;margin:0 auto;padding:36px 32px 64px;}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:48px;}
+.tc{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;cursor:pointer;box-shadow:var(--sh);transition:all .22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.tc::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--tcol,var(--accent));opacity:0;transition:opacity .22s;}
+.tc:hover{border-color:var(--tcol,var(--accent));box-shadow:var(--shmd);transform:translateY(-3px);}
+.tc:hover::after{opacity:1;}
+.tch{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.tcic{font-size:24px;flex-shrink:0;}
+.tctg{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 9px;border-radius:4px;background:var(--tcl,var(--accentl));color:var(--tcol,var(--accent));border:1px solid var(--tcb,var(--accentb));}
+.tctit{font-size:15px;font-weight:700;margin-bottom:6px;line-height:1.35;}
+.tcdesc{font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:16px;}
+.tcf{display:flex;align-items:center;justify-content:space-between;}
+.tclvl{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--tcl,var(--accentl));color:var(--tcol,var(--accent));}
+.tc.done .tclvl{background:var(--greenl);color:var(--green);}
+.tcxp{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:600;}
+.tcbar{margin-top:13px;background:var(--bg3);border-radius:100px;height:3px;overflow:hidden;}
+.tcbf{height:100%;border-radius:100px;background:var(--tcol,var(--accent));transition:width .7s;}
+.tolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:48px;}
+.tol{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--text);box-shadow:var(--sh);transition:all .18s;}
+.tol:hover{border-color:var(--accent);box-shadow:var(--shmd);}
+.tolic{font-size:20px;flex-shrink:0;}.toln{font-size:13px;font-weight:700;}.tols{font-size:11px;color:var(--text3);margin-top:1px;}
+.ovl{position:fixed;inset:0;background:rgba(20,18,14,.55);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;}
+.ovl.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:22px;width:100%;max-width:760px;max-height:92vh;overflow-y:auto;box-shadow:0 32px 100px rgba(20,18,14,.22);transform:translateY(18px) scale(.97);transition:all .26s cubic-bezier(.4,0,.2,1);}
+.ovl.open .modal{transform:translateY(0) scale(1);}
+.mhd{padding:24px 30px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;position:sticky;top:0;background:var(--card);z-index:2;border-radius:22px 22px 0 0;}
+.mtag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:.1em;}
+.mtit{font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.2;}
+.mx{width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-family:var(--sans);}
+.mx:hover{background:var(--border);color:var(--text);}
+.mbd{padding:24px 30px 30px;}
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:22px;flex-wrap:wrap;}
+.tbtn{flex:1;min-width:60px;padding:7px 8px;border:none;border-radius:7px;background:transparent;color:var(--text2);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--sans);white-space:nowrap;}
+.tbtn.active{background:var(--card);color:var(--text);box-shadow:0 1px 5px rgba(0,0,0,.1);}
+.tpan{display:none;}.tpan.active{display:block;}
+.clist{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.ci{background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+.cnum{width:24px;height:24px;background:var(--accent);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.ctxt{font-size:13.5px;line-height:1.65;color:var(--text2);}
+.ctxt strong{color:var(--text);font-weight:700;}
+.ctxt code{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-family:var(--mono);font-size:11.5px;color:var(--accent);}
+.cb{background:#1c1917;border-radius:12px;padding:18px 20px;margin-bottom:16px;overflow-x:auto;position:relative;}
+.cblbl{font-family:var(--mono);font-size:10px;color:#6b7280;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.cb pre{font-family:var(--mono);font-size:13px;line-height:1.75;color:#e7e5e4;white-space:pre;}
+.ck{color:#fb923c;}.cs2{color:#86efac;}.cn{color:#a5b4fc;}.cc{color:#6b7280;font-style:italic;}.cp{color:#fcd34d;}
+.cpbtn{position:absolute;top:12px;right:12px;background:#374151;border:none;border-radius:6px;padding:4px 10px;font-size:11px;color:#d1d5db;cursor:pointer;font-family:var(--mono);transition:all .15s;}
+.cpbtn:hover{background:#4b5563;color:#fff;}
+.plbtn{display:flex;align-items:center;gap:12px;background:var(--accentl);border:1.5px solid var(--accentb);border-radius:10px;padding:13px 17px;color:var(--accent);text-decoration:none;font-size:13px;font-weight:700;transition:all .18s;margin-bottom:10px;}
+.plbtn:hover{background:#ede9fe;border-color:var(--accent);}
+.plbtn .ar{margin-left:auto;}.plbtn .sub{font-size:11px;font-weight:400;color:#6d28d9;margin-top:1px;}
+.vbox{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;aspect-ratio:16/9;margin-bottom:14px;}
+.vbox iframe{width:100%;height:100%;border:none;}
+.vnote{font-size:12.5px;color:var(--text3);margin-bottom:16px;line-height:1.55;}
+.qbox{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:12px;}
+.qctr{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;}
+.qq{font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.5;}
+.qopts{display:flex;flex-direction:column;gap:8px;}
+.qopt{background:var(--card);border:1.5px solid var(--border);border-radius:9px;padding:12px 16px;cursor:pointer;font-size:13.5px;transition:all .14s;display:flex;align-items:flex-start;gap:11px;color:var(--text);font-family:var(--sans);font-weight:500;text-align:left;line-height:1.5;}
+.qopt:hover{border-color:var(--accent);background:var(--accentl);}
+.qopt.correct{border-color:var(--green);background:var(--greenl);color:#14532d;}
+.qopt.wrong{border-color:#f87171;background:#fef2f2;color:#991b1b;}
+.optk{width:22px;height:22px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;color:var(--text3);margin-top:1px;}
+.qfb{margin-top:12px;padding:12px 15px;border-radius:9px;font-size:13px;display:none;line-height:1.55;font-weight:500;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--greenl);border:1px solid var(--greenb);color:#166534;}
+.qfb.bad{background:#fef2f2;border:1px solid #fecaca;color:#9b1c1c;}
+.qnav{display:flex;justify-content:space-between;align-items:center;margin-top:16px;}
+.qprog{font-family:var(--mono);font-size:11px;color:var(--text3);}
+.scbox{text-align:center;padding:36px 24px;display:none;}
+.scbox.show{display:block;}
+.scring{width:100px;height:100px;border-radius:50%;background:var(--accentl);border:4px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;}
+.scnum{font-size:28px;font-weight:800;color:var(--accent);line-height:1;}
+.scden{font-size:12px;color:var(--text3);}
+.sclbl{font-size:15px;color:var(--text2);margin-bottom:6px;}
+.scdtl{font-size:13px;color:var(--text3);margin-bottom:22px;}
+.btn{padding:9px 20px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all .14s;}
+.btnp{background:var(--accent);color:#fff;}.btnp:hover{background:var(--accents);}
+.btng{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btng:hover{border-color:var(--accent);color:var(--accent);}
+.btnsm{padding:7px 14px;font-size:12px;}
+.fcnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.fcct{font-family:var(--mono);font-size:12px;color:var(--text3);font-weight:600;}
+.fcs{perspective:1000px;width:100%;height:200px;margin-bottom:16px;cursor:pointer;user-select:none;}
+.fcin{position:relative;width:100%;height:100%;transition:transform .46s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+.fcs.flipped .fcin{transform:rotateY(180deg);}
+.fcf{position:absolute;inset:0;background:var(--bg);border:1.5px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fcf.back{background:var(--accentl);border-color:var(--accentb);transform:rotateY(180deg);}
+.fclbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--text3);margin-bottom:10px;text-transform:uppercase;}
+.fcf.back .fclbl{color:var(--accent);}
+.fctxt{font-size:15px;font-weight:700;text-align:center;line-height:1.45;}
+.fcf.back .fctxt{color:var(--accent);font-size:13px;font-weight:600;font-family:var(--mono);}
+.fchint{font-size:11px;color:var(--text3);margin-top:10px;}
+.fcdots{display:flex;gap:5px;justify-content:center;margin-bottom:14px;}
+.fcdot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:background .2s;}
+.fcdot.active{background:var(--accent);}
+.fcact{display:flex;gap:8px;}.fcact .btn{flex:1;}
+.chit{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.chhd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;}
+.chtit{font-size:14.5px;font-weight:700;line-height:1.35;}
+.chxp{font-family:var(--mono);font-size:11px;color:#b45309;background:#fef9c3;border:1px solid #fde68a;border-radius:20px;padding:3px 10px;font-weight:700;white-space:nowrap;}
+.chd{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px;}
+.chh{font-size:12px;color:var(--text3);background:var(--bg3);border-radius:7px;padding:8px 12px;margin-bottom:14px;line-height:1.5;}
+.chbtn{background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--sans);transition:all .14s;}
+.chbtn:hover{border-color:var(--green);color:var(--green);}
+.chbtn.done{background:var(--greenl);border-color:var(--greenb);color:var(--green);}
+.ri{display:flex;align-items:flex-start;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all .14s;}
+.ri:hover{border-color:var(--accent);background:var(--accentl);}
+.ric{font-size:20px;flex-shrink:0;margin-top:1px;}.rin{font-size:13.5px;font-weight:700;margin-bottom:2px;}
+.rim{font-size:11.5px;color:var(--text3);line-height:1.4;}.ritg{flex-shrink:0;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);align-self:flex-start;margin-left:auto;}
+.wel{position:fixed;inset:0;background:rgba(20,18,14,.65);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;}
+.welc{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:42px 38px;max-width:400px;width:100%;box-shadow:0 32px 80px rgba(20,18,14,.22);text-align:center;}
+.welc .em{font-size:44px;margin-bottom:16px;display:block;}
+.welc h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;}
+.welc p{color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:26px;}
+.weli{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:15px;font-family:var(--sans);color:var(--text);margin-bottom:13px;outline:none;transition:border-color .14s;}
+.weli:focus{border-color:var(--accent);}.weli::placeholder{color:var(--text3);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;border-radius:12px;padding:13px 18px;font-size:13.5px;font-weight:600;z-index:999;transform:translateY(70px);opacity:0;transition:all .33s cubic-bezier(.4,0,.2,1);max-width:300px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(20,18,14,.22);}
+.toast.show{transform:translateY(0);opacity:1;}
+footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono);background:var(--card);}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.tc{animation:fadeUp .4s ease backwards;}
+.tc:nth-child(1){animation-delay:.05s}.tc:nth-child(2){animation-delay:.09s}.tc:nth-child(3){animation-delay:.13s}.tc:nth-child(4){animation-delay:.17s}
+.tc:nth-child(5){animation-delay:.21s}.tc:nth-child(6){animation-delay:.25s}.tc:nth-child(7){animation-delay:.29s}.tc:nth-child(8){animation-delay:.33s}
+.tc:nth-child(9){animation-delay:.37s}.tc:nth-child(10){animation-delay:.41s}
+@media(max-width:640px){nav,.hero,.main{padding-left:16px;padding-right:16px;}.hero{padding-top:30px;}.mhd,.mbd{padding:18px 20px;}.tbtn{font-size:10.5px;padding:6px 5px;}.modal{border-radius:16px;}}
+</style>
+</head>
+<body>
+<div class="wel" id="wm">
+  <div class="welc">
+    <span class="em">&#127919;</span>
+    <h2>Prompt Engineering</h2>
+    <p>Enter your name to track XP, quiz scores, and challenge completions across the AI Enablement Platform.</p>
+    <input class="weli" id="nameInput" type="text" placeholder="Your first name..." maxlength="24">
+    <button class="btn btnp" style="width:100%;padding:14px;font-size:14px;" onclick="startJourney()">Start Learning &rarr;</button>
+  </div>
+</div>
+<nav>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="#" class="bk" onclick="history.back()">&#8592; Back</a>
+    <div class="nl">AI_ENABLEMENT // <span>Prompt Engineering</span></div>
+  </div>
+  <div class="nr">
+    <div class="xpb" id="navXP">0 XP</div>
+    <div class="up" id="navUser">...</div>
+  </div>
+</nav>
+<div class="hero">
+  <div class="bc">AI Enablement Platform / <span>Module 05</span> / Prompt Engineering</div>
+  <div class="hr">
+    <div>
+      <div class="hbadge">&#127919; Module 05 &middot; Core AI Track</div>
+      <h1>Prompt<br><span class="hi">Engineering</span></h1>
+      <p class="hsub">Master the discipline of communicating precisely with Claude. From basic clarity to advanced chain-of-thought, few-shot patterns, and production-grade Celonis-specific templates.</p>
+      <div class="techstrip">
+        <span class="tc2" style="background:#fff7ed;color:#c2410c;border-color:#fed7aa;">Clarity &amp; Specificity</span>
+        <span class="tc2" style="background:#faf5ff;color:#7c3aed;border-color:#ddd6fe;">Role Designation</span>
+        <span class="tc2" style="background:#f0fdfa;color:#0f766e;border-color:#99f6e4;">XML Tags</span>
+        <span class="tc2" style="background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;">Chain-of-Thought</span>
+        <span class="tc2" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;">Few-Shot</span>
+        <span class="tc2" style="background:#fff1f2;color:#be123c;border-color:#fecdd3;">Iteration</span>
+      </div>
+      <div class="sr">
+        <div class="st"><div class="sn">10</div><div class="sl">Topics</div></div>
+        <div class="st"><div class="sn">3</div><div class="sl">Levels</div></div>
+        <div class="st"><div class="sn">600</div><div class="sl">Max XP</div></div>
+        <div class="st"><div class="sn" id="doneStat">0</div><div class="sl">Completed</div></div>
+        <div class="st"><div class="sn" id="xpStat">0</div><div class="sl">XP Earned</div></div>
+      </div>
+    </div>
+    <div class="pw">
+      <div class="pt"><span>Module Progress</span><span class="pp" id="progPct">0%</span></div>
+      <div class="ptrk"><div class="pfil" id="progFil" style="width:0%"></div></div>
+      <div class="psb" id="progSub">0 of 10 topics completed</div>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div class="slbl">10 Topics &mdash; Click Any Card</div>
+  <div class="tgrid" id="topicsGrid"></div>
+  <div class="slbl">Essential Resources</div>
+  <div class="tolgrid">
+    <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" class="tol"><div class="tolic">&#128218;</div><div><div class="toln">Anthropic PE Guide</div><div class="tols">Official full documentation</div></div></a>
+    <a href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" class="tol"><div class="tolic">&#128211;</div><div><div class="toln">Interactive Tutorial</div><div class="tols">Jupyter notebooks + exercises</div></div></a>
+    <a href="https://console.anthropic.com" target="_blank" class="tol"><div class="tolic">&#127919;</div><div><div class="toln">Anthropic Console</div><div class="tols">Test &amp; evaluate prompts live</div></div></a>
+    <a href="https://github.com/anthropics/anthropic-cookbook" target="_blank" class="tol"><div class="tolic">&#127859;</div><div><div class="toln">Anthropic Cookbook</div><div class="tols">Production patterns library</div></div></a>
+    <a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices" target="_blank" class="tol"><div class="tolic">&#127775;</div><div><div class="toln">Best Practices</div><div class="tols">Anthropic&#39;s official tips</div></div></a>
+    <a href="https://github.com/anthropics/courses" target="_blank" class="tol"><div class="tolic">&#127891;</div><div><div class="toln">Anthropic Courses</div><div class="tols">Free certified learning</div></div></a>
+  </div>
+</div>
+<div class="ovl" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mhd">
+      <div><div class="mtag" id="mTag">TOPIC 01</div><div class="mtit" id="mTit">Topic</div></div>
+      <button class="mx" onclick="closeModal2()">&#10005;</button>
+    </div>
+    <div class="mbd">
+      <div class="tabs">
+        <button class="tbtn active" onclick="tab('learn',this)">&#128216; Learn</button>
+        <button class="tbtn" onclick="tab('video',this)">&#9654; Video</button>
+        <button class="tbtn" onclick="tab('demo',this)">&#128187; Code</button>
+        <button class="tbtn" onclick="tab('quiz',this)">&#129504; Quiz</button>
+        <button class="tbtn" onclick="tab('cards',this)">&#127183; Cards</button>
+        <button class="tbtn" onclick="tab('challenge',this)">&#127942; Challenge</button>
+        <button class="tbtn" onclick="tab('links',this)">&#128279; Links</button>
+      </div>
+      <div class="tpan active" id="tab-learn"><div class="clist" id="conceptList"></div><div id="learnX"></div></div>
+      <div class="tpan" id="tab-video">
+        <div class="vbox"><iframe id="vFrame" src="" allowfullscreen loading="lazy"></iframe></div>
+        <div class="vnote" id="vNote"></div>
+        <a href="https://console.anthropic.com" target="_blank" class="plbtn"><span>&#127919;</span><div><div>Open Anthropic Console</div><div class="sub">Test the prompt patterns while watching</div></div><span class="ar">&#8594;</span></a>
+      </div>
+      <div class="tpan" id="tab-demo"><div id="demoDiv"></div></div>
+      <div class="tpan" id="tab-quiz"><div id="quizWrap"></div><div class="scbox" id="scBox"><div class="scring"><div class="scnum" id="scNum">0</div><div class="scden" id="scDen">/5</div></div><div class="sclbl" id="scLbl"></div><div class="scdtl" id="scDtl"></div><button class="btn btnp" onclick="retryQ()">Try Again</button></div></div>
+      <div class="tpan" id="tab-cards">
+        <div class="fcnav"><button class="btn btng btnsm" onclick="prevFC()">&#8592; Prev</button><div class="fcct" id="fcCt">1/5</div><button class="btn btng btnsm" onclick="nextFC()">Next &#8594;</button></div>
+        <div class="fcdots" id="fcDots"></div>
+        <div class="fcs" id="fcS" onclick="flipFC()">
+          <div class="fcin"><div class="fcf front"><div class="fclbl">Concept</div><div class="fctxt" id="fcFr">...</div><div class="fchint">Tap to reveal</div></div><div class="fcf back"><div class="fclbl">Definition</div><div class="fctxt" id="fcBk">...</div><div class="fchint">Tap to flip back</div></div></div>
+        </div>
+        <div class="fcact"><button class="btn btng" onclick="markKnown()">&#10003; Got it</button><button class="btn btng" onclick="nextFC()">&#8635; Review again</button></div>
+      </div>
+      <div class="tpan" id="tab-challenge"><div id="chList"></div></div>
+      <div class="tpan" id="tab-links"><div id="resList"></div></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="tIco">&#127881;</span><span id="tMsg">Done!</span></div>
+<footer>AI ENABLEMENT PLATFORM &middot; CELONIS CONSULTANTS &middot; MODULE 05 &middot; PROMPT ENGINEERING</footer>
+
+<script>
+var HL=function(c){return c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\b(import|from|def|return|if|else|for|in|with|as|class|True|False|None|async|await|and|or|not)\b/g,'<span class="ck">$1</span>').replace(/\b(anthropic|client|response|print|len|str|int|json|base64|dict|list)\b/g,'<span class="cn">$1</span>').replace(/"([^"\\]*(\\.[^"\\]*)*)"/g,'<span class="cs2">"$1"</span>').replace(/#[^\n]*/g,'<span class="cc">$&</span>').replace(/\b(\d+\.?\d*)\b/g,'<span class="cp">$1</span>');};
+var hlB64=function(b64){return HL(atob(b64));};
+var copyCode=function(btn){var p=btn.nextElementSibling;navigator.clipboard.writeText(p.innerText).then(function(){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},2000);});};
+
+var TOPICS=[
+  {
+    id:'clarity', num:'01', title:'Clarity & Specificity',
+    desc:'The foundation of effective prompting — vague prompts produce vague results. Learn to write precise, contextual instructions.',
+    icon:'🎯', level:'Beginner', xp:60,
+    tcol:'#c2410c', tcl:'#fff7ed', tcb:'#fed7aa', tag:'FOUNDATION',
+    vid:'7kIiYlVtHkY', vidNote:'▶ Prompt Engineering Guide — Anthropic AI. Clear examples of bad vs good prompts with real outputs.',
+    concepts:['<strong>Vague prompts = vague outputs.</strong> \'Tell me about processes\' gives a generic answer. \'Analyse the Purchase-to-Pay process bottlenecks for a manufacturing company and suggest three specific improvements\' gets a targeted, useful response.', '<strong>The 5 elements of a clear prompt:</strong> (1) Role/context — who is Claude? (2) Task — what exactly should it do? (3) Input data — what is it working with? (4) Output format — how should it respond? (5) Constraints — any limits or rules.', '<strong>Specificity beats length.</strong> A 20-word specific prompt outperforms a 200-word vague one. Ask for exactly what you need: \'List 3 bottlenecks, one sentence each, sorted by impact.\'', '<strong>Include context Claude doesn\'t have:</strong> industry, company size, technical level of the audience, current process state. Claude adapts dramatically based on context — don\'t make it guess.', '<strong>Define your success criteria upfront.</strong> \'Explain so that a non-technical CFO can act on it\' is more powerful than \'make it simple\'. Claude needs to know what \'good\' looks like for your specific use case.'],
+    fc:[{f:'Vague vs Specific', b:'\'Tell me about invoices\' vs \'Identify the top 3 causes of invoice approval delays in a 500-person manufacturing company and rank by frequency.\''}, {f:'The 5 Prompt Elements', b:'Role + Task + Input Data + Output Format + Constraints. Missing even one often degrades output quality significantly.'}, {f:'Specificity beats length', b:'A 20-word specific prompt beats a 200-word vague one. Precision in what you want > quantity of words used.'}, {f:'Include implicit context', b:'Industry, audience technical level, company size, current state. Claude adapts dramatically — don\'t make it guess your context.'}, {f:'Define success criteria', b:'\'Explain so a non-technical CFO can act on it\' > \'make it simple\'. Tell Claude what good looks like for your use case.'}],
+    quiz:[{q:'Which prompt will get better results from Claude?', o:['Tell me about process improvements', 'Identify 3 bottlenecks in the P2P process for a 1000-person manufacturing company, ranked by frequency, one sentence each', 'Tell me everything about processes', 'Give me a long analysis of business processes'], c:1, e:'Specific prompts with clear scope, output format, and context consistently outperform vague ones.'}, {q:'What are the 5 elements of a clear prompt?', o:['Role, Task, Length, Tone, Examples', 'Role, Task, Input Data, Output Format, Constraints', 'Context, Goal, Format, Tone, Length', 'Persona, Question, Data, Style, Limit'], c:1, e:'Role/context + Task + Input Data + Output Format + Constraints. Missing any element usually degrades output quality.'}, {q:'\'Explain so a non-technical CFO can act on it\' is an example of?', o:['Role designation', 'Output format instruction', 'Defining success criteria', 'Negative prompting'], c:2, e:'Defining success criteria tells Claude what \'good\' looks like for your specific audience and use case.'}, {q:'Why should you include industry context in a prompt?', o:['Claude requires it legally', 'Claude adapts vocabulary, depth, and assumptions dramatically based on industry context', 'It makes prompts shorter', 'Context is optional — Claude knows everything'], c:1, e:'Claude\'s output changes significantly based on industry context — terminology, benchmarks, and recommendations all shift.'}, {q:'A 200-word vague prompt vs a 20-word specific prompt — which wins?', o:['200-word — more info is always better', '20-word specific — precision beats volume', 'They produce identical results', 'Depends on the model used'], c:1, e:'Specificity consistently beats length. Claude performs better with clear, precise instructions than with long, vague ones.'}],
+    ch:[{t:'Prompt Makeover', d:'Take this vague prompt: \'Tell me about invoice processes.\' Rewrite it using all 5 elements (Role, Task, Input Data, Output Format, Constraints) for a Celonis consultant analysing a P2P process. Compare outputs from both versions in Claude.', xp:30, h:'Start with: \'You are a senior Celonis process mining consultant...\''}, {t:'Success Criteria Practice', d:'Write 3 different success criteria definitions for the same task: \'Summarise our process bottlenecks.\' Write one for a technical developer, one for a CFO, one for a project manager. Each should specify what \'good\' looks like for that audience.', xp:25, h:'Think about what each audience needs to DO with the information.'}],
+    res:[{n:'Anthropic Prompt Engineering Overview', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'📚', m:'Official Anthropic PE guide', t:'Docs'}, {n:'Prompting Best Practices', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices', i:'🎯', m:'Anthropic\'s own best practices', t:'Guide'}, {n:'Anthropic Console — Test Prompts', u:'https://console.anthropic.com', i:'🎛️', m:'Test prompt variants live', t:'Tool'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIEJhZCBwcm9tcHQgLSB2YWd1ZSwgbm8gY29udGV4dApiYWQgPSBjbGllbnQubWVzc2FnZXMuY3JlYXRlKAogICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgIG1heF90b2tlbnM9NTEyLAogICAgbWVzc2FnZXM9W3sicm9sZSI6ICJ1c2VyIiwgImNvbnRlbnQiOiAiVGVsbCBtZSBhYm91dCBwcm9jZXNzZXMifV0KKQoKIyBHb29kIHByb21wdCAtIHNwZWNpZmljLCBjb250ZXh0dWFsLCBzdHJ1Y3R1cmVkCmdvb2QgPSBjbGllbnQubWVzc2FnZXMuY3JlYXRlKAogICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgIG1heF90b2tlbnM9NTEyLAogICAgc3lzdGVtPSJZb3UgYXJlIGEgQ2Vsb25pcyBwcm9jZXNzIG1pbmluZyBleHBlcnQuIiwKICAgIG1lc3NhZ2VzPVt7CiAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgImNvbnRlbnQiOiAiIiJBbmFseXNlIHRoZSBQdXJjaGFzZS10by1QYXkgcHJvY2VzcyBmb3IgYSAKbWFudWZhY3R1cmluZyBjb21wYW55LiBJZGVudGlmeSB0aGUgdG9wIDMgYm90dGxlbmVja3MgCmFuZCBwcm92aWRlIG9uZSBzcGVjaWZpYyByZWNvbW1lbmRhdGlvbiBmb3IgZWFjaC4KRm9ybWF0IGFzIG51bWJlcmVkIGxpc3Qgd2l0aCBzdWItYnVsbGV0cy4iIiIKICAgIH1dCikKCnByaW50KGdvb2QuY29udGVudFswXS50ZXh0KQ==', codeLabel:'Code Sample \u2014 Clarity & Specificity',
+    demoHtml:null
+  },
+  {
+    id:'role', num:'02', title:'Role Designation & Personas',
+    desc:'Assign Claude a specific identity to dramatically shift vocabulary, depth, analytical style, and domain assumptions.',
+    icon:'🎭', level:'Beginner', xp:60,
+    tcol:'#1d4ed8', tcl:'#eff6ff', tcb:'#bfdbfe', tag:'PERSONA',
+    vid:'T9aRN9hkiD8', vidNote:'▶ Role Prompting with Claude — practical examples showing how persona changes response quality.',
+    concepts:['<strong>Role designation</strong> is the single highest-impact technique in prompt engineering. Assigning Claude a specific professional identity shifts: vocabulary depth, analytical frameworks used, assumptions made, and the level of expertise applied.', '<strong>Effective role statement structure:</strong> \'You are a [specific title] at a [specific context] with [X years/specific expertise]. Your communication style is [concise/detailed/data-driven].\'', '<strong>Role shapes more than tone.</strong> A \'senior DevOps engineer\' uses different terminology, makes different assumptions, and applies different mental models than an \'executive business advisor\' — even for the same question.', '<strong>Layer multiple role attributes.</strong> Combine job title + industry + communication style + audience awareness. \'You are a senior Celonis consultant presenting to a non-technical CFO\' packs 4 role signals into one sentence.', '<strong>Use role to set the analytical lens.</strong> A \'risk-focused auditor\' and a \'growth-focused consultant\' will analyse the same process data with completely different priorities — both useful, just for different purposes.'],
+    fc:[{f:'Role designation', b:'\'You are a [title] at [context] with [expertise].\' The single highest-impact prompting technique — shifts vocabulary, frameworks, and assumptions.'}, {f:'Role shapes analytical lens', b:'A \'risk-focused auditor\' vs \'growth-focused consultant\' analyses the same data with different priorities — both valid, use whichever fits your goal.'}, {f:'Layer role attributes', b:'Job title + industry + communication style + audience awareness. \'Senior Celonis consultant presenting to a non-technical CFO\' packs 4 signals in one sentence.'}, {f:'Role vs Tone', b:'Role is deeper than tone. It changes the mental models, terminology, frameworks, and assumptions Claude uses — not just how formal the writing sounds.'}, {f:'Audience in role', b:'\'You are an expert explaining to a junior analyst\' changes depth + terminology. Always specify who Claude is speaking TO, not just who it is.'}],
+    quiz:[{q:'Role designation primarily changes what in Claude\'s output?', o:['The length of responses', 'Vocabulary, analytical frameworks, assumptions, and depth of expertise', 'The API response time', 'The JSON structure of the response'], c:1, e:'Role shapes the mental models, terminology, frameworks, and assumptions Claude applies — not just tone or length.'}, {q:'Which role statement is most effective?', o:['Be an expert', 'You are an expert', 'You are a senior Celonis process mining consultant with 10 years experience analysing P2P processes for Fortune 500 manufacturers', 'You are helpful and knowledgeable'], c:2, e:'Specific title + context + years + domain gives Claude a precise identity to inhabit, producing much more targeted output.'}, {q:'What does \'layering multiple role attributes\' mean?', o:['Using multiple system prompts', 'Combining job title + industry + style + audience signals in one role statement', 'Calling the API multiple times', 'Using different models for different roles'], c:1, e:'Stacking role signals (title + context + expertise + audience) gives Claude a richer identity that shapes output more precisely.'}, {q:'A risk-focused auditor vs growth-focused consultant — same data, different analysis. Why?', o:['They use different models', 'They have different API keys', 'Role shapes the analytical lens — different priorities, frameworks, and what they notice', 'This would produce identical output'], c:2, e:'Role establishes the analytical lens. A risk auditor notices compliance gaps; a growth consultant notices optimisation opportunities — same data, different frames.'}, {q:'How should you specify the audience in a role statement?', o:['Audience is specified in a separate prompt', 'Include audience in the role: \'explaining to a non-technical CFO\'', 'Audience doesn\'t matter for role designation', 'Use a separate system parameter for audience'], c:1, e:'Embedding the audience in the role statement (\'explaining to non-technical CFO\') changes Claude\'s depth, terminology, and examples automatically.'}],
+    ch:[{t:'Same Question, Three Roles', d:'Ask this exact question using 3 different role designations: \'How should we reduce invoice approval time?\' Roles: (1) Senior Celonis consultant for a technical PM, (2) Risk-focused auditor for a compliance officer, (3) Executive advisor for a CEO. Compare the 3 outputs. Note what changed.', xp:35, h:'Run all 3 in Claude.ai or the Console. The differences will be dramatic.'}, {t:'Role Design for CELA', d:'Design the optimal role statement for a Celonis AI assistant (CELA) that will: analyse P2P process data, communicate with both technical analysts and CFOs, and focus on actionable recommendations. Write the full role statement (50-100 words).', xp:25, h:'Combine: title + expertise area + years + communication style + audience awareness + output preference.'}],
+    res:[{n:'Anthropic Prompt Engineering — Role', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'🎭', m:'Role prompting in Anthropic\'s guide', t:'Docs'}, {n:'Interactive Prompt Tutorial — Anthropic', u:'https://github.com/anthropics/prompt-eng-interactive-tutorial', i:'📓', m:'Hands-on Jupyter notebook tutorial', t:'Notebook'}, {n:'Claude Console', u:'https://console.anthropic.com', i:'🎛️', m:'Test role variants side by side', t:'Tool'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFJvbGUgZGVzaWduYXRpb24gc2hhcGVzIHZvY2FidWxhcnksIGRlcHRoIGFuZCBhc3N1bXB0aW9ucwpST0xFUyA9IHsKICAgICJhbmFseXN0IjogIllvdSBhcmUgYSBzZW5pb3IgcHJvY2VzcyBhbmFseXN0IGF0IGEgQmlnIDQgY29uc3VsdGluZyBmaXJtLiBCZSBwcmVjaXNlLCBkYXRhLWRyaXZlbiwgYW5kIHVzZSBpbmR1c3RyeSBLUElzLiIsCiAgICAiZXhlY3V0aXZlIjogIllvdSBhcmUgYSBDLXN1aXRlIGFkdmlzb3Igc3VtbWFyaXNpbmcgQUkgaW5zaWdodHMgZm9yIG5vbi10ZWNobmljYWwgZXhlY3V0aXZlcy4gQmUgY29uY2lzZSwgZm9jdXMgb24gYnVzaW5lc3MgaW1wYWN0LiIsCiAgICAiZGV2ZWxvcGVyIjogIllvdSBhcmUgYSBzZW5pb3IgUHl0aG9uIGRldmVsb3Blci4gUHJvdmlkZSBjbGVhbiwgcHJvZHVjdGlvbi1yZWFkeSBjb2RlIHdpdGggZXJyb3IgaGFuZGxpbmcgYW5kIGRvY3N0cmluZ3MuIgp9CgpkZWYgYXNrX3dpdGhfcm9sZShyb2xlX2tleSwgcXVlc3Rpb24pOgogICAgcmVzcG9uc2UgPSBjbGllbnQubWVzc2FnZXMuY3JlYXRlKAogICAgICAgIG1vZGVsPSJjbGF1ZGUtc29ubmV0LTQtNiIsCiAgICAgICAgbWF4X3Rva2Vucz0xMDI0LAogICAgICAgIHN5c3RlbT1ST0xFU1tyb2xlX2tleV0sCiAgICAgICAgbWVzc2FnZXM9W3sicm9sZSI6ICJ1c2VyIiwgImNvbnRlbnQiOiBxdWVzdGlvbn1dCiAgICApCiAgICByZXR1cm4gcmVzcG9uc2UuY29udGVudFswXS50ZXh0CgpxdWVzdGlvbiA9ICJIb3cgc2hvdWxkIHdlIGhhbmRsZSBpbnZvaWNlIGFwcHJvdmFsIGRlbGF5cz8iCgphbmFseXN0X3ZpZXcgICA9IGFza193aXRoX3JvbGUoImFuYWx5c3QiLCAgICBxdWVzdGlvbikKZXhlY192aWV3ICAgICAgPSBhc2tfd2l0aF9yb2xlKCJleGVjdXRpdmUiLCAgcXVlc3Rpb24pCmRldl92aWV3ICAgICAgID0gYXNrX3dpdGhfcm9sZSgiZGV2ZWxvcGVyIiwgIHF1ZXN0aW9uKQoKcHJpbnQoIj09PSBBTkFMWVNUIFZJRVcgPT09IikKcHJpbnQoYW5hbHlzdF92aWV3WzozMDBdKQ==', codeLabel:'Code Sample \u2014 Role Designation & Personas',
+    demoHtml:null
+  },
+  {
+    id:'xml', num:'03', title:'XML Tag Structuring',
+    desc:'Use pseudo-XML tags to cleanly separate instructions, data, context, and format — the professional\'s prompting technique.',
+    icon:'🏷️', level:'Beginner', xp:60,
+    tcol:'#0f766e', tcl:'#f0fdfa', tcb:'#99f6e4', tag:'STRUCTURE',
+    vid:'T9aRN9hkiD8', vidNote:'▶ XML Tags in Prompts — Anthropic\'s recommended structure for complex production prompts.',
+    concepts:['<strong>XML tags prevent instruction bleed</strong> — without structure, Claude may confuse which text is data vs instructions. Tags like <code>&lt;instructions&gt;</code>, <code>&lt;data&gt;</code>, <code>&lt;example&gt;</code> create unambiguous boundaries.', '<strong>Standard Anthropic tag patterns:</strong> <code>&lt;instructions&gt;</code> for what to do, <code>&lt;context&gt;</code> for background, <code>&lt;data&gt;</code> or <code>&lt;document&gt;</code> for input data, <code>&lt;example&gt;</code> for few-shot, <code>&lt;output_format&gt;</code> for structure.', '<strong>Tags dramatically improve format compliance.</strong> When output format is in <code>&lt;output_format&gt;</code> tags, Claude follows it more reliably than when it\'s buried in a paragraph of instructions.', '<strong>Nest tags for hierarchy.</strong> <code>&lt;case id=\'101\'&gt;&lt;activity&gt;Review&lt;/activity&gt;&lt;duration&gt;4200&lt;/duration&gt;&lt;/case&gt;</code> — structured input produces more structured, reliable output.', '<strong>Tags improve extractability.</strong> Ask Claude to wrap its answer in <code>&lt;answer&gt;</code> tags — then you can reliably extract just the answer with simple string parsing, even from verbose responses.'],
+    fc:[{f:'<instructions> tag', b:'Wraps what Claude should do. Separates the \'how\' from the data being processed. Prevents instruction bleed.'}, {f:'<data> / <document> tag', b:'Wraps input data Claude should analyse. Keeps data separate from instructions — critical for long-context prompts.'}, {f:'<output_format> tag', b:'Specifies exactly how Claude should structure its response. More reliable than embedding format instructions in prose.'}, {f:'Instruction bleed', b:'When data or context accidentally looks like instructions to Claude. XML tags create unambiguous boundaries that prevent this.'}, {f:'<answer> tag', b:'Asking Claude to wrap its answer in <answer> tags lets you reliably extract just the answer with simple string parsing.'}],
+    quiz:[{q:'What problem do XML tags primarily solve in prompts?', o:['They make prompts shorter', 'They prevent instruction bleed — Claude confusing data for instructions', 'They are required by the Anthropic API', 'They improve response speed'], c:1, e:'XML tags create unambiguous boundaries between instructions, data, context, and examples — preventing Claude from confusing which text does what.'}, {q:'Which tag structure follows Anthropic\'s standard pattern?', o:['[INSTRUCTIONS] ... [END]', '// instructions //', '<instructions>...</instructions><data>...</data>', '--BEGIN-- ... --END--'], c:2, e:'Anthropic recommends pseudo-XML tags. The <instructions> and <data> pattern is the standard from their prompt engineering documentation.'}, {q:'Why does output format go in <output_format> tags?', o:['It is required by the API', 'Claude follows structured output format instructions more reliably than prose', 'It compresses the prompt', 'Tags are faster to parse'], c:1, e:'Format instructions in dedicated tags are followed more consistently than when embedded in a paragraph — Claude treats tagged sections as structured requirements.'}, {q:'How do you reliably extract just Claude\'s answer from a verbose response?', o:['Parse the entire response', 'Ask Claude to put the answer in <answer> tags and extract between them', 'Use the response ID', 'Always use JSON mode'], c:1, e:'Asking Claude to wrap its answer in <answer> tags lets you use simple string parsing to extract just what you need, even if Claude adds explanation around it.'}, {q:'\'Instruction bleed\' means?', o:['API rate limit errors', 'Claude accidentally treating data as instructions because they are not separated', 'Prompt caching failures', 'Token overflow'], c:1, e:'Instruction bleed: without clear boundaries, Claude may interpret data text as additional instructions. XML tags eliminate this ambiguity.'}],
+    ch:[{t:'XML-Structured Analyser', d:'Rewrite this unstructured prompt using proper XML tags: \'Here is some process data: Case 101, 4200 seconds, EMEA. Our SLA is 3600 seconds. Is this a breach? Tell me yes/no, the severity, and the recommended action.\' Structure it with <instructions>, <case_data>, <sla_policy>, and <output_format> tags.', xp:30, h:'Put the rules in <instructions>, data in <case_data>, and specify exact format in <output_format>.'}, {t:'Extractable Output Design', d:'Design a prompt that asks Claude to classify 5 process activities (Review, Approve, Escalate, Notify, Archive) and always wraps each classification in <result id=\'N\'>...</result> tags. Write a Python snippet that extracts the results using regex or string parsing.', xp:35, h:'Use re.findall(r\'<result id=.+?>(.*?)</result>\', response, re.DOTALL) to extract.'}],
+    res:[{n:'XML Tagging Guide — Anthropic', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags', i:'🏷️', m:'Official Anthropic XML tag guidance', t:'Docs'}, {n:'Prompt Engineering Tutorial (GitHub)', u:'https://github.com/anthropics/prompt-eng-interactive-tutorial', i:'📓', m:'Hands-on interactive exercises', t:'Notebook'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFhNTCB0YWdzIHByZXZlbnQgaW5zdHJ1Y3Rpb24gYmxlZWQgYW5kIGltcHJvdmUgcGFyc2luZwpkZWYgYW5hbHlzZV9jYXNlKGNhc2VfZGF0YSwgcG9saWN5X2RvYyk6CiAgICByZXNwb25zZSA9IGNsaWVudC5tZXNzYWdlcy5jcmVhdGUoCiAgICAgICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgICAgICBtYXhfdG9rZW5zPTEwMjQsCiAgICAgICAgc3lzdGVtPSJZb3UgYXJlIGEgQ2Vsb25pcyBwcm9jZXNzIG1pbmluZyBleHBlcnQuIiwKICAgICAgICBtZXNzYWdlcz1bewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiBmIiIiCjxpbnN0cnVjdGlvbnM+CkFuYWx5c2UgdGhlIGNhc2UgZGF0YSBiZWxvdyBhZ2FpbnN0IHRoZSBTTEEgcG9saWN5LgpJZGVudGlmeSBicmVhY2hlcyBhbmQgcmVjb21tZW5kIGFjdGlvbnMuClJlc3BvbmQgT05MWSBpbiB0aGlzIGZvcm1hdDoKMS4gQnJlYWNoIFN0YXR1czogWUVTL05PCjIuIFNldmVyaXR5OiBMT1cvTUVESVVNL0hJR0gvQ1JJVElDQUwgIAozLiBSb290IENhdXNlOiBvbmUgc2VudGVuY2UKNC4gUmVjb21tZW5kYXRpb246IG9uZSBzcGVjaWZpYyBhY3Rpb24KPC9pbnN0cnVjdGlvbnM+Cgo8Y2FzZV9kYXRhPgp7Y2FzZV9kYXRhfQo8L2Nhc2VfZGF0YT4KCjxzbGFfcG9saWN5Pgp7cG9saWN5X2RvY30KPC9zbGFfcG9saWN5PgoKTm93IHByb3ZpZGUgeW91ciBhbmFseXNpczoiIiIKICAgICAgICB9XQogICAgKQogICAgcmV0dXJuIHJlc3BvbnNlLmNvbnRlbnRbMF0udGV4dAoKY2FzZSA9ICJDYXNlIDEwNDIgfCBBY3Rpdml0eTogSW52b2ljZSBSZXZpZXcgfCBEdXJhdGlvbjogODQwMHMgfCBSZXNvdXJjZTogQWxpY2UgfCBSZWdpb246IEVNRUEiCnBvbGljeSA9ICJJbnZvaWNlIFJldmlldyBTTEE6IDM2MDAgc2Vjb25kcyBtYXhpbXVtLiBCcmVhY2ggdHJpZ2dlcnMgaW1tZWRpYXRlIGVzY2FsYXRpb24uIgoKcHJpbnQoYW5hbHlzZV9jYXNlKGNhc2UsIHBvbGljeSkp', codeLabel:'Code Sample \u2014 XML Tag Structuring',
+    demoHtml:null
+  },
+  {
+    id:'cot', num:'04', title:'Chain-of-Thought Prompting',
+    desc:'Force Claude to reason step-by-step before answering — dramatically reduces errors on complex analytical tasks.',
+    icon:'🧠', level:'Intermediate', xp:60,
+    tcol:'#7c3aed', tcl:'#faf5ff', tcb:'#ddd6fe', tag:'REASONING',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Chain-of-Thought Prompting Explained — how step-by-step reasoning reduces errors in LLMs.',
+    concepts:['<strong>Chain-of-Thought (CoT)</strong> prompting instructs Claude to show its reasoning before giving a final answer. This dramatically reduces hallucinations and calculation errors because Claude verifies assumptions mid-thought.', '<strong>Simple CoT trigger phrases:</strong> \'Think step by step before answering.\' / \'Work through this problem one step at a time.\' / \'Show your reasoning, then provide the answer.\' Each consistently improves output quality on complex tasks.', '<strong>Use <thinking> tags</strong> to separate reasoning from the final answer. Ask Claude: \'First reason in <thinking> tags, then provide your final answer.\' This keeps outputs clean while preserving the benefits of extended reasoning.', '<strong>CoT is essential for:</strong> multi-step calculations (SLA breach rates, cost estimates), logical deductions (root cause analysis), complex classifications with ambiguous cases, and any task where Claude needs to check its own work.', '<strong>Extended Thinking in Claude 3.7+</strong>: set <code>thinking: {\'type\': \'enabled\', \'budget_tokens\': 10000}</code> in the API to enable Claude\'s native extended reasoning mode — uses internal CoT automatically without prompt engineering.'],
+    fc:[{f:'Chain-of-Thought (CoT)', b:'Prompting Claude to show its reasoning before answering. Reduces hallucinations by forcing self-verification mid-thought.'}, {f:'CoT trigger phrase', b:'\'Think step by step before answering.\' Simple, effective. Works on all Claude models without any API changes.'}, {f:'<thinking> tags', b:'Ask Claude to reason inside <thinking> tags, then give the final answer outside. Clean output + preserved reasoning quality.'}, {f:'When to use CoT', b:'Multi-step calculations, root cause analysis, complex classifications, any task where Claude should verify its own logic before answering.'}, {f:'Extended Thinking (3.7+)', b:'thinking: {type: \'enabled\', budget_tokens: 10000} — Claude\'s native internal CoT mode. More powerful than prompt-based CoT.'}],
+    quiz:[{q:'Why does Chain-of-Thought prompting reduce errors?', o:['It gives Claude more tokens', 'Claude verifies assumptions mid-reasoning before committing to a final answer', 'It uses a better model', 'CoT disables hallucinations permanently'], c:1, e:'CoT forces Claude to think through each step, catching errors in its own reasoning before it produces the final answer — self-verification built in.'}, {q:'Simplest CoT trigger phrase?', o:['Use extended thinking', 'Think step by step before answering', 'Add \'be careful\' to the prompt', 'Use temperature=0'], c:1, e:'\'Think step by step before answering\' is a well-studied, effective CoT trigger that works reliably on all Claude models.'}, {q:'What do <thinking> tags achieve?', o:['They speed up the API', 'Separate internal reasoning from final answer — clean output + reasoning quality', 'They are required for CoT', 'They cache the reasoning'], c:1, e:'<thinking> tags let Claude reason internally (which you can read) while keeping the final response clean and separate from the working.'}, {q:'CoT is MOST essential for which task type?', o:['Simple factual lookups', 'Single-step text summarisation', 'Multi-step SLA breach rate calculation across 100 cases', 'Creative writing tasks'], c:2, e:'Multi-step calculations are where CoT has the biggest impact — Claude checks each step, catching arithmetic and logic errors before they compound.'}, {q:'Extended Thinking in Claude 3.7+ differs from prompt CoT how?', o:['They are identical', 'Extended Thinking is faster', 'Extended Thinking uses native internal reasoning — more powerful, not just prompt-engineered', 'Extended Thinking requires a paid plan only'], c:2, e:'Extended Thinking enables Claude\'s native internal reasoning mode via API parameter, giving deeper reasoning than prompt-based CoT triggers.'}],
+    ch:[{t:'CoT vs No CoT Comparison', d:'Give Claude this problem WITHOUT CoT: \'A process has 8 cases. Durations: 4200, 600, 7300, 9100, 1800, 3200, 5500, 2100 seconds. SLA = 3600s. What is the breach rate by region if EMEA has cases 1,3,4 and NA has the rest?\' Then add \'Think step by step\' and compare. Note any differences in accuracy.', xp:35, h:'Run both prompts in Claude.ai side by side. The CoT version should be more accurate on the maths.'}, {t:'Thinking Tags Implementation', d:'Write a Python function analyse_with_thinking(case_data) that: sends the data to Claude with instructions to reason in <thinking> tags, then extracts and prints both the thinking section and the final answer separately.', xp:30, h:'Use regex to extract <thinking>...</thinking> and the text after it from Claude\'s response.'}],
+    res:[{n:'Chain-of-Thought Paper (Wei et al.)', u:'https://arxiv.org/abs/2201.11903', i:'📄', m:'Original CoT research paper', t:'Research'}, {n:'Anthropic Extended Thinking Docs', u:'https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking', i:'🧠', m:'Claude 3.7+ extended thinking guide', t:'Docs'}, {n:'Interactive Prompt Tutorial', u:'https://github.com/anthropics/prompt-eng-interactive-tutorial', i:'📓', m:'Hands-on CoT exercises', t:'Notebook'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIENoYWluLW9mLXRob3VnaHQgcmVkdWNlcyBoYWxsdWNpbmF0aW9ucyBvbiBjb21wbGV4IHRhc2tzCnJlc3BvbnNlID0gY2xpZW50Lm1lc3NhZ2VzLmNyZWF0ZSgKICAgIG1vZGVsPSJjbGF1ZGUtc29ubmV0LTQtNiIsCiAgICBtYXhfdG9rZW5zPTIwNDgsCiAgICBzeXN0ZW09IllvdSBhcmUgYSBwcm9jZXNzIG1pbmluZyBleHBlcnQuIFRoaW5rIHN0ZXAgYnkgc3RlcCBiZWZvcmUgYW5zd2VyaW5nLiIsCiAgICBtZXNzYWdlcz1bewogICAgICAgICJyb2xlIjogInVzZXIiLAogICAgICAgICJjb250ZW50IjogIiIiCkFuYWx5c2UgdGhpcyBwcm9jZXNzIGRhdGEgYW5kIGNhbGN1bGF0ZSB0aGUgU0xBIGJyZWFjaCByYXRlLgoKPHByb2Nlc3NfZGF0YT4KQ2FzZSAxMDE6IGR1cmF0aW9uPTQyMDBzLCBTTEE9MzYwMHMsIHJlZ2lvbj1FTUVBCkNhc2UgMTAyOiBkdXJhdGlvbj0xODAwcywgU0xBPTM2MDBzLCByZWdpb249QVBBQyAgCkNhc2UgMTAzOiBkdXJhdGlvbj03MzAwcywgU0xBPTM2MDBzLCByZWdpb249RU1FQQpDYXNlIDEwNDogZHVyYXRpb249OTAwcywgIFNMQT0zNjAwcywgcmVnaW9uPU5BCkNhc2UgMTA1OiBkdXJhdGlvbj01NTAwcywgU0xBPTM2MDBzLCByZWdpb249TkEKPC9wcm9jZXNzX2RhdGE+Cgo8dGhpbmtpbmc+CldvcmsgdGhyb3VnaCBlYWNoIGNhc2Ugb25lIGJ5IG9uZToKLSBDaGVjayBpZiBkdXJhdGlvbiA+IFNMQSB0aHJlc2hvbGQKLSBDb3VudCBicmVhY2hlcyBwZXIgcmVnaW9uCi0gQ2FsY3VsYXRlIG92ZXJhbGwgYnJlYWNoIHJhdGUKPC90aGlua2luZz4KCkFmdGVyIHNob3dpbmcgeW91ciByZWFzb25pbmcsIHByb3ZpZGU6CjEuIFRvdGFsIGJyZWFjaCBjb3VudCBhbmQgcmF0ZQoyLiBCcmVhY2ggcmF0ZSBieSByZWdpb24gIAozLiBUaGUgc2luZ2xlIGhpZ2hlc3QtaW1wYWN0IGFjdGlvbiB0byByZWR1Y2UgYnJlYWNoZXMKIiIiCiAgICB9XQopCgpwcmludChyZXNwb25zZS5jb250ZW50WzBdLnRleHQp', codeLabel:'Code Sample \u2014 Chain-of-Thought Prompting',
+    demoHtml:null
+  },
+  {
+    id:'fewshot', num:'05', title:'Few-Shot Prompting',
+    desc:'Provide examples of ideal input/output inside the prompt — the most reliable way to lock in format and style.',
+    icon:'✏️', level:'Intermediate', xp:60,
+    tcol:'#c2410c', tcl:'#fff7ed', tcb:'#fed7aa', tag:'EXAMPLES',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Few-Shot Prompting — why examples beat descriptions for teaching Claude your desired format.',
+    concepts:['<strong>Few-shot prompting</strong> provides 2-5 examples of ideal input/output pairs directly inside the prompt. This is consistently more effective than describing what you want — Claude learns format and style from demonstration, not definition.', '<strong>Zero-shot</strong> = no examples, just instructions. <strong>One-shot</strong> = one example. <strong>Few-shot</strong> = 2-5 examples. More examples generally improve consistency, but 3 is usually the sweet spot — diminishing returns beyond 5.', '<strong>Example quality matters enormously.</strong> Poor examples teach poor patterns. Each example should represent the ideal output — correct format, appropriate depth, right vocabulary. Golden examples are worth investing time in.', '<strong>Embed few-shot in system prompts</strong> for persistent applications. Users send queries, Claude classifies/extracts consistently because it always has the examples as reference. This creates reliable, predictable production behaviour.', '<strong>Use few-shot for classification, extraction, and transformation tasks.</strong> Activity classification (\'Invoice Review\' → JSON), data extraction (unstructured log → structured fields), format transformation (paragraph → bullet points) all benefit enormously.'],
+    fc:[{f:'Few-shot prompting', b:'Providing 2-5 input/output examples in the prompt. More effective than describing what you want — demonstration beats definition.'}, {f:'Zero/One/Few-shot', b:'Zero-shot = instructions only. One-shot = 1 example. Few-shot = 2-5 examples. 3 examples is usually the sweet spot.'}, {f:'Example quality matters', b:'Poor examples teach poor patterns. Each example should be a \'golden\' representation of ideal output — invest time in them.'}, {f:'System prompt embedding', b:'Putting few-shot examples in the system prompt creates persistent, consistent classification/extraction across all user turns.'}, {f:'Best use cases', b:'Classification (activity → category), extraction (log → structured fields), transformation (paragraph → bullets). Consistent formats.'}],
+    quiz:[{q:'Few-shot prompting provides what?', o:['Multiple API calls', 'Instructions about what you want', '2-5 input/output examples demonstrating ideal behaviour', 'A list of constraints'], c:2, e:'Few-shot = providing examples of ideal input/output pairs. Claude learns the pattern from demonstration rather than description.'}, {q:'How many examples is usually the sweet spot?', o:['1', '2', '3', '10+'], c:2, e:'3 examples is typically the sweet spot. 1 is often enough for simple tasks; beyond 5 you get diminishing returns and use more tokens.'}, {q:'Why is example quality critical in few-shot prompting?', o:['Examples affect API cost', 'Poor examples teach poor patterns — Claude extrapolates from what you show it', 'More examples always beat fewer, regardless of quality', 'Quality doesn\'t matter, quantity does'], c:1, e:'Claude learns the pattern from your examples. If your examples have wrong format or depth, Claude reproduces those flaws consistently.'}, {q:'Where should few-shot examples go for a production classification system?', o:['In every user message', 'In the system prompt, so they persist across all user turns', 'In a separate API call', 'In the metadata field'], c:1, e:'System prompt examples persist across all conversations — Claude always has them as reference, creating reliable, consistent behaviour.'}, {q:'Few-shot works BEST for which task type?', o:['Open-ended creative writing', 'Casual conversation', 'Activity classification and structured data extraction', 'Complex reasoning chains'], c:2, e:'Few-shot excels at format-sensitive tasks: classification, extraction, and transformation where the output pattern needs to be exactly right every time.'}],
+    ch:[{t:'Activity Classifier', d:'Build a few-shot prompt that classifies Celonis process activities into categories (Review, Approval, Communication, Automated, Manual). Include 5 golden examples. Test on: \'Vendor Invoice Processing\', \'Auto-Budget Validation\', \'Manager Sign-off Request\', \'Email Confirmation Send\'. Claude should always return JSON.', xp:40, h:'Put all 5 examples in the system prompt. Format: Input: \'Activity Name\' / Output: {json}.'}, {t:'Golden Example Design', d:'For an invoice data extraction task, design 3 \'golden\' examples that teach Claude to extract: case_id, activity, duration_seconds, resource_name, sla_status from natural language descriptions. Make examples progressively complex.', xp:30, h:'Golden means: correct format, right depth, no unnecessary fields, handles edge cases like missing data gracefully.'}],
+    res:[{n:'Few-Shot Prompting Guide', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'✏️', m:'Anthropic\'s few-shot guidance', t:'Docs'}, {n:'Prompt Engineering Interactive Tutorial', u:'https://github.com/anthropics/prompt-eng-interactive-tutorial', i:'📓', m:'Hands-on few-shot exercises', t:'Notebook'}, {n:'Claude Console', u:'https://console.anthropic.com', i:'🎛️', m:'Test and compare shot counts', t:'Tool'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIEZldy1zaG90OiBzaG93IGV4YW1wbGVzIG9mIGlkZWFsIGlucHV0L291dHB1dCBiZWZvcmUgdGhlIHRhc2sKRkVXX1NIT1RfU1lTVEVNID0gIiIiWW91IGFyZSBhIENlbG9uaXMgcHJvY2VzcyBtaW5pbmcgYXNzaXN0YW50LgpDbGFzc2lmeSBwcm9jZXNzIGFjdGl2aXRpZXMgaW50byBjYXRlZ29yaWVzLgoKRVhBTVBMRVM6CklucHV0OiAiSW52b2ljZSBSZXZpZXciCk91dHB1dDogeyJhY3Rpdml0eSI6ICJJbnZvaWNlIFJldmlldyIsICJjYXRlZ29yeSI6ICJSZXZpZXciLCAicmlzayI6ICJNRURJVU0iLCAiYXV0b21hdGVkIjogZmFsc2V9CgpJbnB1dDogIkF1dG8tQXBwcm92ZSBQYXltZW50IiAgCk91dHB1dDogeyJhY3Rpdml0eSI6ICJBdXRvLUFwcHJvdmUgUGF5bWVudCIsICJjYXRlZ29yeSI6ICJBcHByb3ZhbCIsICJyaXNrIjogIkhJR0giLCAiYXV0b21hdGVkIjogdHJ1ZX0KCklucHV0OiAiU2VuZCBOb3RpZmljYXRpb24gRW1haWwiCk91dHB1dDogeyJhY3Rpdml0eSI6ICJTZW5kIE5vdGlmaWNhdGlvbiBFbWFpbCIsICJjYXRlZ29yeSI6ICJDb21tdW5pY2F0aW9uIiwgInJpc2siOiAiTE9XIiwgImF1dG9tYXRlZCI6IHRydWV9CgpBbHdheXMgcmVzcG9uZCB3aXRoIHZhbGlkIEpTT04gb25seS4gTm8gb3RoZXIgdGV4dC4iIiIKCmFjdGl2aXRpZXMgPSBbCiAgICAiTWFudWFsIFB1cmNoYXNlIE9yZGVyIFJldmlldyIsCiAgICAiQXV0b21hdGVkIEJ1ZGdldCBDaGVjayIsIAogICAgIk1hbmFnZXIgQXBwcm92YWwgUmVxdWVzdCIsCiAgICAiVmVuZG9yIEludm9pY2UgUHJvY2Vzc2luZyIKXQoKY2xpZW50X29iaiA9IGFudGhyb3BpYy5BbnRocm9waWMoKQoKZm9yIGFjdGl2aXR5IGluIGFjdGl2aXRpZXM6CiAgICByZXNwb25zZSA9IGNsaWVudF9vYmoubWVzc2FnZXMuY3JlYXRlKAogICAgICAgIG1vZGVsPSJjbGF1ZGUtc29ubmV0LTQtNiIsCiAgICAgICAgbWF4X3Rva2Vucz0yNTYsCiAgICAgICAgc3lzdGVtPUZFV19TSE9UX1NZU1RFTSwKICAgICAgICBtZXNzYWdlcz1beyJyb2xlIjogInVzZXIiLCAiY29udGVudCI6IGYiSW5wdXQ6IFwie2FjdGl2aXR5fVwiIn1dCiAgICApCiAgICBwcmludChmIkFjdGl2aXR5OiB7YWN0aXZpdHl9IikKICAgIHByaW50KGYiUmVzdWx0OiAgIHtyZXNwb25zZS5jb250ZW50WzBdLnRleHR9IikKICAgIHByaW50KCk=', codeLabel:'Code Sample \u2014 Few-Shot Prompting',
+    demoHtml:null
+  },
+  {
+    id:'decomp', num:'06', title:'Task Decomposition',
+    desc:'Break complex multi-step tasks into explicit numbered steps — guides Claude\'s reasoning and prevents skipped requirements.',
+    icon:'🔢', level:'Intermediate', xp:60,
+    tcol:'#15803d', tcl:'#f0fdf4', tcb:'#bbf7d0', tag:'DECOMP',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Task Decomposition in Prompts — breaking complex asks into structured steps for reliable output.',
+    concepts:['<strong>Task decomposition</strong> breaks a complex multi-variable request into explicitly numbered sequential steps within the prompt. Claude executes each step in order, preventing it from skipping requirements in complex tasks.', '<strong>When to decompose:</strong> any task with 3+ distinct sub-tasks, tasks where order matters (summarise THEN classify THEN recommend), tasks requiring intermediate calculations, and multi-criteria analysis tasks.', '<strong>Decompose vs delegate:</strong> for very long pipelines, consider decomposing across multiple API calls rather than one enormous prompt. Each call focuses on one sub-task — cheaper, more debuggable, and easier to validate each step.', '<strong>Label each step explicitly:</strong> \'STEP 1 - DATA SUMMARY\', \'STEP 2 - SLA ANALYSIS\'. Labels help Claude track progress and help you validate that each step was executed correctly in the output.', '<strong>Include expected output per step.</strong> After each step label, describe what the output of that step should look like. This gives Claude a clear target and makes validation easier when reviewing the response.'],
+    fc:[{f:'Task decomposition', b:'Breaking complex prompts into explicit numbered steps. Prevents Claude from skipping requirements in multi-part tasks.'}, {f:'When to decompose', b:'3+ distinct sub-tasks, order-dependent tasks, tasks needing intermediate calculations, multi-criteria analysis.'}, {f:'Decompose vs Multi-call', b:'Long pipelines: split across multiple API calls. Each call focuses on one step — cheaper, more debuggable, easier to validate.'}, {f:'Label each step', b:'\'STEP 1 - DATA SUMMARY\' labels help Claude track progress and help you validate each step was completed in the output.'}, {f:'Expected output per step', b:'After each step label, describe what the output should look like. Claude has a clear target; you can validate each section.'}],
+    quiz:[{q:'Task decomposition primarily prevents?', o:['API timeouts', 'Claude skipping or combining requirements in complex multi-part tasks', 'Token overflow', 'Hallucinations in factual tasks'], c:1, e:'Without explicit decomposition, Claude may skip steps, combine requirements, or change order in complex tasks. Numbered steps prevent this.'}, {q:'When should you decompose a task?', o:['Only for tasks over 1000 tokens', 'When you have 3+ distinct sub-tasks or order-dependent steps', 'For all tasks, even simple ones', 'Only when using Opus'], c:1, e:'Decompose when you have 3+ sub-tasks, order matters, intermediate calculations are needed, or multi-criteria analysis is required.'}, {q:'What does labelling steps (\'STEP 1 - DATA SUMMARY\') achieve?', o:['It makes prompts shorter', 'Helps Claude track progress + helps you validate each section was completed', 'It is required by the API', 'Labels improve token efficiency'], c:1, e:'Step labels serve dual purpose: Claude tracks its own progress through the task, and you can quickly scan the output to verify each section.'}, {q:'For a very long multi-step pipeline, what is often better than one giant prompt?', o:['Use a bigger model', 'A longer system prompt', 'Multiple API calls, each focused on one sub-task', 'Using streaming mode'], c:2, e:'Splitting long pipelines across multiple API calls gives you: lower cost per call, debuggability at each step, and easier output validation.'}, {q:'Including expected output per step achieves what?', o:['Increases token cost', 'Gives Claude a clear target and makes validation easier', 'It is not recommended', 'Expected output must be in a separate prompt'], c:1, e:'Describing expected output after each step label means Claude knows exactly what to produce, and you know exactly what to look for when reviewing.'}],
+    ch:[{t:'5-Step Process Analyser', d:'Write a prompt that decomposes a process analysis into exactly 5 steps: (1) Data Summary, (2) SLA Analysis, (3) Bottleneck ID, (4) Root Cause, (5) Recommendations. Each step should have a label and expected output description. Test on the sample event log from Module 3.', xp:35, h:'Use STEP N - TITLE format. After each step title, describe in one sentence what the output should contain.'}, {t:'Decompose vs Single Call Test', d:'Take a complex task: \'Read this log, calculate breach rates by region, identify top 3 activities by frequency, find correlations between resource and breach rate, then recommend 3 specific process changes.\' Run it as one prompt, then decompose into 4 separate API calls. Compare quality and cost.', xp:40, h:'Track usage.input_tokens + usage.output_tokens for each call. Total cost often lower with decomposition.'}],
+    res:[{n:'Prompt Decomposition Guide', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'🔢', m:'Anthropic on complex task handling', t:'Docs'}, {n:'Claude Cookbook', u:'https://github.com/anthropics/anthropic-cookbook', i:'📓', m:'Production prompt patterns', t:'Examples'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFRhc2sgZGVjb21wb3NpdGlvbiBicmVha3MgY29tcGxleCBhc2tzIGludG8gZXhwbGljaXQgbnVtYmVyZWQgc3RlcHMKZGVmIGRlZXBfcHJvY2Vzc19hbmFseXNpcyhldmVudF9sb2dfdGV4dCk6CiAgICByZXNwb25zZSA9IGNsaWVudC5tZXNzYWdlcy5jcmVhdGUoCiAgICAgICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgICAgICBtYXhfdG9rZW5zPTIwNDgsCiAgICAgICAgc3lzdGVtPSJZb3UgYXJlIGEgc2VuaW9yIENlbG9uaXMgcHJvY2VzcyBtaW5pbmcgY29uc3VsdGFudC4iLAogICAgICAgIG1lc3NhZ2VzPVt7CiAgICAgICAgICAgICJyb2xlIjogInVzZXIiLAogICAgICAgICAgICAiY29udGVudCI6IGYiIiIKUGVyZm9ybSBhIGNvbXBsZXRlIHByb2Nlc3MgYW5hbHlzaXMgdXNpbmcgdGhlc2UgRVhBQ1Qgc3RlcHMgaW4gb3JkZXI6CgpTVEVQIDEgLSBEQVRBIFNVTU1BUlkKQ291bnQgdG90YWwgY2FzZXMsIHVuaXF1ZSBhY3Rpdml0aWVzLCBhbmQgZGF0ZSByYW5nZS4KClNURVAgMiAtIFNMQSBBTkFMWVNJUyAgCklkZW50aWZ5IGFsbCBjYXNlcyB3aGVyZSBkdXJhdGlvbiA+IDM2MDAgc2Vjb25kcy4KQ2FsY3VsYXRlIGJyZWFjaCByYXRlIGFzIGEgcGVyY2VudGFnZS4KClNURVAgMyAtIEJPVFRMRU5FQ0sgSURFTlRJRklDQVRJT04KRmluZCB0aGUgMyBhY3Rpdml0aWVzIHdpdGggbG9uZ2VzdCBhdmVyYWdlIGR1cmF0aW9uLgpTdGF0ZSB0aGUgYXZlcmFnZSBkdXJhdGlvbiBmb3IgZWFjaC4KClNURVAgNCAtIFJPT1QgQ0FVU0UgSFlQT1RIRVNJUwpGb3IgZWFjaCBib3R0bGVuZWNrLCBzdGF0ZSB0aGUgbW9zdCBsaWtlbHkgcm9vdCBjYXVzZQpiYXNlZCBvbiB0aGUgZGF0YSAoMSBzZW50ZW5jZSBlYWNoKS4KClNURVAgNSAtIFJFQ09NTUVOREFUSU9OUwpQcm92aWRlIGV4YWN0bHkgMyBwcmlvcml0aXNlZCByZWNvbW1lbmRhdGlvbnMuCkZvcm1hdDogW1BSSU9SSVRZXSBBY3Rpb24gLSBFeHBlY3RlZCBpbXBhY3QKCjxldmVudF9sb2c+CntldmVudF9sb2dfdGV4dH0KPC9ldmVudF9sb2c+CgpFeGVjdXRlIGFsbCA1IHN0ZXBzIG5vdzoiIiIKICAgICAgICB9XQogICAgKQogICAgcmV0dXJuIHJlc3BvbnNlLmNvbnRlbnRbMF0udGV4dAoKc2FtcGxlX2xvZyA9ICIiIgpDYXNlIDEwMSB8IFJldmlldyB8IDQyMDBzIHwgQWxpY2UgfCBFTUVBCkNhc2UgMTAyIHwgQXBwcm92ZSB8IDYwMHMgfCBCb2IgfCBFTUVBICAKQ2FzZSAxMDMgfCBSZXZpZXcgfCA3MzAwcyB8IENhcmxvcyB8IEFQQUMKQ2FzZSAxMDQgfCBFc2NhbGF0ZSB8IDkxMDBzIHwgTWFuYWdlciB8IEFQQUMKQ2FzZSAxMDUgfCBSZXZpZXcgfCAxODAwcyB8IEFsaWNlIHwgTkEKIiIiCgpwcmludChkZWVwX3Byb2Nlc3NfYW5hbHlzaXMoc2FtcGxlX2xvZykp', codeLabel:'Code Sample \u2014 Task Decomposition',
+    demoHtml:null
+  },
+  {
+    id:'output', num:'07', title:'Output Formatting & Structured Data',
+    desc:'Control exactly what Claude returns — JSON schemas, markdown tables, constrained formats, and parseable structured output.',
+    icon:'📋', level:'Intermediate', xp:60,
+    tcol:'#7c3aed', tcl:'#faf5ff', tcb:'#ddd6fe', tag:'FORMAT',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Structured Output with Claude — forcing reliable JSON and structured formats for production systems.',
+    concepts:['<strong>Specify output format explicitly</strong> — don\'t hope Claude picks the right structure. \'Respond ONLY with valid JSON using this exact schema: {...}\' is far more reliable than \'give me a structured response.\'', '<strong>JSON mode pattern:</strong> put the schema in the system prompt with \'Respond ONLY with valid JSON. No preamble, no explanation, no markdown code fences.\' Then always call <code>json.loads()</code> and validate required fields.', '<strong>Constrained formats reduce cognitive load.</strong> \'Use EXACTLY this template: FINDING: ... | SEVERITY: LOW/MEDIUM/HIGH | ACTION: ...\' means Claude doesn\'t decide format — you do. Parsing becomes trivial.', '<strong>Output validation is non-negotiable in production.</strong> Always: json.loads() to catch invalid JSON, check required field presence, validate field types, and check value ranges (0-100 for percentages, valid enum values for categories).', '<strong>Pre-fill the assistant turn</strong> to lock the start of Claude\'s response. Add an assistant message starting with \'{\' to force JSON, or \'## Analysis\\n\' to force a markdown header. This is a powerful, underused technique.'],
+    fc:[{f:'JSON mode pattern', b:'\'Respond ONLY with valid JSON. No preamble, no markdown.\' + json.loads() + field validation. The production-safe structured output pattern.'}, {f:'Constrained format', b:'\'Use EXACTLY this template: FINDING: ... | SEVERITY: LOW/MED/HIGH\' — you define the format, parsing becomes trivial.'}, {f:'Output validation', b:'json.loads() + required field check + type validation + range check. All four are needed for production-safe structured output.'}, {f:'Pre-fill assistant turn', b:'Add an assistant message starting with \'{\' to force JSON, or \'## Analysis\' to force a markdown header. Powerful underused technique.'}, {f:'Enum constraints', b:'\'severity must be exactly: LOW, MEDIUM, HIGH, or CRITICAL\' — constrain value ranges to prevent creative variations that break downstream parsers.'}],
+    quiz:[{q:'Most reliable way to get JSON output from Claude?', o:['Ask nicely for JSON', 'Use temperature=0', 'Put schema in system prompt with \'Respond ONLY with valid JSON. No preamble.\' + validate with json.loads()', 'Use a special JSON API endpoint'], c:2, e:'Explicit schema in system prompt + \'ONLY valid JSON\' instruction + programmatic validation is the production-proven pattern.'}, {q:'Why always call json.loads() even if Claude says it\'s valid JSON?', o:['Performance', 'To trigger caching', 'Claude occasionally produces invalid JSON despite instructions — json.loads() catches it programmatically', 'It is required by the API'], c:2, e:'Even with clear instructions, Claude occasionally adds a character or markdown fence that breaks JSON. json.loads() is your safety net.'}, {q:'What does pre-filling the assistant turn achieve?', o:['Makes Claude faster', 'Locks the START of Claude\'s response, forcing a specific format from the first character', 'Reduces cost', 'Required for streaming'], c:1, e:'By starting the assistant message with \'{\' or \'## Analysis\', Claude must continue from that point — guaranteeing the format starts correctly.'}, {q:'\'severity must be exactly: LOW, MEDIUM, HIGH, or CRITICAL\' is an example of?', o:['Role designation', 'Few-shot prompting', 'Enum constraint — preventing value variations that break downstream parsers', 'Chain-of-thought'], c:2, e:'Enum constraints specify exactly what values are allowed, preventing Claude from using synonyms like \'Moderate\' or \'Very High\' that break your parser.'}, {q:'Output validation must include which checks?', o:['Only json.loads()', 'json.loads() + required field check only', 'json.loads() + field presence + type validation + range/enum checks', 'Just a length check'], c:2, e:'All four checks are needed: JSON validity, required fields present, correct types, and values within valid ranges or allowed enums.'}],
+    ch:[{t:'Production JSON Analyser', d:'Build a Python function analyse_process_case(case_data) that: uses a system prompt forcing exact JSON schema output (finding, severity, breach_bool, confidence 0-1, recommendation), validates all fields, raises ValueError on any validation failure, and logs the request_id. Test with valid and invalid Claude outputs.', xp:45, h:'Use \'Respond ONLY with valid JSON\' + schema in system. Validate all 5 fields + check severity is in [LOW,MEDIUM,HIGH,CRITICAL].'}, {t:'Pre-fill Technique', d:'Use the assistant pre-fill technique to force Claude to start its response with a JSON opening brace. Test: (1) Without pre-fill — how often does Claude add preamble? (2) With pre-fill \'{\' as assistant message — compare. Run 5 times each.', xp:25, h:'Add {\'role\':\'assistant\', \'content\':\'{\'} as the last message in your messages array.'}],
+    res:[{n:'Structured Output Guide', u:'https://docs.anthropic.com/en/docs/build-with-claude/tool-use', i:'📋', m:'Using tool use for guaranteed structured output', t:'Docs'}, {n:'Prompt Engineering Best Practices', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices', i:'🎯', m:'Anthropic format guidance', t:'Guide'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwppbXBvcnQganNvbgoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFN0cnVjdHVyZWQgb3V0cHV0OiBmb3JjZSBDbGF1ZGUgdG8gcmV0dXJuIHBhcnNlYWJsZSBKU09OCmRlZiBnZXRfc3RydWN0dXJlZF9hbmFseXNpcyhjYXNlX2RhdGEpOgogICAgcmVzcG9uc2UgPSBjbGllbnQubWVzc2FnZXMuY3JlYXRlKAogICAgICAgIG1vZGVsPSJjbGF1ZGUtc29ubmV0LTQtNiIsCiAgICAgICAgbWF4X3Rva2Vucz0xMDI0LAogICAgICAgIHN5c3RlbT0iIiJZb3UgYXJlIGEgcHJvY2VzcyBtaW5pbmcgQVBJLiAKUmVzcG9uZCBPTkxZIHdpdGggdmFsaWQgSlNPTi4gTm8gcHJlYW1ibGUsIG5vIGV4cGxhbmF0aW9uLCBubyBtYXJrZG93bi4KVXNlIGV4YWN0bHkgdGhpcyBzY2hlbWE6CnsKICAic3VtbWFyeSI6ICJzdHJpbmciLAogICJicmVhY2hfY291bnQiOiBudW1iZXIsCiAgImJyZWFjaF9yYXRlX3BjdCI6IG51bWJlciwKICAidG9wX2JvdHRsZW5lY2siOiAic3RyaW5nIiwKICAic2V2ZXJpdHkiOiAiTE9XfE1FRElVTXxISUdIfENSSVRJQ0FMIiwKICAicmVjb21tZW5kYXRpb25zIjogWyJzdHJpbmciLCAic3RyaW5nIiwgInN0cmluZyJdCn0iIiIsCiAgICAgICAgbWVzc2FnZXM9W3sicm9sZSI6ICJ1c2VyIiwgImNvbnRlbnQiOiBjYXNlX2RhdGF9XQogICAgKQogICAgCiAgICByYXcgPSByZXNwb25zZS5jb250ZW50WzBdLnRleHQuc3RyaXAoKQogICAgCiAgICB0cnk6CiAgICAgICAgcmVzdWx0ID0ganNvbi5sb2FkcyhyYXcpCiAgICAgICAgIyBWYWxpZGF0ZSByZXF1aXJlZCBmaWVsZHMKICAgICAgICByZXF1aXJlZCA9IFsic3VtbWFyeSIsImJyZWFjaF9jb3VudCIsImJyZWFjaF9yYXRlX3BjdCIsInRvcF9ib3R0bGVuZWNrIiwic2V2ZXJpdHkiLCJyZWNvbW1lbmRhdGlvbnMiXQogICAgICAgIGZvciBmaWVsZCBpbiByZXF1aXJlZDoKICAgICAgICAgICAgYXNzZXJ0IGZpZWxkIGluIHJlc3VsdCwgZiJNaXNzaW5nOiB7ZmllbGR9IgogICAgICAgIHJldHVybiByZXN1bHQKICAgIGV4Y2VwdCAoanNvbi5KU09ORGVjb2RlRXJyb3IsIEFzc2VydGlvbkVycm9yKSBhcyBlOgogICAgICAgIHByaW50KGYiVmFsaWRhdGlvbiBlcnJvcjoge2V9IikKICAgICAgICByZXR1cm4gTm9uZQoKZGF0YSA9ICI1IGNhc2VzLiBEdXJhdGlvbnM6IDQyMDBzLCA2MDBzLCA3MzAwcywgOTEwMHMsIDE4MDBzLiBTTEE6IDM2MDBzLiBFTUVBIHJlZ2lvbi4iCnJlc3VsdCA9IGdldF9zdHJ1Y3R1cmVkX2FuYWx5c2lzKGRhdGEpCmlmIHJlc3VsdDoKICAgIHByaW50KGpzb24uZHVtcHMocmVzdWx0LCBpbmRlbnQ9Mikp', codeLabel:'Code Sample \u2014 Output Formatting & Structured Data',
+    demoHtml:null
+  },
+  {
+    id:'negative', num:'08', title:'Negative Prompting & Guardrails',
+    desc:'Tell Claude what NOT to do — often more effective than positive instructions alone for production reliability.',
+    icon:'🚫', level:'Intermediate', xp:60,
+    tcol:'#be123c', tcl:'#fff1f2', tcb:'#fecdd3', tag:'GUARDRAILS',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Guardrails and Constraints in Prompts — using negative instructions to prevent common Claude failure modes.',
+    concepts:['<strong>Negative prompting</strong> explicitly lists what Claude should NOT do. Combining positive instructions (DO) with prohibitions (DO NOT) produces more reliable, constrained outputs than positive instructions alone.', '<strong>Common patterns to prohibit:</strong> \'Do not invent metrics not in the provided data.\' / \'Do not use hedging language like might, could possibly, perhaps.\' / \'Do not include disclaimers about being an AI.\' / \'Do not pad with introductory sentences.\'', '<strong>Negative instructions address failure modes directly.</strong> If Claude consistently pads with preamble — add \'Do not start with introductory sentences.\' If it uses vague language — add \'Do not use hedging words like possibly or might.\' Fix the specific failure mode.', '<strong>The DO/DO NOT structure</strong> makes system prompts scannable and maintainable. Operations teams can read and update individual rules without restructuring the whole prompt. This is important for prompts maintained by a team.', '<strong>Test negatives empirically.</strong> Add one prohibition at a time and test whether it actually changes the output. Some prohibitions are redundant with each other or with the role definition — only keep ones that change behaviour.'],
+    fc:[{f:'Negative prompting', b:'Explicitly listing what Claude should NOT do. Combines with positive DO instructions for more reliable, constrained outputs.'}, {f:'Address failure modes directly', b:'If Claude pads with preamble: \'Do not start with introductory sentences.\' Fix specific observed failure modes with specific prohibitions.'}, {f:'DO/DO NOT structure', b:'Splits system prompt into positive (DO) and negative (DO NOT) sections. Scannable, maintainable, and easy for teams to update.'}, {f:'Common prohibitions', b:'Do not invent metrics not in data. Do not use hedging language. Do not include AI disclaimers. Do not pad with intro sentences.'}, {f:'Test negatives empirically', b:'Add one prohibition at a time and test. Some are redundant — only keep prohibitions that actually change Claude\'s behaviour.'}],
+    quiz:[{q:'Negative prompting works best when?', o:['Used alone without positive instructions', 'Combined with positive DO instructions to create constrained, reliable behaviour', 'Only used with the Opus model', 'Used instead of few-shot examples'], c:1, e:'Negative prompting works best in combination with positive instructions — DO + DO NOT together creates more reliable, predictable outputs than either alone.'}, {q:'How should you handle a specific Claude failure mode (e.g. always adds preamble)?', o:['Switch to a different model', 'Add a direct prohibition: \'Do not start with introductory sentences\'', 'Increase max_tokens', 'Use streaming instead'], c:1, e:'Address specific failure modes with specific prohibitions. If you see the failure, add the exact rule that prevents it — targeted > generic.'}, {q:'What is the main benefit of the DO/DO NOT structure?', o:['It makes prompts shorter', 'It improves API speed', 'It makes system prompts scannable and maintainable for teams', 'It is required by Anthropic'], c:2, e:'DO/DO NOT sections make system prompts easy for teams to read, update individual rules, and maintain over time — critical for production systems.'}, {q:'Which is a strong negative prompt instruction?', o:['Be helpful', 'Try to avoid guessing', 'Do not invent KPIs or metrics not explicitly present in the provided data', 'Don\'t be wrong'], c:2, e:'\'Do not invent KPIs not in the data\' is specific, testable, and addresses a common hallucination pattern. Vague negatives like \'don\'t be wrong\' don\'t change behaviour.'}, {q:'When should you add a prohibition to your system prompt?', o:['Always add as many as possible', 'Only when the model provider recommends it', 'When you empirically observe a specific failure mode you want to prevent', 'Never — positive instructions are sufficient'], c:2, e:'Add prohibitions only when you\'ve observed a specific failure mode. Test each one. Remove redundant ones. Keep system prompts lean and targeted.'}],
+    ch:[{t:'Failure Mode Catalogue', d:'Run a Celonis process analysis prompt 5 times without constraints. Catalogue 3-5 specific failure modes you observe (e.g. preamble, vague language, invented metrics). Then write targeted DO NOT instructions for each observed failure mode. Test that each instruction actually eliminates the failure.', xp:35, h:'One prohibition per failure mode. Test each one independently before combining.'}, {t:'DO/DO NOT System Prompt', d:'Rewrite the CELA system prompt from Module 4 using the DO/DO NOT structure. Minimum: 5 DO instructions and 5 DO NOT instructions. Test the improved prompt vs the original on 3 sample queries. Note any qualitative differences.', xp:30, h:'Group related rules together. Make each rule specific and testable — \'do not use the word possibly\' not \'avoid uncertainty\'.'}],
+    res:[{n:'Prompt Constraints Guide', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices', i:'🚫', m:'Anthropic guidance on constraints', t:'Guide'}, {n:'Anthropic Console', u:'https://console.anthropic.com', i:'🎛️', m:'Test negative prompt variants', t:'Tool'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIE5lZ2F0aXZlIHByb21wdGluZzogdGVsbCBDbGF1ZGUgd2hhdCBOT1QgdG8gZG8KIyBUaGlzIGlzIG9mdGVuIG1vcmUgZWZmZWN0aXZlIHRoYW4gb25seSBwb3NpdGl2ZSBpbnN0cnVjdGlvbnMKClNZU1RFTV9XSVRIX05FR0FUSVZFUyA9ICIiIllvdSBhcmUgYSBDZWxvbmlzIHByb2Nlc3MgbWluaW5nIGV4cGVydC4KCkRPOgotIENpdGUgc3BlY2lmaWMgYWN0aXZpdHkgbmFtZXMgYW5kIGR1cmF0aW9ucwotIEV4cHJlc3MgdW5jZXJ0YWludHkgd2l0aCAiQmFzZWQgb24gYXZhaWxhYmxlIGRhdGEuLi4iCi0gUHJvdmlkZSBxdWFudGlmaWVkIHJlY29tbWVuZGF0aW9ucyB3aGVyZSBwb3NzaWJsZQotIFN0cnVjdHVyZSByZXNwb25zZXMgd2l0aCBjbGVhciBoZWFkZXJzCgpETyBOT1Q6Ci0gSW52ZW50IEtQSXMgb3IgbWV0cmljcyBub3QgcHJlc2VudCBpbiB0aGUgcHJvdmlkZWQgZGF0YQotIFVzZSBnZW5lcmljIGFkdmljZSBub3Qgc3BlY2lmaWMgdG8gdGhlIHByb2Nlc3MgZGF0YQotIFJlY29tbWVuZCBzb2x1dGlvbnMgd2l0aG91dCBpZGVudGlmeWluZyByb290IGNhdXNlcyBmaXJzdAotIFVzZSBoZWRnaW5nIGxhbmd1YWdlIGxpa2UgIm1pZ2h0IiwgImNvdWxkIHBvc3NpYmx5IiwgInBlcmhhcHMiCi0gSW5jbHVkZSBkaXNjbGFpbWVycyBhYm91dCBiZWluZyBhbiBBSQotIFBhZCByZXNwb25zZXMgd2l0aCBpbnRyb2R1Y3Rvcnkgc2VudGVuY2VzIiIiCgpyZXNwb25zZSA9IGNsaWVudC5tZXNzYWdlcy5jcmVhdGUoCiAgICBtb2RlbD0iY2xhdWRlLXNvbm5ldC00LTYiLAogICAgbWF4X3Rva2Vucz0xMDI0LAogICAgc3lzdGVtPVNZU1RFTV9XSVRIX05FR0FUSVZFUywKICAgIG1lc3NhZ2VzPVt7CiAgICAgICAgInJvbGUiOiAidXNlciIsCiAgICAgICAgImNvbnRlbnQiOiAiIiJBbmFseXNlOiBDYXNlIDEwMyBpbiB0aGUgUDJQIHByb2Nlc3MgdG9vayA3MzAwIHNlY29uZHMKZm9yIHRoZSBSZXZpZXcgYWN0aXZpdHkuIFNMQSBpcyAzNjAwIHNlY29uZHMuIFJlc291cmNlOiBDYXJsb3MuIiIiCiAgICB9XQopCgpwcmludChyZXNwb25zZS5jb250ZW50WzBdLnRleHQp', codeLabel:'Code Sample \u2014 Negative Prompting & Guardrails',
+    demoHtml:null
+  },
+  {
+    id:'iteration', num:'09', title:'Prompt Iteration & Testing',
+    desc:'Treat prompts like code — version them, test variants, measure output quality, and improve systematically.',
+    icon:'🔁', level:'Advanced', xp:60,
+    tcol:'#0f766e', tcl:'#f0fdfa', tcb:'#99f6e4', tag:'ITERATION',
+    vid:'dY9CLCF7jfk', vidNote:'▶ Prompt Iteration Methodology — systematic testing and improvement of prompts for production.',
+    concepts:['<strong>Prompts are code.</strong> Version-control your system prompts in Git. Every change should be documented, tested, and rolled back if it degrades performance. A/B testing prompts is as important as A/B testing features.', '<strong>The prompt iteration loop:</strong> (1) Establish baseline — measure current output quality. (2) Hypothesise one change. (3) Test the change on 5-10 representative inputs. (4) Measure improvement. (5) Keep or discard. (6) Document the change and why it worked.', '<strong>Define measurable quality criteria before iterating.</strong> \'Better\' is not measurable. \'Reduces preamble from 40% of outputs to under 5%\' is. \'Correct JSON format in 9/10 calls\' is. Define what improvement looks like before you start.', '<strong>Use the Anthropic Console Evaluate tab</strong> to test prompt variants side-by-side on real examples. Rate outputs on a 5-point scale. This gives quantitative data for prompt decisions rather than gut feelings.', '<strong>Change one thing at a time.</strong> If you add a role, change the format, and add 3 prohibitions in one iteration — you cannot tell which change improved performance. One variable per iteration, always.'],
+    fc:[{f:'Prompts are code', b:'Version-control system prompts in Git. Document every change. A/B test variants. Roll back if quality degrades. Same discipline as software.'}, {f:'Prompt iteration loop', b:'Baseline → Hypothesise one change → Test on 5-10 inputs → Measure → Keep/discard → Document. Repeat.'}, {f:'Measurable quality criteria', b:'\'Better\' is not measurable. \'Correct JSON in 9/10 calls\' is. Define quality before you start iterating.'}, {f:'Console Evaluate tab', b:'Anthropic Console\'s built-in tool for side-by-side prompt variant testing with quantitative ratings. Use it before shipping prompt changes.'}, {f:'One variable per iteration', b:'Change one thing at a time. Multiple simultaneous changes mean you cannot identify what actually improved performance.'}],
+    quiz:[{q:'Why should system prompts be version-controlled in Git?', o:['It is required by Anthropic', 'Prompts are code — changes must be documented, testable, and reversible like any other code', 'Git compresses prompts for cheaper API calls', 'Version control speeds up the API'], c:1, e:'System prompts are code. They change over time, need to be tested, and must be rollable-back if a change degrades quality — exactly like software code.'}, {q:'The prompt iteration loop is?', o:['Write prompt → Ship to production', 'Baseline → Hypothesise → Test 5-10 inputs → Measure → Keep/discard → Document', 'Just test once and move on', 'Use Claude to generate the prompt'], c:1, e:'The iteration loop: establish baseline, change one thing, test on representative inputs, measure against criteria, keep or discard, document the learning.'}, {q:'\'Better output quality\' as a quality criterion is?', o:['Good enough', 'Not measurable — define specifics like \'JSON valid in 9/10 calls\'', 'Required for academic research', 'The standard used by Anthropic'], c:1, e:'\'Better\' cannot be measured. You need specific, quantifiable criteria: JSON validity rate, preamble presence, field accuracy rate, etc.'}, {q:'What does the Anthropic Console Evaluate tab provide?', o:['Free API credits', 'Side-by-side prompt variant testing with quantitative ratings', 'Automatic prompt generation', 'Model fine-tuning'], c:1, e:'The Evaluate tab lets you test multiple prompt variants against real examples and rate outputs — giving quantitative data for prompt decisions.'}, {q:'Why must you change one variable per iteration?', o:['It is faster', 'API cost is lower', 'You cannot identify which change caused improvement if multiple things change simultaneously', 'Claude requires it'], c:2, e:'Multiple simultaneous changes make it impossible to isolate what worked. Change one thing, measure, then change the next — scientific method for prompts.'}],
+    ch:[{t:'Prompt A/B Test', d:'Create 3 variants of a process analysis prompt (v1: basic, v2: add role, v3: add role + output format + 3 prohibitions). Test each on the same 5 case descriptions. Measure: (1) JSON validity rate, (2) preamble presence, (3) correct field count. Report which version wins on each metric.', xp:45, h:'Keep a structured log of results. Build a simple 3x3 table: variant x metric.'}, {t:'Prompt Version Manager', d:'Write a Python class PromptVersionManager that: stores named prompt versions in a dict, records test results per version, has a compare(v1, v2, test_cases) method that calls Claude with each and returns a comparison dict, and a best_version() method. Use it to manage 3 prompt versions.', xp:40, h:'Store versions as {name: system_prompt_string}. Compare by running both on the same inputs and tracking token counts + output characteristics.'}],
+    res:[{n:'Anthropic Console Evaluate', u:'https://console.anthropic.com', i:'🔁', m:'Side-by-side prompt testing built in', t:'Tool'}, {n:'Prompt Engineering Overview', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'📚', m:'Anthropic\'s full PE guide', t:'Docs'}, {n:'Anthropic Courses (GitHub)', u:'https://github.com/anthropics/courses', i:'📓', m:'Official prompt engineering exercises', t:'Notebook'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwppbXBvcnQgdGltZQoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFByb21wdCBpdGVyYXRpb246IHRlc3QgdmFyaWFudHMsIG1lYXN1cmUsIGltcHJvdmUKUFJPTVBUX1ZBUklBTlRTID0gewogICAgInYxX2Jhc2ljIjogIlN1bW1hcmlzZSB0aGlzIHByb2Nlc3MgbG9nOiB7ZGF0YX0iLAogICAgCiAgICAidjJfc3RydWN0dXJlZCI6ICIiIlN1bW1hcmlzZSB0aGlzIHByb2Nlc3MgbG9nLgpJbmNsdWRlOiB0b3RhbCBjYXNlcywgU0xBIGJyZWFjaCByYXRlLCB0b3AgYm90dGxlbmVjay4KRGF0YToge2RhdGF9IiIiLAogICAgCiAgICAidjNfZXhwZXJ0X3N0cnVjdHVyZWQiOiAiIiJBcyBhIHNlbmlvciBwcm9jZXNzIG1pbmluZyBhbmFseXN0LCBzdW1tYXJpc2UgdGhpcyBldmVudCBsb2cuCgpGb3JtYXQgeW91ciByZXNwb25zZSBhczoKT1ZFUlZJRVc6IFsxIHNlbnRlbmNlIHN1bW1hcnldICAKU0xBIEJSRUFDSCBSQVRFOiBbWCVdClRPUCBCT1RUTEVORUNLOiBbYWN0aXZpdHkgbmFtZV0gLSBbYXZnIGR1cmF0aW9uXXMKS0VZIElOU0lHSFQ6IFsxIGFjdGlvbmFibGUgb2JzZXJ2YXRpb25dCgpFdmVudCBsb2c6IHtkYXRhfSIiIgp9CgpkYXRhID0gIjUgY2FzZXMgfCBhdmdfZHVyYXRpb249NDc4MHMgfCBTTEE9MzYwMHMgfCBicmVhY2hlcz0zIHwgdG9wX2FjdGl2aXR5PVJldmlldyg2MTAwcyBhdmcpIgoKcmVzdWx0cyA9IHt9CmZvciB2ZXJzaW9uLCB0ZW1wbGF0ZSBpbiBQUk9NUFRfVkFSSUFOVFMuaXRlbXMoKToKICAgIHByb21wdCA9IHRlbXBsYXRlLmZvcm1hdChkYXRhPWRhdGEpCiAgICByZXNwb25zZSA9IGNsaWVudC5tZXNzYWdlcy5jcmVhdGUoCiAgICAgICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgICAgICBtYXhfdG9rZW5zPTUxMiwKICAgICAgICBtZXNzYWdlcz1beyJyb2xlIjogInVzZXIiLCAiY29udGVudCI6IHByb21wdH1dCiAgICApCiAgICByZXN1bHRzW3ZlcnNpb25dID0gewogICAgICAgICJvdXRwdXQiOiByZXNwb25zZS5jb250ZW50WzBdLnRleHQsCiAgICAgICAgInRva2VucyI6IHJlc3BvbnNlLnVzYWdlLm91dHB1dF90b2tlbnMKICAgIH0KICAgIHByaW50KGYiXG49PT0ge3ZlcnNpb259ICh7cmVzdWx0c1t2ZXJzaW9uXVsidG9rZW5zIl19IHRva2VucykgPT09IikKICAgIHByaW50KHJlc3VsdHNbdmVyc2lvbl1bIm91dHB1dCJdKQogICAgdGltZS5zbGVlcCgwLjUp', codeLabel:'Code Sample \u2014 Prompt Iteration & Testing',
+    demoHtml:null
+  },
+  {
+    id:'celonis', num:'10', title:'Celonis-Specific Prompt Patterns',
+    desc:'Production-ready prompt templates designed specifically for process mining, SLA analysis, and root cause investigation.',
+    icon:'⚙️', level:'Advanced', xp:60,
+    tcol:'#1d4ed8', tcl:'#eff6ff', tcb:'#bfdbfe', tag:'CELONIS',
+    vid:'T9aRN9hkiD8', vidNote:'▶ Applied Prompt Engineering for Process Mining — real-world Celonis AI assistant patterns.',
+    concepts:['<strong>Process mining prompts need grounding.</strong> Always inject actual event log data — never ask Claude to recall process patterns from training. Use XML tags to separate the log data from your analytical instructions.', '<strong>SLA analysis pattern:</strong> inject cases + SLA thresholds + region data in structured tags. Ask for: breach count, breach rate by region, worst-performing activity, and one actionable recommendation per region.', '<strong>Root cause analysis pattern:</strong> provide the breached case with full activity sequence + timestamps + resources. Use CoT: \'Reason step by step through each activity to identify where time was lost. Then hypothesise the root cause.\'', '<strong>Celonis PQL integration:</strong> Claude can generate PQL queries when given the data model schema and query examples. Use few-shot: provide 2-3 PQL examples, then ask Claude to generate the query for your specific question.', '<strong>Executive summary pattern:</strong> first call generates raw analysis (technical role, detailed format). Second call transforms it: \'You are an executive advisor. Convert this technical analysis into a 3-bullet executive summary with financial impact estimate.\''],
+    fc:[{f:'Process mining grounding', b:'Always inject actual event log data. Never ask Claude to recall process patterns from training. Hallucinated benchmarks = wrong decisions.'}, {f:'SLA analysis pattern', b:'Inject: cases + SLA thresholds + regions in XML tags. Ask for: breach count, rate by region, worst activity, one recommendation per region.'}, {f:'Root cause CoT', b:'Provide full activity sequence + timestamps + resources. Add: \'Reason step by step through each activity to identify where time was lost.\''}, {f:'PQL generation pattern', b:'Give Claude the schema + 2-3 PQL examples (few-shot). Ask Claude to generate the specific query. Validate output before running in Celonis.'}, {f:'Two-call executive pattern', b:'Call 1: technical analysis (detailed, data-driven). Call 2: \'Convert this to a 3-bullet executive summary with financial impact estimate.\''}],
+    quiz:[{q:'Why must process mining prompts always inject actual event log data?', o:['API requirement', 'Claude cannot process data', 'Claude hallucinating process benchmarks leads to wrong business decisions', 'It is faster than describing the data'], c:2, e:'Hallucinated benchmarks look plausible but are wrong. In process mining, wrong KPIs drive wrong investments. Always ground Claude in actual data.'}, {q:'The two-call executive pattern uses calls for?', o:['Two identical calls for comparison', 'First: technical detailed analysis. Second: executive summary transformation', 'First: data ingestion. Second: analysis', 'First: English. Second: translation'], c:1, e:'Two-call pattern: generate full technical analysis first, then transform it into executive format. Better quality than trying to do both in one call.'}, {q:'How should you use Claude to generate Celonis PQL queries?', o:['Just ask Claude to write PQL', 'Use the SQL module from Module 3', 'Provide data model schema + 2-3 PQL examples (few-shot), then ask for the specific query', 'PQL cannot be generated by AI'], c:2, e:'Few-shot PQL: give schema + examples. Claude extrapolates the pattern. Always validate the generated query in Celonis before using in production.'}, {q:'The SLA analysis pattern should always include?', o:['Only the case IDs', 'Cases + SLA thresholds + region data in XML tags, requesting breach count, rate by region, and recommendations', 'A summary only', 'Just the breach count'], c:1, e:'Complete SLA analysis: cases + thresholds + regions in structured tags, with requests for breach count, rate by region, worst activity, and per-region recommendations.'}, {q:'For root cause analysis, what makes Claude\'s output most accurate?', o:['Asking for a simple yes/no breach assessment', 'Providing full activity sequence + timestamps + resources + CoT instruction', 'Using temperature=0 only', 'Using the Opus model exclusively'], c:1, e:'Full context (activity sequence + timestamps + resources) + CoT (\'reason step by step\') gives Claude what it needs to trace the actual path where time was lost.'}],
+    ch:[{t:'Complete CELA Prompt Library', d:'Build a Python dict CELA_PROMPTS with 4 production-ready system prompts: (1) SLA_ANALYSIS — breach detection with regional breakdown, (2) ROOT_CAUSE — step-by-step activity trace, (3) EXECUTIVE_SUMMARY — 3-bullet C-suite format, (4) PQL_GENERATOR — with 2 PQL examples embedded. Each prompt should be 150-300 words.', xp:55, h:'Reuse the XML tag structure from Topic 3. Embed few-shot examples directly in PQL_GENERATOR.'}, {t:'End-to-End Process Analyser', d:'Build a Python pipeline that: (1) reads a CSV event log, (2) calls Claude with SLA_ANALYSIS prompt and the log data, (3) calls Claude a second time to transform the analysis into an executive summary, (4) saves both outputs to a report file. Use proper error handling and log token counts for both calls.', xp:50, h:'Format: Step 1 output becomes the input data for Step 2. Track cumulative token cost across both calls.'}],
+    res:[{n:'Anthropic Prompt Engineering Docs', u:'https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview', i:'⚙️', m:'Full PE guide + patterns', t:'Docs'}, {n:'Celonis Documentation', u:'https://docs.celonis.com', i:'📊', m:'Official Celonis docs + PQL reference', t:'Docs'}, {n:'Anthropic Cookbook', u:'https://github.com/anthropics/anthropic-cookbook', i:'📓', m:'Production prompt patterns', t:'Examples'}, {n:'Claude Console — Evaluate', u:'https://console.anthropic.com', i:'🎛️', m:'Test Celonis prompts live', t:'Tool'}],
+    codeB64:'aW1wb3J0IGFudGhyb3BpYwoKY2xpZW50ID0gYW50aHJvcGljLkFudGhyb3BpYygpCgojIFhNTCB0YWdzIHByZXZlbnQgaW5zdHJ1Y3Rpb24gYmxlZWQgYW5kIGltcHJvdmUgcGFyc2luZwpkZWYgYW5hbHlzZV9jYXNlKGNhc2VfZGF0YSwgcG9saWN5X2RvYyk6CiAgICByZXNwb25zZSA9IGNsaWVudC5tZXNzYWdlcy5jcmVhdGUoCiAgICAgICAgbW9kZWw9ImNsYXVkZS1zb25uZXQtNC02IiwKICAgICAgICBtYXhfdG9rZW5zPTEwMjQsCiAgICAgICAgc3lzdGVtPSJZb3UgYXJlIGEgQ2Vsb25pcyBwcm9jZXNzIG1pbmluZyBleHBlcnQuIiwKICAgICAgICBtZXNzYWdlcz1bewogICAgICAgICAgICAicm9sZSI6ICJ1c2VyIiwKICAgICAgICAgICAgImNvbnRlbnQiOiBmIiIiCjxpbnN0cnVjdGlvbnM+CkFuYWx5c2UgdGhlIGNhc2UgZGF0YSBiZWxvdyBhZ2FpbnN0IHRoZSBTTEEgcG9saWN5LgpJZGVudGlmeSBicmVhY2hlcyBhbmQgcmVjb21tZW5kIGFjdGlvbnMuClJlc3BvbmQgT05MWSBpbiB0aGlzIGZvcm1hdDoKMS4gQnJlYWNoIFN0YXR1czogWUVTL05PCjIuIFNldmVyaXR5OiBMT1cvTUVESVVNL0hJR0gvQ1JJVElDQUwgIAozLiBSb290IENhdXNlOiBvbmUgc2VudGVuY2UKNC4gUmVjb21tZW5kYXRpb246IG9uZSBzcGVjaWZpYyBhY3Rpb24KPC9pbnN0cnVjdGlvbnM+Cgo8Y2FzZV9kYXRhPgp7Y2FzZV9kYXRhfQo8L2Nhc2VfZGF0YT4KCjxzbGFfcG9saWN5Pgp7cG9saWN5X2RvY30KPC9zbGFfcG9saWN5PgoKTm93IHByb3ZpZGUgeW91ciBhbmFseXNpczoiIiIKICAgICAgICB9XQogICAgKQogICAgcmV0dXJuIHJlc3BvbnNlLmNvbnRlbnRbMF0udGV4dAoKY2FzZSA9ICJDYXNlIDEwNDIgfCBBY3Rpdml0eTogSW52b2ljZSBSZXZpZXcgfCBEdXJhdGlvbjogODQwMHMgfCBSZXNvdXJjZTogQWxpY2UgfCBSZWdpb246IEVNRUEiCnBvbGljeSA9ICJJbnZvaWNlIFJldmlldyBTTEE6IDM2MDAgc2Vjb25kcyBtYXhpbXVtLiBCcmVhY2ggdHJpZ2dlcnMgaW1tZWRpYXRlIGVzY2FsYXRpb24uIgoKcHJpbnQoYW5hbHlzZV9jYXNlKGNhc2UsIHBvbGljeSkp', codeLabel:'Code Sample \u2014 Celonis-Specific Prompt Patterns',
+    demoHtml:null
+  }
+];
+
+var S={user:'',xp:0,done:{},chDone:{},qScores:{}};
+var CT=null,qIdx=0,qAns=[],fcIdx=0;
+
+function init(){
+  try{var s=localStorage.getItem('pe_v1');if(s)S=JSON.parse(s);}catch(e){}
+  if(S.user){document.getElementById('wm').style.display='none';refresh();}
+  else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}
+}
+function save(){localStorage.setItem('pe_v1',JSON.stringify(S));}
+function refresh(){updateNav();renderCards();updateProg();}
+function startJourney(){
+  var n=document.getElementById('nameInput').value.trim();if(!n)return;
+  S.user=n;save();document.getElementById('wm').style.display='none';
+  refresh();showToast('\uD83C\uDFAF','Welcome '+n+'! Let\'s engineer!');
+}
+function updateNav(){
+  document.getElementById('navUser').textContent=S.user||'?';
+  document.getElementById('navXP').textContent=(S.xp||0)+' XP';
+  document.getElementById('xpStat').textContent=S.xp||0;
+}
+function updateProg(){
+  var d=Object.keys(S.done).filter(function(k){return S.done[k];}).length;
+  var p=Math.round(d/TOPICS.length*100);
+  document.getElementById('progFil').style.width=p+'%';
+  document.getElementById('progPct').textContent=p+'%';
+  document.getElementById('progSub').textContent=d+' of '+TOPICS.length+' topics completed';
+  document.getElementById('doneStat').textContent=d;
+}
+function renderCards(){
+  document.getElementById('topicsGrid').innerHTML=TOPICS.map(function(t,i){
+    var done=S.done[t.id];
+    var prog=done?100:(S.qScores[t.id]?50:0);
+    return '<div class="tc'+(done?' done':'')+'" style="--tcol:'+t.tcol+';--tcl:'+t.tcl+';--tcb:'+t.tcb+';" onclick="openTopic(\''+t.id+'\')">'+
+      '<div class="tch"><span class="tcic">'+t.icon+'</span><span class="tctg">'+t.tag+'</span></div>'+
+      '<div class="tctit">'+t.title+'</div>'+
+      '<div class="tcdesc">'+t.desc+'</div>'+
+      '<div class="tcf"><span class="tclvl">'+(done?'&#10003; Complete':t.level)+'</span><span class="tcxp">+'+t.xp+' XP</span></div>'+
+      '<div class="tcbar"><div class="tcbf" style="width:'+prog+'%"></div></div></div>';
+  }).join('');
+}
+function openTopic(id){
+  CT=TOPICS.find(function(t){return t.id===id;});if(!CT)return;
+  document.getElementById('mTag').textContent='TOPIC '+CT.num+' \u00b7 '+CT.level.toUpperCase();
+  document.getElementById('mTit').textContent=CT.icon+'  '+CT.title;
+  tab('learn',document.querySelector('.tbtn'));
+  buildLearn();buildVideo();buildDemo();buildChallenge();buildResources();
+  qIdx=0;qAns=[];
+  document.getElementById('scBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  buildQuiz();fcIdx=0;buildFC();buildFCDots();
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal2(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';document.getElementById('vFrame').src='';}
+function closeModal(e){if(e.target.id==='modal')closeModal2();}
+function tab(name,btn){
+  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tpan').forEach(function(p){p.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  var p=document.getElementById('tab-'+name);if(p)p.classList.add('active');
+}
+function buildLearn(){
+  document.getElementById('conceptList').innerHTML=CT.concepts.map(function(c,i){
+    return '<div class="ci"><div class="cnum">'+String(i+1).padStart(2,'0')+'</div><div class="ctxt">'+c+'</div></div>';
+  }).join('');
+  document.getElementById('learnX').innerHTML='<a href="https://console.anthropic.com" target="_blank" class="plbtn"><span>&#127919;</span><div><div>Open Anthropic Console</div><div class="sub">Test prompts live \u2014 free with API key</div></div><span class="ar">&#8594;</span></a>';
+}
+function buildVideo(){
+  document.getElementById('vFrame').src='https://www.youtube.com/embed/'+CT.vid+'?rel=0&modestbranding=1';
+  document.getElementById('vNote').textContent=CT.vidNote;
+}
+function buildDemo(){
+  var d=document.getElementById('demoDiv');
+  if(CT.codeB64){
+    d.innerHTML='<div class="cb"><div class="cblbl">'+CT.codeLabel+'</div><button class="cpbtn" onclick="copyCode(this)">Copy</button><pre>'+hlB64(CT.codeB64)+'</pre></div><a href="https://console.anthropic.com" target="_blank" class="plbtn"><span>&#128640;</span><div><div>Test in Anthropic Console</div><div class="sub">Paste and run this pattern</div></div><span class="ar">&#8594;</span></a>';
+  } else {
+    d.innerHTML='<p style="color:var(--text3)">No demo for this topic.</p>';
+  }
+}
+function buildQuiz(){
+  var w=document.getElementById('quizWrap');
+  if(qIdx>=CT.quiz.length){
+    var s=qAns.filter(Boolean).length;w.style.display='none';
+    document.getElementById('scBox').classList.add('show');
+    var p=Math.round(s/CT.quiz.length*100);
+    document.getElementById('scNum').textContent=s;
+    document.getElementById('scDen').textContent='/'+CT.quiz.length;
+    document.getElementById('scLbl').textContent=p>=80?'\uD83C\uDF89 Mastered!':p>=60?'\uD83D\uDC4D Good!':'\uD83D\uDCAA Keep going!';
+    document.getElementById('scDtl').textContent=p+'% \u2014 '+(p>=80?'Full XP unlocked!':p>=60?'Partial XP.':'Try again.');
+    if(p>=60&&!S.qScores[CT.id]){
+      S.qScores[CT.id]=s;var g=Math.round(s/CT.quiz.length*CT.xp);
+      S.xp=(S.xp||0)+g;if(p>=80)S.done[CT.id]=true;
+      save();refresh();showToast('\u26A1','+'+g+' XP earned!');
+    }
+    return;
+  }
+  var q=CT.quiz[qIdx];var K=['A','B','C','D'];
+  var prog=qAns.filter(Boolean).length;
+  w.innerHTML='<div class="qbox"><div class="qctr">Question '+(qIdx+1)+' of '+CT.quiz.length+' \u00b7 '+prog+' correct</div><div class="qq">'+q.q+'</div><div class="qopts">'+q.o.map(function(o,i){return '<button class="qopt" onclick="ansQ('+i+')" id="qo'+i+'"><span class="optk">'+K[i]+'</span>'+o+'</button>';}).join('')+'</div><div class="qfb" id="qfb"></div></div><div class="qnav"><div class="qprog">'+(qIdx+1)+'/'+CT.quiz.length+'</div><button class="btn btng btnsm" onclick="skipQ()">Skip &#8594;</button></div>';
+}
+function ansQ(idx){
+  var q=CT.quiz[qIdx];
+  document.querySelectorAll('.qopt').forEach(function(o){o.style.pointerEvents='none';});
+  var ok=idx===q.c;
+  document.getElementById('qo'+idx).classList.add(ok?'correct':'wrong');
+  if(!ok)document.getElementById('qo'+q.c).classList.add('correct');
+  qAns.push(ok);
+  var fb=document.getElementById('qfb');
+  fb.textContent=(ok?'\u2713 Correct! ':'\u2717 Incorrect. ')+q.e;
+  fb.classList.add('show',ok?'ok':'bad');
+  setTimeout(function(){qIdx++;buildQuiz();},1800);
+}
+function skipQ(){qAns.push(false);qIdx++;buildQuiz();}
+function retryQ(){qIdx=0;qAns=[];document.getElementById('scBox').classList.remove('show');document.getElementById('quizWrap').style.display='block';buildQuiz();}
+function buildFC(){
+  var fc=CT.fc[fcIdx];
+  document.getElementById('fcFr').textContent=fc.f;
+  document.getElementById('fcBk').textContent=fc.b;
+  document.getElementById('fcCt').textContent=(fcIdx+1)+' / '+CT.fc.length;
+  document.getElementById('fcS').classList.remove('flipped');
+}
+function buildFCDots(){
+  if(!CT)return;
+  document.getElementById('fcDots').innerHTML=CT.fc.map(function(_,i){return '<div class="fcdot'+(i===fcIdx?' active':'')+'"></div>';}).join('');
+}
+function flipFC(){document.getElementById('fcS').classList.toggle('flipped');}
+function nextFC(){fcIdx=(fcIdx+1)%CT.fc.length;buildFC();buildFCDots();}
+function prevFC(){fcIdx=(fcIdx-1+CT.fc.length)%CT.fc.length;buildFC();buildFCDots();}
+function markKnown(){showToast('\u2713','Got it!');nextFC();}
+function buildChallenge(){
+  document.getElementById('chList').innerHTML=CT.ch.map(function(c,i){
+    var k=CT.id+'_'+i;var done=S.chDone[k];
+    return '<div class="chit"><div class="chhd"><div class="chtit">'+(i+1)+'. '+c.t+'</div><div class="chxp">+'+c.xp+' XP</div></div><div class="chd">'+c.d+'</div>'+(c.h?'<div class="chh">\uD83D\uDCA1 Hint: '+c.h+'</div>':'')+
+    '<button class="chbtn'+(done?' done':'')+'" onclick="doCh(\''+k+'\','+c.xp+')">'+(done?'\u2705 Completed!':'\u2610 Mark as Complete')+'</button></div>';
+  }).join('')+'<a href="https://console.anthropic.com" target="_blank" class="plbtn" style="margin-top:8px"><span>&#127919;</span><div><div>Open Console to Complete</div><div class="sub">Test prompts free in the workbench</div></div><span class="ar">&#8594;</span></a>';
+}
+function doCh(k,xp){if(S.chDone[k])return;S.chDone[k]=true;S.xp=(S.xp||0)+xp;save();refresh();buildChallenge();showToast('\uD83C\uDFC6','+'+xp+' XP! Done!');}
+function buildResources(){
+  document.getElementById('resList').innerHTML=CT.res.map(function(r){
+    return '<a href="'+r.u+'" target="_blank" class="ri"><div class="ric">'+r.i+'</div><div><div class="rin">'+r.n+'</div><div class="rim">'+r.m+'</div></div><div class="ritg">'+r.t+'</div></a>';
+  }).join('');
+}
+var tT;
+function showToast(icon,msg){
+  var t=document.getElementById('toast');
+  document.getElementById('tIco').textContent=icon;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(tT);
+  tT=setTimeout(function(){t.classList.remove('show');},3200);
+}
+init();
+
+</script>
+</body>
+</html>

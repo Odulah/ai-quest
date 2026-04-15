@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Fundamentals — AI Enablement Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f2f5f9;
+  --bg2: #ffffff;
+  --bg3: #e8edf4;
+  --card: #ffffff;
+  --border: #dde3ed;
+  --border2: #c4cdd e;
+  --text: #171c26;
+  --text2: #5c6578;
+  --text3: #9ba3b4;
+  --accent: #0066ff;
+  --accent-light: #e5efff;
+  --accent2: #00b377;
+  --accent2-light: #e0f7ee;
+  --accent3: #f59e0b;
+  --accent3-light: #fef3cd;
+  --accent4: #ef4444;
+  --accent4-light: #fef2f2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0,30,80,0.06), 0 4px 16px rgba(0,30,80,0.07);
+  --shadow-md: 0 4px 12px rgba(0,30,80,0.1), 0 12px 32px rgba(0,30,80,0.09);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+
+/* NAV */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(242,245,249,0.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;
+}
+.nav-logo{font-family:var(--mono);font-size:12px;color:var(--text2);}
+.nav-logo span{color:var(--accent);font-weight:600;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.xp-badge{background:var(--accent-light);border:1px solid #b3d0ff;border-radius:30px;padding:5px 14px;font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;}
+.user-pill{background:var(--text);color:#fff;border-radius:30px;padding:6px 16px;font-size:13px;font-weight:700;}
+.back-link{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text2);font-size:13px;font-weight:600;transition:color 0.15s;}
+.back-link:hover{color:var(--accent);}
+
+/* HERO */
+.hero{padding:48px 32px 32px;max-width:1100px;margin:0 auto;}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px;}
+.breadcrumb span{color:var(--accent);}
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:28px;flex-wrap:wrap;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-light);color:var(--accent);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:14px;}
+.hero h1{font-size:clamp(30px,4vw,52px);font-weight:800;letter-spacing:-0.025em;line-height:1.08;margin-bottom:10px;}
+.hero h1 .line2{color:var(--accent);}
+.hero-sub{color:var(--text2);font-size:14.5px;max-width:460px;line-height:1.7;}
+
+/* STATS */
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 0;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;box-shadow:var(--shadow);}
+.stat-num{font-size:22px;font-weight:800;line-height:1;color:var(--text);}
+.stat-label{font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;}
+
+/* PROGRESS */
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;min-width:260px;box-shadow:var(--shadow);}
+.pw-top{display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;font-weight:700;}
+.pw-pct{color:var(--accent);font-family:var(--mono);}
+.pw-track{background:var(--bg3);border-radius:100px;height:8px;overflow:hidden;margin-bottom:10px;}
+.pw-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent) 0%,#3b9eff 100%);transition:width 0.9s cubic-bezier(.4,0,.2,1);}
+.pw-sub{font-size:11px;color:var(--text3);}
+
+/* HTTP METHOD LEGEND */
+.method-legend{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0;}
+.m-badge{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:700;}
+.m-get{background:#dff5ec;color:#0a7a5c;border:1px solid #a3e8d5;}
+.m-post{background:#e5efff;color:#0050cc;border:1px solid #b3d0ff;}
+.m-put{background:#fef3cd;color:#b45309;border:1px solid #fcd34d;}
+.m-delete{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;}
+.m-patch{background:var(--purple-light);color:#5b21b6;border:1px solid #c4b5fd;}
+
+/* SECTION LABEL */
+.section-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:32px 32px 60px;}
+
+/* TOPIC CARDS */
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:12px;margin-bottom:44px;}
+.topic-card{
+  background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);
+  padding:20px 22px;cursor:pointer;box-shadow:var(--shadow);
+  transition:all 0.22s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+}
+.topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc,var(--accent));opacity:0;transition:opacity 0.2s;}
+.topic-card:hover{border-color:var(--tc,var(--accent));box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.topic-card:hover::before{opacity:1;}
+.tc-top{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.tc-icon{font-size:22px;flex-shrink:0;}
+.tc-method{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--tl,var(--accent-light));color:var(--tc,var(--accent));}
+.tc-title{font-size:14.5px;font-weight:700;margin-bottom:5px;}
+.tc-desc{font-size:12.5px;color:var(--text2);line-height:1.55;margin-bottom:14px;}
+.tc-footer{display:flex;align-items:center;justify-content:space-between;}
+.tc-badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--tl,var(--accent-light));color:var(--tc,var(--accent));}
+.topic-card.done .tc-badge{background:var(--accent2-light);color:var(--accent2);}
+.tc-xp{font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:600;}
+.tc-bar{margin-top:12px;background:var(--bg3);border-radius:100px;height:3px;overflow:hidden;}
+.tc-fill{height:100%;border-radius:100px;background:var(--tc,var(--accent));transition:width 0.7s;}
+
+/* TOOLS */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:44px;}
+.tool-link{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);box-shadow:var(--shadow);transition:all 0.18s;}
+.tool-link:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.tl-icon{font-size:18px;flex-shrink:0;}
+.tl-name{font-size:13px;font-weight:700;}
+.tl-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,20,40,0.48);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,30,80,0.2);transform:translateY(16px) scale(0.97);transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-hd{padding:22px 26px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--card);z-index:2;}
+.modal-tag{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:0.08em;}
+.modal-title{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
+.modal-x{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.modal-x:hover{background:var(--bg);color:var(--text);}
+.modal-bd{padding:22px 26px;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:20px;flex-wrap:wrap;}
+.tab-btn{flex:1;min-width:68px;padding:7px 9px;border:none;border-radius:8px;background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:var(--sans);white-space:nowrap;}
+.tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.1);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* LEARN */
+.concept-list{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.concept-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;align-items:flex-start;gap:11px;}
+.c-num{width:22px;height:22px;background:var(--accent);color:#fff;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;}
+.c-text{font-size:13.5px;line-height:1.6;color:var(--text2);}
+.c-text strong{color:var(--text);font-weight:700;}
+.c-text code{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:11.5px;color:var(--accent);}
+
+/* API DEMO BOX */
+.api-demo{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+.api-demo-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.api-demo-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.api-demo-method{font-family:var(--mono);font-size:12px;font-weight:700;padding:5px 10px;border-radius:6px;}
+.api-demo-url{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 10px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.api-demo-status{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.status-200{background:#dff5ec;color:#0a7a5c;}
+.status-400{background:#fef3cd;color:#b45309;}
+.status-401{background:var(--purple-light);color:#5b21b6;}
+.status-404{background:#fef3cd;color:#b45309;}
+.status-500{background:#fef2f2;color:#b91c1c;}
+
+.play-btn{display:flex;align-items:center;gap:11px;background:var(--accent-light);border:1.5px solid #b3d0ff;border-radius:10px;padding:13px 17px;color:var(--accent);text-decoration:none;font-size:13px;font-weight:700;transition:all 0.18s;margin-bottom:10px;}
+.play-btn:hover{background:#d0e5ff;border-color:var(--accent);}
+.play-btn-arrow{margin-left:auto;}
+.play-btn-sub{font-size:11px;font-weight:400;color:#4488cc;margin-top:1px;}
+
+/* VIDEO */
+.video-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;aspect-ratio:16/9;margin-bottom:13px;}
+.video-box iframe{width:100%;height:100%;border:none;}
+.video-note{font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5;}
+
+/* QUIZ */
+.quiz-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.quiz-counter{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;}
+.quiz-q{font-size:14.5px;font-weight:700;margin-bottom:13px;line-height:1.5;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.quiz-opt{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:13.5px;transition:all 0.14s;display:flex;align-items:center;gap:10px;color:var(--text);font-family:var(--sans);font-weight:500;text-align:left;}
+.quiz-opt:hover{border-color:var(--accent);background:var(--accent-light);}
+.quiz-opt.correct{border-color:var(--accent2);background:var(--accent2-light);color:#0a7a5c;}
+.quiz-opt.wrong{border-color:var(--accent4);background:var(--accent4-light);color:#b91c1c;}
+.opt-k{width:21px;height:21px;background:var(--bg3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;flex-shrink:0;color:var(--text3);}
+.quiz-fb{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:13px;display:none;line-height:1.5;font-weight:500;}
+.quiz-fb.show{display:block;}
+.quiz-fb.ok{background:var(--accent2-light);border:1px solid #a3e8d5;color:#0a6b50;}
+.quiz-fb.bad{background:var(--accent4-light);border:1px solid #fca5a5;color:#9b1e2b;}
+.quiz-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+.score-box{text-align:center;padding:30px;display:none;}
+.score-box.show{display:block;}
+.score-big{font-size:52px;font-weight:800;color:var(--accent);line-height:1;}
+.score-label{font-size:14px;color:var(--text2);margin:8px 0 20px;}
+
+/* BTNS */
+.btn{padding:9px 19px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all 0.14s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#0052cc;}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+/* FLASHCARDS */
+.fc-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+.fc-count{font-family:var(--mono);font-size:12px;color:var(--text3);font-weight:600;}
+.fc-scene{perspective:900px;width:100%;height:185px;margin-bottom:14px;cursor:pointer;}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform 0.42s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;}
+.fc-scene.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-face{position:absolute;inset:0;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fc-face.back{background:var(--accent-light);border-color:#b3d0ff;transform:rotateY(180deg);}
+.fc-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--text3);margin-bottom:9px;text-transform:uppercase;}
+.fc-face.back .fc-lbl{color:var(--accent);}
+.fc-txt{font-size:15px;font-weight:700;text-align:center;line-height:1.4;}
+.fc-face.back .fc-txt{color:var(--accent);}
+.fc-hint{font-size:11px;color:var(--text3);margin-top:9px;}
+.fc-actions{display:flex;gap:8px;}
+.fc-actions .btn{flex:1;}
+
+/* CHALLENGE */
+.ch-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+.ch-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px;}
+.ch-title{font-size:14px;font-weight:700;}
+.ch-xp{font-family:var(--mono);font-size:10.5px;color:var(--accent3);background:var(--accent3-light);border:1px solid #fcd34d;border-radius:20px;padding:2px 9px;font-weight:700;white-space:nowrap;}
+.ch-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:13px;}
+.ch-btn{background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text2);font-family:var(--sans);transition:all 0.14s;}
+.ch-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+.ch-btn.done{background:var(--accent2-light);border-color:#a3e8d5;color:var(--accent2);}
+
+/* RESOURCES */
+.res-item{display:flex;align-items:center;gap:11px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 15px;margin-bottom:8px;text-decoration:none;color:var(--text);transition:all 0.14s;}
+.res-item:hover{border-color:var(--accent);background:var(--accent-light);}
+.res-icon{font-size:18px;flex-shrink:0;}
+.res-name{font-size:13.5px;font-weight:700;}
+.res-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.res-tag{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;}
+
+/* WELCOME */
+.welcome{position:fixed;inset:0;background:rgba(10,20,40,0.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;}
+.welcome-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:38px 34px;max-width:390px;width:100%;box-shadow:0 32px 80px rgba(0,30,80,0.2);text-align:center;}
+.wc-emoji{font-size:42px;margin-bottom:14px;}
+.wc-h{font-size:24px;font-weight:800;letter-spacing:-0.01em;margin-bottom:9px;}
+.wc-p{color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:24px;}
+.wc-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;font-size:15px;font-family:var(--sans);color:var(--text);margin-bottom:13px;outline:none;transition:border-color 0.14s;}
+.wc-input:focus{border-color:var(--accent);}
+.wc-input::placeholder{color:var(--text3);}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:#fff;border-radius:12px;padding:12px 17px;font-size:13.5px;font-weight:600;z-index:999;transform:translateY(66px);opacity:0;transition:all 0.32s cubic-bezier(.4,0,.2,1);max-width:280px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 30px rgba(0,30,80,0.2);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;font-size:11px;color:var(--text3);font-family:var(--mono);background:var(--card);}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.topic-card{animation:fadeUp 0.38s ease backwards;}
+.topic-card:nth-child(1){animation-delay:.04s}.topic-card:nth-child(2){animation-delay:.08s}
+.topic-card:nth-child(3){animation-delay:.12s}.topic-card:nth-child(4){animation-delay:.16s}
+.topic-card:nth-child(5){animation-delay:.20s}.topic-card:nth-child(6){animation-delay:.24s}
+.topic-card:nth-child(7){animation-delay:.28s}.topic-card:nth-child(8){animation-delay:.32s}
+
+@media(max-width:600px){
+  nav,.hero,.main{padding-left:16px;padding-right:16px;}
+  .hero{padding-top:28px;}
+  .modal-hd,.modal-bd{padding:16px 18px;}
+  .tab-btn{font-size:11px;padding:6px 7px;}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div class="welcome" id="wm">
+  <div class="welcome-card">
+    <div class="wc-emoji">🔌</div>
+    <div class="wc-h">Welcome to API Fundamentals</div>
+    <div class="wc-p">Enter your name to track XP, quiz scores, and challenge completions across the platform.</div>
+    <input class="wc-input" id="nameInput" type="text" placeholder="Your first name..." maxlength="24"/>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;" onclick="startJourney()">Start Learning →</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="#" class="back-link" onclick="history.back()">← Back</a>
+    <div class="nav-logo">AI_ENABLEMENT // <span>API Fundamentals</span></div>
+  </div>
+  <div class="nav-right">
+    <div class="xp-badge" id="navXP">0 XP</div>
+    <div class="user-pill" id="navUser">...</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb">AI Enablement Platform / <span>Module 02</span> / API Fundamentals</div>
+  <div class="hero-row">
+    <div>
+      <div class="hero-badge">🔌 Module 02 · Foundations Track</div>
+      <h1>API<br><span class="line2">Fundamentals</span></h1>
+      <p class="hero-sub">Connect AI models to the world. Master REST, HTTP methods, authentication, and the Claude API — the arteries of every modern AI system.</p>
+
+      <div class="method-legend">
+        <div class="m-badge m-get">GET <span style="font-weight:400;opacity:0.7">Read</span></div>
+        <div class="m-badge m-post">POST <span style="font-weight:400;opacity:0.7">Create</span></div>
+        <div class="m-badge m-put">PUT <span style="font-weight:400;opacity:0.7">Update</span></div>
+        <div class="m-badge m-delete">DELETE <span style="font-weight:400;opacity:0.7">Remove</span></div>
+        <div class="m-badge m-patch">PATCH <span style="font-weight:400;opacity:0.7">Partial</span></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num">8</div><div class="stat-label">Topics</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Levels</div></div>
+        <div class="stat"><div class="stat-num">400</div><div class="stat-label">Max XP</div></div>
+        <div class="stat"><div class="stat-num" id="doneStat">0</div><div class="stat-label">Completed</div></div>
+        <div class="stat"><div class="stat-num" id="xpStat">0</div><div class="stat-label">XP Earned</div></div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="pw-top"><span>Module Progress</span><span class="pw-pct" id="progPct">0%</span></div>
+      <div class="pw-track"><div class="pw-fill" id="progFill" style="width:0%"></div></div>
+      <div class="pw-sub" id="progSub">0 of 8 topics completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="section-label">8 Topics — Click Any Card</div>
+  <div class="topics-grid" id="topicsGrid"></div>
+
+  <div class="section-label">Live Tools &amp; Free Resources</div>
+  <div class="tools-grid">
+    <a href="https://hoppscotch.io/" target="_blank" class="tool-link">
+      <div class="tl-icon">🚀</div><div><div class="tl-name">Hoppscotch</div><div class="tl-sub">Browser API client · No login</div></div>
+    </a>
+    <a href="https://httpbin.org/" target="_blank" class="tool-link">
+      <div class="tl-icon">🪞</div><div><div class="tl-name">HTTPBin</div><div class="tl-sub">Free API that echoes requests</div></div>
+    </a>
+    <a href="https://reqbin.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">⚡</div><div><div class="tl-name">ReqBin</div><div class="tl-sub">Instant browser API tester</div></div>
+    </a>
+    <a href="https://jsonlint.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">📋</div><div><div class="tl-name">JSON Lint</div><div class="tl-sub">Validate &amp; format JSON</div></div>
+    </a>
+    <a href="https://docs.anthropic.com/en/api/getting-started" target="_blank" class="tool-link">
+      <div class="tl-icon">🤖</div><div><div class="tl-name">Claude API Docs</div><div class="tl-sub">Official Anthropic reference</div></div>
+    </a>
+    <a href="https://github.com/public-apis/public-apis" target="_blank" class="tool-link">
+      <div class="tl-icon">📦</div><div><div class="tl-name">Public APIs List</div><div class="tl-sub">1000+ free APIs to practice</div></div>
+    </a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-tag" id="mTag">TOPIC 01 · BEGINNER</div>
+        <div class="modal-title" id="mTitle">Topic</div>
+      </div>
+      <button class="modal-x" onclick="closeModal2()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="tab('learn',this)">📘 Learn</button>
+        <button class="tab-btn" onclick="tab('video',this)">▶ Video</button>
+        <button class="tab-btn" onclick="tab('demo',this)">🔬 Demo</button>
+        <button class="tab-btn" onclick="tab('quiz',this)">🧠 Quiz</button>
+        <button class="tab-btn" onclick="tab('cards',this)">🃏 Cards</button>
+        <button class="tab-btn" onclick="tab('challenge',this)">⚡ Challenge</button>
+        <button class="tab-btn" onclick="tab('links',this)">🔗 Links</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-learn">
+        <div class="concept-list" id="conceptList"></div>
+        <a href="https://hoppscotch.io/" target="_blank" class="play-btn">
+          <span>🚀</span>
+          <div><div>Open Hoppscotch</div><div class="play-btn-sub">Browser-based API client · no login needed</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-video">
+        <div class="video-box"><iframe id="vFrame" src="" allowfullscreen loading="lazy"></iframe></div>
+        <div class="video-note" id="vNote"></div>
+        <a href="https://hoppscotch.io/" target="_blank" class="play-btn">
+          <span>🔌</span>
+          <div><div>Test APIs in Hoppscotch</div><div class="play-btn-sub">Open while watching the video</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-demo">
+        <div id="demoArea"></div>
+      </div>
+
+      <div class="tab-panel" id="tab-quiz">
+        <div id="quizWrap"></div>
+        <div class="score-box" id="scoreBox">
+          <div class="score-big" id="scoreBig">0/5</div>
+          <div class="score-label" id="scoreLbl">Quiz complete!</div>
+          <button class="btn btn-primary" onclick="retryQuiz()">Try Again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-cards">
+        <div class="fc-nav">
+          <button class="btn btn-ghost" onclick="prevFC()">← Prev</button>
+          <div class="fc-count" id="fcCount">1 / 5</div>
+          <button class="btn btn-ghost" onclick="nextFC()">Next →</button>
+        </div>
+        <div class="fc-scene" id="fcScene" onclick="flipFC()">
+          <div class="fc-inner">
+            <div class="fc-face front">
+              <div class="fc-lbl">Term</div>
+              <div class="fc-txt" id="fcFront">...</div>
+              <div class="fc-hint">Tap to reveal</div>
+            </div>
+            <div class="fc-face back">
+              <div class="fc-lbl">Definition</div>
+              <div class="fc-txt" id="fcBack">...</div>
+              <div class="fc-hint">Tap to flip back</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-actions">
+          <button class="btn btn-ghost" onclick="markKnown()">✓ Got it</button>
+          <button class="btn btn-ghost" onclick="nextFC()">↺ Again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-challenge">
+        <div id="chList"></div>
+        <a href="https://hoppscotch.io/" target="_blank" class="play-btn" style="margin-top:4px">
+          <span>💻</span>
+          <div><div>Open Hoppscotch to Complete</div><div class="play-btn-sub">Free browser API client · no install</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-links">
+        <div id="resList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIcon">🎉</span><span id="tMsg">Done!</span></div>
+<footer>AI ENABLEMENT PLATFORM · CELONIS CONSULTANTS · MODULE 02 · API FUNDAMENTALS</footer>
+
+<script>
+const TOPICS = [
+  {
+    id:'rest', num:'01', title:'REST Architecture', desc:'The universal standard for modern APIs — stateless, scalable, resource-based design.',
+    icon:'🌐', level:'Beginner', xp:50, tc:'#0066ff', tl:'#e5efff', method:'CONCEPT',
+    concepts:[
+      {t:'<strong>REST</strong> (Representational State Transfer) is an architectural style that uses standard HTTP to provide lightweight, stateless communication between systems.'},
+      {t:'<strong>Resources</strong> are the core concept — everything is a "noun" accessed via a URL. <code>/cases</code>, <code>/activities</code>, <code>/users/42</code> are all resources.'},
+      {t:'<strong>Stateless</strong> means each API call is independent — the server doesn\'t remember previous requests. All context must be sent in every request.'},
+      {t:'<strong>Uniform Interface</strong>: consistent URL patterns, standard HTTP methods, and predictable response formats make REST easy to learn and use across teams.'},
+      {t:'<strong>Client-Server separation</strong>: the frontend and backend are decoupled. This is how Claude API works — your app (client) calls Anthropic\'s servers independently.'},
+    ],
+    vid:'7YcW25PHnAA', vidNote:'▶ APIs for Beginners — freeCodeCamp. The definitive free introduction to APIs and REST.',
+    demo:{
+      title:'REST Resource Design',
+      items:[
+        {method:'GET', url:'/api/cases', status:'200', desc:'Retrieve all process cases'},
+        {method:'GET', url:'/api/cases/101', status:'200', desc:'Get case with ID 101'},
+        {method:'POST', url:'/api/cases', status:'201', desc:'Create a new process case'},
+        {method:'PUT', url:'/api/cases/101', status:'200', desc:'Update case 101 fully'},
+        {method:'DELETE', url:'/api/cases/101', status:'204', desc:'Delete case 101'},
+      ]
+    },
+    fc:[
+      {f:'REST', b:'Representational State Transfer — architectural style using HTTP for stateless client-server communication.'},
+      {f:'Resource', b:'A "noun" in a REST API — accessed via a URL. e.g. /cases, /users/42, /activities'},
+      {f:'Stateless', b:'Each request is self-contained. Server holds no session state between calls.'},
+      {f:'Endpoint', b:'A specific URL where a resource can be accessed or an action triggered.'},
+      {f:'Client-Server', b:'Frontend (client) and backend (server) are decoupled. Claude API uses this model.'},
+    ],
+    quiz:[
+      {q:'What does REST stand for?',o:['Remote Execution Service Transfer','Representational State Transfer','Real-time Event Streaming Technology','Resource-Enabled Server Technology'],c:1,e:'REST = Representational State Transfer — coined by Roy Fielding in his 2000 dissertation.'},
+      {q:'What does "stateless" mean in REST?',o:['The server is offline','Each request is self-contained with no session memory','The API has no authentication','Responses have no body'],c:1,e:'Stateless = the server doesn\'t remember previous requests. All context is in each request.'},
+      {q:'Which URL pattern follows REST conventions?',o:['/getUser?id=5','/user/5','/fetchUserById/5','/users/get/5'],c:1,e:'/user/5 is RESTful — a resource noun with an ID parameter.'},
+      {q:'In REST, what represents a "resource"?',o:['An HTTP method','A server response','A data entity accessible via URL','An authentication token'],c:2,e:'Resources are the nouns of REST — data entities like /cases, /activities, /users.'},
+      {q:'Which HTTP status code means "resource created successfully"?',o:['200','201','204','302'],c:1,e:'201 Created is the correct response when a POST request creates a new resource.'},
+    ],
+    ch:[
+      {t:'Design a Celonis API',d:'Design REST endpoints for a process mining API. Create URLs for: list all cases, get one case, create a case, update a case, delete a case. Include HTTP method for each.',xp:25},
+      {t:'REST vs Non-REST',d:'Given 5 bad API URL patterns (e.g. /getCase, /deleteUser?id=1), rewrite them following REST conventions. Explain each fix.',xp:20},
+    ],
+    res:[
+      {n:'REST API Tutorial',u:'https://restfulapi.net/',i:'📚',m:'Comprehensive free reference',t:'Guide'},
+      {n:'Hoppscotch — API Client',u:'https://hoppscotch.io/',i:'🚀',m:'Browser-based, no login',t:'Tool'},
+      {n:'Mastering API Architecture',u:'https://www.f5.com/company/blog/mastering-api-architecture-api-fundamentals',i:'🔗',m:'F5 API fundamentals article',t:'Article'},
+    ]
+  },
+  {
+    id:'http', num:'02', title:'HTTP Methods', desc:'GET, POST, PUT, DELETE, PATCH — the verbs that define every API interaction.',
+    icon:'📡', level:'Beginner', xp:50, tc:'#00b377', tl:'#e0f7ee', method:'METHODS',
+    concepts:[
+      {t:'<strong>GET</strong>: retrieves data. Safe and idempotent — calling it multiple times has no side effects. <code>GET /api/cases</code> fetches all cases.'},
+      {t:'<strong>POST</strong>: creates a new resource. Not idempotent — calling twice creates two records. <code>POST /api/cases</code> with a JSON body.'},
+      {t:'<strong>PUT</strong>: replaces an entire resource. Idempotent — same call twice produces same result. <code>PUT /api/cases/101</code> fully replaces case 101.'},
+      {t:'<strong>DELETE</strong>: removes a resource. Idempotent. <code>DELETE /api/cases/101</code> removes case 101.'},
+      {t:'<strong>PATCH</strong>: partially updates a resource. More efficient than PUT when only updating one field. <code>PATCH /api/cases/101</code> with <code>{"status":"closed"}</code>.'},
+    ],
+    vid:'iYM2zFP3Zn0', vidNote:'▶ HTTP Methods Explained — Traversy Media. Clear, practical, with real code examples.',
+    demo:{
+      title:'HTTP Methods at a Glance',
+      items:[
+        {method:'GET',    url:'/api/cases',        status:'200', desc:'Fetch all cases — read-only, safe'},
+        {method:'POST',   url:'/api/cases',        status:'201', desc:'Create new case — sends body'},
+        {method:'PUT',    url:'/api/cases/101',    status:'200', desc:'Replace full case 101'},
+        {method:'PATCH',  url:'/api/cases/101',    status:'200', desc:'Update one field of case 101'},
+        {method:'DELETE', url:'/api/cases/101',    status:'204', desc:'Remove case 101 — no body returned'},
+      ]
+    },
+    fc:[
+      {f:'GET', b:'Retrieves data. Safe + idempotent. Never changes server state.'},
+      {f:'POST', b:'Creates a new resource. NOT idempotent — calling twice makes two records.'},
+      {f:'PUT', b:'Replaces a resource entirely. Idempotent — same result if called multiple times.'},
+      {f:'DELETE', b:'Removes a resource. Idempotent. Usually returns 204 No Content.'},
+      {f:'Idempotent', b:'An operation where multiple identical calls produce the same result as one call.'},
+    ],
+    quiz:[
+      {q:'Which HTTP method is used to CREATE a new resource?',o:['GET','POST','PUT','PATCH'],c:1,e:'POST creates new resources. The server assigns the ID.'},
+      {q:'Which method is "safe" — meaning it never modifies data?',o:['POST','PUT','GET','DELETE'],c:2,e:'GET is safe and idempotent — it only reads, never modifies server state.'},
+      {q:'What is idempotency?',o:['A request that always fails','Calling multiple times gives same result as once','A POST request','An encryption method'],c:1,e:'Idempotent = calling the same request multiple times produces the same result.'},
+      {q:'You want to update ONLY the status field of case 101. Which method?',o:['PUT','GET','PATCH','POST'],c:2,e:'PATCH is for partial updates — more efficient than PUT when changing one field.'},
+      {q:'What status code does DELETE typically return?',o:['200','201','204','404'],c:2,e:'204 No Content — success, but nothing to return in the body.'},
+    ],
+    ch:[
+      {t:'Method Matcher',d:'Given 6 scenarios (fetch user list, create a case, remove an activity, update status, replace full record, get specific item), assign the correct HTTP method to each.',xp:25},
+      {t:'API Call Planner',d:'Design the full API call plan for a Celonis "case lifecycle" feature: open case → update activity → close case → archive case. Use correct methods and URLs.',xp:30},
+    ],
+    res:[
+      {n:'MDN: HTTP Methods',u:'https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods',i:'📚',m:'Official MDN reference',t:'Docs'},
+      {n:'HTTPBin — Test Methods',u:'https://httpbin.org/',i:'🪞',m:'Free API that echoes requests',t:'Tool'},
+    ]
+  },
+  {
+    id:'reqres', num:'03', title:'Requests & Responses', desc:'Understanding headers, body, status codes — the anatomy of every API call.',
+    icon:'🔄', level:'Beginner', xp:50, tc:'#7c3aed', tl:'#ede9fe', method:'ANATOMY',
+    concepts:[
+      {t:'<strong>Request anatomy</strong>: every API call has a Method, URL, Headers, and optionally a Body. Headers carry metadata like content type and auth tokens.'},
+      {t:'<strong>Content-Type header</strong>: tells the server what format your body is in. <code>Content-Type: application/json</code> is standard for AI APIs.'},
+      {t:'<strong>Response anatomy</strong>: Status Code + Response Headers + Response Body. The body is almost always JSON in modern APIs.'},
+      {t:'<strong>HTTP status code families</strong>: 2xx = success, 3xx = redirect, 4xx = client error (your fault), 5xx = server error (their fault).'},
+      {t:'<strong>Common codes</strong>: 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Rate Limited, 500 Internal Server Error.'},
+    ],
+    vid:'pHFWGN-upGM', vidNote:'▶ HTTP Status Codes — Traversy Media. Visual walkthrough of every important status code.',
+    demo:{
+      title:'Common Status Codes',
+      items:[
+        {method:'200', url:'OK', status:'200', desc:'Request succeeded — body contains data'},
+        {method:'201', url:'Created', status:'200', desc:'POST success — new resource created'},
+        {method:'400', url:'Bad Request', status:'400', desc:'Invalid JSON or missing required field'},
+        {method:'401', url:'Unauthorized', status:'401', desc:'Missing or invalid API key'},
+        {method:'429', url:'Rate Limited', status:'400', desc:'Too many requests — wait and retry'},
+        {method:'500', url:'Server Error', status:'500', desc:'Something broke on the server side'},
+      ]
+    },
+    fc:[
+      {f:'Content-Type', b:'Request header telling the server your body format. application/json for APIs.'},
+      {f:'Authorization', b:'Header carrying auth credentials. e.g. Authorization: Bearer sk-ant-xxxxx'},
+      {f:'200 OK', b:'Request succeeded. Standard success response with data in body.'},
+      {f:'401 Unauthorized', b:'Missing, expired, or invalid credentials. Check your API key.'},
+      {f:'429 Too Many Requests', b:'Rate limit hit. Add retry logic with exponential backoff.'},
+    ],
+    quiz:[
+      {q:'A 4xx error means?',o:['Server error','Client made a bad request','Success','Redirect'],c:1,e:'4xx = client errors — problems with YOUR request (bad data, missing auth, not found).'},
+      {q:'Which header tells the server your body is JSON?',o:['Accept: application/json','Authorization: json','Content-Type: application/json','X-Format: json'],c:2,e:'Content-Type: application/json tells the server how to parse your request body.'},
+      {q:'You get 401. What is the problem?',o:['Server crashed','Resource not found','Auth credentials missing or invalid','Rate limit hit'],c:2,e:'401 Unauthorized = missing or invalid API key/token.'},
+      {q:'What does a 429 status code mean?',o:['Not found','Forbidden','Too many requests','Bad gateway'],c:2,e:'429 = rate limit exceeded. Implement retry logic with exponential backoff.'},
+      {q:'What status code does a successful GET return?',o:['201','204','200','202'],c:2,e:'200 OK is the standard success response for GET requests.'},
+    ],
+    ch:[
+      {t:'Status Code Decoder',d:'Given 8 API responses with status codes (200, 201, 400, 401, 403, 404, 429, 500), write the meaning of each and one fix/action for the error codes.',xp:25},
+      {t:'Request Builder',d:'Build a complete Claude API request in pseudocode: correct URL, headers (Content-Type + Authorization), and JSON body (model, max_tokens, messages array).',xp:35},
+    ],
+    res:[
+      {n:'MDN: HTTP Status Codes',u:'https://developer.mozilla.org/en-US/docs/Web/HTTP/Status',i:'📚',m:'Full reference for all status codes',t:'Docs'},
+      {n:'HTTPBin — Status Codes',u:'https://httpbin.org/#/Status_codes',i:'🪞',m:'Trigger any status code live',t:'Tool'},
+      {n:'ReqBin — API Tester',u:'https://reqbin.com/',i:'⚡',m:'Instant browser-based API testing',t:'Tool'},
+    ]
+  },
+  {
+    id:'json', num:'04', title:'JSON & Data Formats', desc:'Parsing, serialising, and structuring JSON — the universal language of APIs.',
+    icon:'📋', level:'Beginner', xp:50, tc:'#f59e0b', tl:'#fef3cd', method:'DATA',
+    concepts:[
+      {t:'<strong>JSON</strong> (JavaScript Object Notation) is the universal API data format. Lightweight, human-readable, and natively supported in Python with the <code>json</code> module.'},
+      {t:'<strong>JSON structure</strong>: objects <code>{}</code> hold key-value pairs. Arrays <code>[]</code> hold ordered lists. Values can be strings, numbers, booleans, null, or nested objects/arrays.'},
+      {t:'<strong>Parsing</strong> (JSON → Python): <code>import json; data = json.loads(response_text)</code> — converts a JSON string into a Python dict.'},
+      {t:'<strong>Serialising</strong> (Python → JSON): <code>json.dumps(my_dict, indent=2)</code> — converts a Python dict into a JSON string ready to send as a request body.'},
+      {t:'<strong>Claude API response</strong> is JSON. The model\'s text is at <code>response["content"][0]["text"]</code> — always parse before using!'},
+    ],
+    vid:'iiADhChRriI', vidNote:'▶ JSON Crash Course — Traversy Media. Everything you need to know about JSON in 30 minutes.',
+    demo:{
+      title:'Claude API Response Structure',
+      items:[
+        {method:'KEY', url:'id', status:'200', desc:'"msg_01XFDUDYJgAACехо" — unique message ID'},
+        {method:'KEY', url:'type', status:'200', desc:'"message" — response type'},
+        {method:'KEY', url:'model', status:'200', desc:'"claude-sonnet-4-6" — model used'},
+        {method:'KEY', url:'content[0].text', status:'200', desc:'The actual AI-generated text response'},
+        {method:'KEY', url:'usage.input_tokens', status:'200', desc:'Tokens consumed from your prompt'},
+      ]
+    },
+    fc:[
+      {f:'JSON', b:'JavaScript Object Notation — lightweight key-value data format used by virtually all modern APIs.'},
+      {f:'json.loads()', b:'Parses a JSON string into a Python dict/list. "loads" = load string.'},
+      {f:'json.dumps()', b:'Converts a Python object into a JSON string. "dumps" = dump string.'},
+      {f:'JSON Array', b:'An ordered list of values: ["GET","POST","PUT"]. Mapped to Python list.'},
+      {f:'JSON Object', b:'Key-value pairs: {"method":"GET","url":"/cases"}. Mapped to Python dict.'},
+    ],
+    quiz:[
+      {q:'What does json.loads() do?',o:['Loads a JSON file from disk','Converts JSON string to Python object','Sends JSON over HTTP','Validates JSON syntax'],c:1,e:'json.loads() = "load string" — parses a JSON-formatted string into Python dict/list.'},
+      {q:'How do you access Claude\'s response text from the API JSON?',o:['response["text"]','response["message"]','response["content"][0]["text"]','response["output"]'],c:2,e:'Claude API returns: content is a list, first item is a block, text is the key.'},
+      {q:'Which is valid JSON?',o:['{"name": John}','{"name": \'John\'}','{"name": "John"}','{name: "John"}'],c:2,e:'JSON requires double quotes for both keys and string values.'},
+      {q:'What Python type does a JSON object {} map to?',o:['list','tuple','dict','set'],c:2,e:'JSON objects {} map to Python dictionaries {}. JSON arrays [] map to Python lists.'},
+      {q:'json.dumps(data, indent=2) does what?',o:['Validates JSON','Parses JSON string','Converts Python to formatted JSON string','Sends data to an API'],c:2,e:'json.dumps() converts Python to a JSON string. indent=2 makes it human-readable.'},
+    ],
+    ch:[
+      {t:'JSON Parser',d:'Write Python code to parse a Claude API response JSON. Extract and print: the response text, model used, input token count, and stop reason.',xp:30},
+      {t:'Request Body Builder',d:'Build a Python dict for a Claude API request body with: model, max_tokens, system prompt (Celonis assistant), and a user message. Then json.dumps() it.',xp:25},
+    ],
+    res:[
+      {n:'JSON Lint — Validator',u:'https://jsonlint.com/',i:'📋',m:'Validate and format JSON instantly',t:'Tool'},
+      {n:'Python json module',u:'https://docs.python.org/3/library/json.html',i:'📚',m:'Official Python docs',t:'Docs'},
+      {n:'JSON Formatter',u:'https://jsonformatter.curiousconcept.com/',i:'🔧',m:'Format and validate JSON',t:'Tool'},
+    ]
+  },
+  {
+    id:'auth', num:'05', title:'Authentication & Security', desc:'API keys, Bearer tokens, OAuth — securing your AI API calls properly.',
+    icon:'🔐', level:'Intermediate', xp:50, tc:'#ef4444', tl:'#fef2f2', method:'SECURITY',
+    concepts:[
+      {t:'<strong>API Key authentication</strong>: the simplest method. Send your key in a header: <code>x-api-key: sk-ant-api03-...</code>. Used by the Claude API.'},
+      {t:'<strong>Bearer Token</strong>: <code>Authorization: Bearer &lt;token&gt;</code>. Common in OAuth 2.0 flows where a short-lived token is granted after login.'},
+      {t:'<strong>NEVER hardcode API keys</strong> in your source code. Use environment variables: <code>import os; key = os.getenv("ANTHROPIC_API_KEY")</code>.'},
+      {t:'<strong>Rate limiting</strong>: APIs restrict how many calls you can make per minute/day. Handle 429 responses with exponential backoff retry logic.'},
+      {t:'<strong>HTTPS only</strong>: always use <code>https://</code> URLs. HTTP sends data in plaintext — your API key would be exposed on the network.'},
+    ],
+    vid:'x_cPg8MjYCM', vidNote:'▶ API Authentication — Web Dev Simplified. Covers API keys, tokens, OAuth clearly.',
+    demo:{
+      title:'Claude API Auth Header',
+      items:[
+        {method:'HDR', url:'x-api-key', status:'200', desc:'Your Anthropic API key — required on every request'},
+        {method:'HDR', url:'anthropic-version', status:'200', desc:'"2023-06-01" — API version to use'},
+        {method:'HDR', url:'content-type', status:'200', desc:'"application/json" — body format'},
+        {method:'BAD', url:'Hardcoded key in code', status:'401', desc:'❌ Never do this — commits expose secrets'},
+        {method:'KEY', url:'os.getenv("API_KEY")', status:'200', desc:'✅ Always use environment variables'},
+      ]
+    },
+    fc:[
+      {f:'API Key', b:'A secret token passed in a header to authenticate requests. Treat like a password.'},
+      {f:'Bearer Token', b:'Authorization: Bearer <token> — common OAuth 2.0 auth pattern.'},
+      {f:'Environment Variable', b:'os.getenv("ANTHROPIC_API_KEY") — stores secrets outside your code.'},
+      {f:'Rate Limit (429)', b:'Too many requests sent. Implement exponential backoff: wait 1s, 2s, 4s, 8s...'},
+      {f:'HTTPS', b:'HTTP + TLS encryption. Required for all API calls — never use plain HTTP.'},
+    ],
+    quiz:[
+      {q:'Where should you store your Anthropic API key?',o:['In your Python file','In a GitHub README','In an environment variable','In a JSON file in the repo'],c:2,e:'Always use environment variables (os.getenv). Never hardcode secrets in code.'},
+      {q:'What HTTP status code means your API key is invalid?',o:['403','404','401','500'],c:2,e:'401 Unauthorized = authentication failed. Check your API key.'},
+      {q:'What is exponential backoff?',o:['A faster API call technique','Retry with increasing wait times: 1s, 2s, 4s...','An encryption method','Compressing request bodies'],c:1,e:'Exponential backoff: on 429, wait 1s, retry. If still 429, wait 2s, then 4s...'},
+      {q:'Which header carries the Claude API key?',o:['Authorization: Bearer','x-api-key','API-Token','claude-key'],c:1,e:'Claude uses x-api-key header. Other APIs may use Authorization: Bearer.'},
+      {q:'Why must you use HTTPS and not HTTP?',o:['HTTPS is faster','HTTP doesn\'t support JSON','HTTP sends data in plaintext — exposes your key','HTTPS is required by JSON spec'],c:2,e:'HTTP is unencrypted — anyone on the network can read your API key. Always use HTTPS.'},
+    ],
+    ch:[
+      {t:'Secure API Client',d:'Write a Python function make_api_call() that: loads API key from environment variables, includes correct headers, handles 401 and 429 errors with appropriate messages.',xp:35},
+      {t:'Security Audit',d:'Given 5 code snippets with security flaws (hardcoded key, HTTP URL, no error handling), identify and fix each flaw with an explanation.',xp:25},
+    ],
+    res:[
+      {n:'Anthropic API Auth Docs',u:'https://docs.anthropic.com/en/api/getting-started',i:'🤖',m:'Official auth guide',t:'Docs'},
+      {n:'Python-dotenv Guide',u:'https://pypi.org/project/python-dotenv/',i:'🔧',m:'Manage environment variables',t:'Tool'},
+    ]
+  },
+  {
+    id:'params', num:'06', title:'Parameters & Filtering', desc:'Query params, path params, request bodies — controlling exactly what data you get.',
+    icon:'🎛️', level:'Intermediate', xp:50, tc:'#0066ff', tl:'#e5efff', method:'PARAMS',
+    concepts:[
+      {t:'<strong>Path parameters</strong>: embedded in the URL to identify a specific resource. <code>/cases/{case_id}</code> → <code>/cases/101</code>'},
+      {t:'<strong>Query parameters</strong>: appended after <code>?</code> to filter, sort, or paginate. <code>/cases?status=open&limit=50&offset=0</code>'},
+      {t:'<strong>Request body parameters</strong>: sent in the POST/PUT/PATCH body as JSON. The Claude API uses this for model, messages, and max_tokens.'},
+      {t:'<strong>Claude API parameters</strong>: <code>model</code>, <code>max_tokens</code>, <code>temperature</code> (0–1), <code>system</code> prompt, <code>messages</code> array.'},
+      {t:'<strong>Pagination</strong>: APIs limit results per page. Use <code>limit</code> and <code>offset</code> (or <code>cursor</code>) to iterate through large datasets like Celonis event logs.'},
+    ],
+    vid:'KUP11j1mMuQ', vidNote:'▶ REST API Query Parameters — Programming with Mosh. Path vs query params explained clearly.',
+    demo:{
+      title:'Parameter Types in Action',
+      items:[
+        {method:'PATH', url:'/api/cases/101', status:'200', desc:'101 is a path param — identifies the resource'},
+        {method:'QUERY', url:'/api/cases?status=open', status:'200', desc:'status=open filters results'},
+        {method:'QUERY', url:'/api/cases?limit=50&offset=100', status:'200', desc:'Pagination — get 50 items starting at 100'},
+        {method:'BODY', url:'{"model":"claude-sonnet-4-6"}', status:'200', desc:'Claude API param in request body'},
+        {method:'BODY', url:'{"temperature":0.7}', status:'200', desc:'Controls output randomness (0=focused, 1=creative)'},
+      ]
+    },
+    fc:[
+      {f:'Path parameter', b:'/cases/{case_id} — identifies a specific resource in the URL path.'},
+      {f:'Query parameter', b:'?key=value appended to URL — used for filtering, sorting, pagination.'},
+      {f:'temperature', b:'Claude API param (0–1). 0 = deterministic/focused. 1 = creative/varied.'},
+      {f:'max_tokens', b:'Claude API param — limits the maximum length of the AI\'s response.'},
+      {f:'Pagination', b:'limit + offset params to fetch large datasets in pages. Avoids overloading the API.'},
+    ],
+    quiz:[
+      {q:'In /api/cases/101/activities, what is "101"?',o:['A query param','A path parameter','A header value','A body field'],c:1,e:'101 is a path parameter — embedded in the URL to identify a specific resource.'},
+      {q:'How do you add a filter to a GET request?',o:['In the request body','As a path parameter','As a query parameter','In a custom header'],c:2,e:'GET filters use query parameters: /cases?status=open&limit=20'},
+      {q:'Claude\'s temperature=0 means?',o:['Very creative','Random output','Deterministic / focused responses','No response'],c:2,e:'temperature=0 = always picks the most likely token. Consistent, focused output.'},
+      {q:'What Claude API param limits response length?',o:['max_length','token_limit','max_tokens','response_size'],c:2,e:'max_tokens sets the maximum number of tokens in Claude\'s response.'},
+      {q:'You need cases 51–100. What query params?',o:['?page=2','?limit=50&offset=50','?start=51&count=50','?skip=50'],c:1,e:'limit=50&offset=50 gets the next 50 items starting after the first 50.'},
+    ],
+    ch:[
+      {t:'Claude API Request Builder',d:'Build a complete Python dict for a Claude API request: set model to claude-sonnet-4-6, max_tokens to 1024, temperature to 0.3, a system prompt for Celonis consulting, and one user message.',xp:30},
+      {t:'Paginated Fetcher',d:'Write pseudocode that fetches ALL cases from an API using pagination (limit=100). Loop until fewer than 100 results returned. Track total count.',xp:35},
+    ],
+    res:[
+      {n:'Claude API Reference',u:'https://docs.anthropic.com/en/api/messages',i:'🤖',m:'All Claude API parameters',t:'Docs'},
+      {n:'Hoppscotch — Test Params',u:'https://hoppscotch.io/',i:'🚀',m:'Test query params live',t:'Tool'},
+    ]
+  },
+  {
+    id:'claudeapi', num:'07', title:'The Claude API', desc:'Building with Anthropic\'s Messages API — your gateway to production AI.',
+    icon:'🤖', level:'Advanced', xp:50, tc:'#7c3aed', tl:'#ede9fe', method:'CLAUDE',
+    concepts:[
+      {t:'<strong>Messages API endpoint</strong>: <code>POST https://api.anthropic.com/v1/messages</code> — the single endpoint for all Claude interactions.'},
+      {t:'<strong>Request structure</strong>: requires <code>model</code>, <code>max_tokens</code>, and <code>messages</code> array. Optionally <code>system</code> for persona, <code>temperature</code> for creativity.'},
+      {t:'<strong>Messages array</strong>: alternating user/assistant turns. Always start with user. <code>[{"role":"user","content":"Hello"}]</code>'},
+      {t:'<strong>System prompt</strong>: sets Claude\'s persona and constraints BEFORE the conversation. This is where you define "You are a Celonis process mining expert..."'},
+      {t:'<strong>Prompt caching</strong>: add <code>cache_control: {"type":"ephemeral"}</code> to large static context (e.g. a 100-page process document) to save up to 90% on repeated API costs.'},
+    ],
+    vid:'nv0G6_DZUPI', vidNote:'▶ Claude API Tutorial — Anthropic Developer Relations. Official walkthrough of the Messages API.',
+    demo:{
+      title:'Claude API Request Anatomy',
+      items:[
+        {method:'URL', url:'POST /v1/messages', status:'200', desc:'The only endpoint you need for Claude'},
+        {method:'HDR', url:'x-api-key: sk-ant-...', status:'200', desc:'Your Anthropic API key — required'},
+        {method:'HDR', url:'anthropic-version: 2023-06-01', status:'200', desc:'API version — always include this'},
+        {method:'KEY', url:'model: claude-sonnet-4-6', status:'200', desc:'The Claude model to use'},
+        {method:'KEY', url:'messages: [{role, content}]', status:'200', desc:'Conversation turns array'},
+      ]
+    },
+    fc:[
+      {f:'Messages API', b:'POST /v1/messages — the main Anthropic endpoint for all Claude interactions.'},
+      {f:'System prompt', b:'Sets Claude\'s persona/instructions before the conversation. Not part of messages array.'},
+      {f:'messages array', b:'[{role:"user",content:"..."},{role:"assistant",content:"..."}] — alternating turns.'},
+      {f:'Prompt caching', b:'cache_control on large static context. Saves up to 90% tokens on repeated calls.'},
+      {f:'anthropic-version', b:'Required header: "2023-06-01" — pins you to a specific API version.'},
+    ],
+    quiz:[
+      {q:'What is the Claude API Messages endpoint?',o:['GET /v1/chat','POST /v1/messages','PUT /v1/claude','POST /api/generate'],c:1,e:'POST https://api.anthropic.com/v1/messages is the single endpoint for Claude.'},
+      {q:'What does the system prompt do?',o:['It\'s the first user message','Sets Claude\'s persona/instructions before conversation','Controls the model temperature','Replaces the messages array'],c:1,e:'System prompt sets Claude\'s role, constraints, and persona — outside the messages array.'},
+      {q:'Messages array must start with which role?',o:['assistant','system','user','any'],c:2,e:'The messages array must start with a "user" role message. System goes in the system field.'},
+      {q:'What does prompt caching help with?',o:['Makes responses faster','Reduces API costs on repeated large context','Increases max_tokens limit','Improves model accuracy'],c:1,e:'Prompt caching saves up to 90% on tokens when the same large context is used repeatedly.'},
+      {q:'Which header pins you to a specific Claude API version?',o:['x-api-version','anthropic-version','claude-version','api-date'],c:1,e:'anthropic-version: "2023-06-01" — always include this header.'},
+    ],
+    ch:[
+      {t:'Celonis AI Assistant',d:'Write complete Python code to call the Claude API. Build a Celonis process mining assistant: system prompt defining its role, one user question about process bottlenecks. Print the response text.',xp:45},
+      {t:'Multi-turn Conversation',d:'Build a Python loop that maintains conversation history. Each iteration adds user input and Claude\'s response to the messages array. Run 3 turns about process mining.',xp:40},
+    ],
+    res:[
+      {n:'Anthropic Messages API',u:'https://docs.anthropic.com/en/api/messages',i:'🤖',m:'Official full reference',t:'Docs'},
+      {n:'Anthropic Python SDK',u:'https://github.com/anthropics/anthropic-sdk-python',i:'🐍',m:'Official Python library',t:'SDK'},
+      {n:'Anthropic Console',u:'https://console.anthropic.com/',i:'🎛️',m:'Test prompts in the workbench',t:'Tool'},
+    ]
+  },
+  {
+    id:'errors', num:'08', title:'Error Handling & Retries', desc:'Building resilient API integrations that gracefully handle failures and rate limits.',
+    icon:'🛡️', level:'Advanced', xp:50, tc:'#00b377', tl:'#e0f7ee', method:'RESILIENCE',
+    concepts:[
+      {t:'<strong>Always handle API errors</strong>: wrap every API call in try/except. APIs fail — network issues, rate limits, server errors are all normal in production.'},
+      {t:'<strong>Exponential backoff</strong>: on 429 (rate limit) or 503 (service unavailable), wait and retry. Start at 1 second, double each attempt: 1s → 2s → 4s → 8s → give up.'},
+      {t:'<strong>Error classification</strong>: 4xx errors are YOUR fault (fix the request). 5xx errors are THEIR fault (retry). 401 = fix your auth. 400 = fix your body.'},
+      {t:'<strong>Timeout handling</strong>: always set request timeouts. A hanging request blocks your entire application. Use <code>requests.get(url, timeout=30)</code>.'},
+      {t:'<strong>Logging</strong>: log all API errors with timestamp, status code, and request ID. Anthropic returns a <code>request-id</code> header useful for support tickets.'},
+    ],
+    vid:'pPVoSHXZJLc', vidNote:'▶ REST API Error Handling — Fireship. Modern patterns for resilient API integrations.',
+    demo:{
+      title:'Error Handling Decision Tree',
+      items:[
+        {method:'400', url:'Bad Request', status:'400', desc:'Fix your request body — do NOT retry'},
+        {method:'401', url:'Unauthorized', status:'401', desc:'Fix your API key — do NOT retry'},
+        {method:'429', url:'Rate Limited', status:'400', desc:'Wait + retry with exponential backoff'},
+        {method:'500', url:'Server Error', status:'500', desc:'Retry up to 3 times with backoff'},
+        {method:'503', url:'Unavailable', status:'500', desc:'Retry with backoff — service temporarily down'},
+      ]
+    },
+    fc:[
+      {f:'Exponential backoff', b:'Retry with doubling wait: 1s → 2s → 4s → 8s. Prevents flooding an overloaded server.'},
+      {f:'Timeout', b:'requests.get(url, timeout=30) — prevents a hung connection from blocking your app.'},
+      {f:'4xx errors', b:'Client errors — your request is wrong. Fix before retrying. Don\'t retry blindly.'},
+      {f:'5xx errors', b:'Server errors — not your fault. Safe to retry with backoff.'},
+      {f:'request-id header', b:'Unique ID in Anthropic responses. Include when contacting support for help.'},
+    ],
+    quiz:[
+      {q:'You get a 429. What should you do?',o:['Fix your API key','Fix your request body','Wait and retry with exponential backoff','Give up'],c:2,e:'429 = rate limit. Wait, then retry with exponential backoff. Don\'t fix the request — it was fine.'},
+      {q:'You get a 400. What should you do?',o:['Retry immediately','Retry with backoff','Fix your request and don\'t retry','Contact Anthropic support'],c:2,e:'400 = bad request — YOUR request is wrong. Fix the body/params before retrying.'},
+      {q:'What is exponential backoff?',o:['A compression algorithm','Faster retry logic','Wait times that double each retry: 1s, 2s, 4s...','Random retry timing'],c:2,e:'Exponential backoff doubles the wait time after each failed attempt.'},
+      {q:'Why set request timeouts?',o:['To speed up responses','To prevent hung connections blocking your app','Required by REST spec','To reduce token usage'],c:1,e:'Without timeouts, a hung connection blocks your entire application indefinitely.'},
+      {q:'Which error code category is safe to retry?',o:['4xx','2xx','5xx','3xx'],c:2,e:'5xx = server-side errors. Safe to retry. 4xx = client errors — fix first, then maybe retry.'},
+    ],
+    ch:[
+      {t:'Resilient API Wrapper',d:'Write a Python function call_claude_with_retry(messages, max_retries=3) that: calls the Claude API, handles 429 with exponential backoff, handles 5xx with retries, logs all errors, raises after max retries.',xp:45},
+      {t:'Error Response Logger',d:'Build a function that logs API errors to a list: timestamp, status_code, error_type, request_id. Print a summary report after 5 simulated calls with different error codes.',xp:30},
+    ],
+    res:[
+      {n:'Anthropic Error Codes',u:'https://docs.anthropic.com/en/api/errors',i:'📚',m:'Official error reference',t:'Docs'},
+      {n:'Python requests library',u:'https://requests.readthedocs.io/',i:'🐍',m:'HTTP for Humans',t:'Docs'},
+      {n:'Hoppscotch',u:'https://hoppscotch.io/',i:'🚀',m:'Test error handling live',t:'Tool'},
+    ]
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let S={user:'',xp:0,done:{},chDone:{},qScores:{}};
+let CT=null,qIdx=0,qAns=[],fcIdx=0;
+
+function init(){
+  try{const s=localStorage.getItem('api_v1');if(s)S=JSON.parse(s);}catch(e){}
+  if(S.user){document.getElementById('wm').style.display='none';refresh();}
+  else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
+}
+function save(){localStorage.setItem('api_v1',JSON.stringify(S));}
+function refresh(){updateNav();renderCards();updateProg();}
+
+function startJourney(){
+  const n=document.getElementById('nameInput').value.trim();if(!n)return;
+  S.user=n;save();
+  document.getElementById('wm').style.display='none';
+  refresh();toast('🔌','Welcome '+n+'! Let\'s connect!');
+}
+
+function updateNav(){
+  document.getElementById('navUser').textContent=S.user||'?';
+  document.getElementById('navXP').textContent=(S.xp||0)+' XP';
+  document.getElementById('xpStat').textContent=S.xp||0;
+}
+function updateProg(){
+  const d=Object.keys(S.done).filter(k=>S.done[k]).length;
+  const p=Math.round(d/TOPICS.length*100);
+  document.getElementById('progFill').style.width=p+'%';
+  document.getElementById('progPct').textContent=p+'%';
+  document.getElementById('progSub').textContent=d+' of '+TOPICS.length+' topics completed';
+  document.getElementById('doneStat').textContent=d;
+}
+
+function renderCards(){
+  document.getElementById('topicsGrid').innerHTML=TOPICS.map((t,i)=>{
+    const done=S.done[t.id];
+    const prog=done?100:(S.qScores[t.id]?50:0);
+    return `<div class="topic-card ${done?'done':''}" style="--tc:${t.tc};--tl:${t.tl};" onclick="openTopic('${t.id}')">
+      <div class="tc-top">
+        <span class="tc-icon">${t.icon}</span>
+        <span class="tc-method">${t.method}</span>
+      </div>
+      <div class="tc-title">${t.title}</div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-footer">
+        <span class="tc-badge">${done?'✓ Complete':t.level}</span>
+        <span class="tc-xp">+${t.xp} XP</span>
+      </div>
+      <div class="tc-bar"><div class="tc-fill" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openTopic(id){
+  CT=TOPICS.find(t=>t.id===id);if(!CT)return;
+  document.getElementById('mTag').textContent=`TOPIC ${CT.num} · ${CT.level.toUpperCase()}`;
+  document.getElementById('mTitle').textContent=`${CT.icon}  ${CT.title}`;
+  tab('learn',document.querySelector('.tab-btn'));
+  bLearn();bVideo();bDemo();bChallenge();bResources();
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+  fcIdx=0;bFC();
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal2(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('vFrame').src='';
+}
+function closeModal(e){if(e.target.id==='modal')closeModal2();}
+
+function tab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const p=document.getElementById('tab-'+name);if(p)p.classList.add('active');
+}
+
+function bLearn(){
+  document.getElementById('conceptList').innerHTML=CT.concepts.map((c,i)=>`
+    <div class="concept-item">
+      <div class="c-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="c-text">${c.t}</div>
+    </div>`).join('');
+}
+
+function bVideo(){
+  document.getElementById('vFrame').src=`https://www.youtube.com/embed/${CT.vid}?rel=0&modestbranding=1`;
+  document.getElementById('vNote').textContent=CT.vidNote;
+}
+
+function bDemo(){
+  if(!CT.demo){document.getElementById('demoArea').innerHTML='<p style="color:var(--text3);font-size:13px;">No demo for this topic.</p>';return;}
+  const methodColors={
+    'GET':'m-get','POST':'m-post','PUT':'m-put','DELETE':'m-delete','PATCH':'m-patch',
+    'HDR':'m-patch','KEY':'m-post','PATH':'m-put','QUERY':'m-get','BODY':'m-post',
+    'URL':'m-get','BAD':'m-delete','200':'m-get','201':'m-get','400':'m-delete',
+    '401':'m-patch','429':'m-put','500':'m-delete','503':'m-delete'
+  };
+  const statusMap={'200':'status-200','400':'status-400','401':'status-401','404':'status-404','500':'status-500'};
+  document.getElementById('demoArea').innerHTML=`
+    <div class="api-demo">
+      <div class="api-demo-label">${CT.demo.title}</div>
+      ${CT.demo.items.map(item=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+          <span class="api-demo-method ${methodColors[item.method]||'m-get'}">${item.method}</span>
+          <span class="api-demo-url" style="flex:1;min-width:120px;">${item.url}</span>
+          <span style="font-size:12px;color:var(--text2);flex:1;min-width:120px;">${item.desc}</span>
+        </div>`).join('')}
+    </div>
+    <a href="https://hoppscotch.io/" target="_blank" class="play-btn">
+      <span>🚀</span>
+      <div><div>Try in Hoppscotch</div><div class="play-btn-sub">Free browser API client · no install needed</div></div>
+      <span class="play-btn-arrow">→</span>
+    </a>`;
+}
+
+function bQuiz(){
+  const w=document.getElementById('quizWrap');
+  if(qIdx>=CT.quiz.length){
+    const s=qAns.filter(Boolean).length;
+    w.style.display='none';
+    document.getElementById('scoreBox').classList.add('show');
+    const p=Math.round(s/CT.quiz.length*100);
+    document.getElementById('scoreBig').textContent=`${s}/${CT.quiz.length}`;
+    document.getElementById('scoreLbl').textContent=p>=80?'🎉 Excellent! Topic mastered!':p>=60?'👍 Good — try again for full XP!':'💪 Keep practicing!';
+    if(p>=60&&!S.qScores[CT.id]){
+      S.qScores[CT.id]=s;
+      const g=Math.round(s/CT.quiz.length*CT.xp);
+      S.xp=(S.xp||0)+g;
+      if(p>=80)S.done[CT.id]=true;
+      save();refresh();toast('⚡',`+${g} XP earned!`);
+    }
+    return;
+  }
+  const q=CT.quiz[qIdx];
+  const K=['A','B','C','D'];
+  w.innerHTML=`
+    <div class="quiz-box">
+      <div class="quiz-counter">Question ${qIdx+1} of ${CT.quiz.length}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts">
+        ${q.o.map((o,i)=>`<button class="quiz-opt" onclick="ansQ(${i})" id="o${i}"><span class="opt-k">${K[i]}</span>${o}</button>`).join('')}
+      </div>
+      <div class="quiz-fb" id="qfb"></div>
+    </div>
+    <div class="quiz-nav"><button class="btn btn-ghost" onclick="skipQ()">Skip →</button></div>`;
+}
+
+function ansQ(idx){
+  const q=CT.quiz[qIdx];
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
+  const ok=idx===q.c;
+  document.getElementById('o'+idx).classList.add(ok?'correct':'wrong');
+  if(!ok)document.getElementById('o'+q.c).classList.add('correct');
+  qAns.push(ok);
+  const fb=document.getElementById('qfb');
+  fb.textContent=(ok?'✓ Correct! ':'✗ Incorrect. ')+q.e;
+  fb.classList.add('show',ok?'ok':'bad');
+  setTimeout(()=>{qIdx++;bQuiz();},1700);
+}
+function skipQ(){qAns.push(false);qIdx++;bQuiz();}
+function retryQuiz(){
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+}
+
+function bFC(){
+  const fc=CT.fc[fcIdx];
+  document.getElementById('fcFront').textContent=fc.f;
+  document.getElementById('fcBack').textContent=fc.b;
+  document.getElementById('fcCount').textContent=`${fcIdx+1} / ${CT.fc.length}`;
+  document.getElementById('fcScene').classList.remove('flipped');
+}
+function flipFC(){document.getElementById('fcScene').classList.toggle('flipped');}
+function nextFC(){fcIdx=(fcIdx+1)%CT.fc.length;bFC();}
+function prevFC(){fcIdx=(fcIdx-1+CT.fc.length)%CT.fc.length;bFC();}
+function markKnown(){toast('✓','Marked as known!');nextFC();}
+
+function bChallenge(){
+  document.getElementById('chList').innerHTML=CT.ch.map((c,i)=>{
+    const k=`${CT.id}_${i}`,done=S.chDone[k];
+    return `<div class="ch-item">
+      <div class="ch-hd"><div class="ch-title">${i+1}. ${c.t}</div><div class="ch-xp">+${c.xp} XP</div></div>
+      <div class="ch-desc">${c.d}</div>
+      <button class="ch-btn ${done?'done':''}" onclick="doCh('${k}',${c.xp})">${done?'✅ Completed!':'☐ Mark as Complete'}</button>
+    </div>`;
+  }).join('');
+}
+function doCh(k,xp){
+  if(S.chDone[k])return;
+  S.chDone[k]=true;S.xp=(S.xp||0)+xp;
+  save();refresh();bChallenge();toast('⚡',`+${xp} XP! Challenge done!`);
+}
+
+function bResources(){
+  document.getElementById('resList').innerHTML=CT.res.map(r=>`
+    <a href="${r.u}" target="_blank" class="res-item">
+      <div class="res-icon">${r.i}</div>
+      <div><div class="res-name">${r.n}</div><div class="res-meta">${r.m}</div></div>
+      <div class="res-tag">${r.t}</div>
+    </a>`).join('');
+}
+
+let tT;
+function toast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tIcon').textContent=icon;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(tT);
+  tT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+init();
+</script>
+</body>
+</html>

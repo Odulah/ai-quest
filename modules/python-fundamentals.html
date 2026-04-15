@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Fundamentals — AI Enablement Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --bg2: #ffffff;
+  --bg3: #f0efe9;
+  --card: #ffffff;
+  --border: #e2e0d8;
+  --border2: #ccc9be;
+  --text: #1a1916;
+  --text2: #6b6860;
+  --text3: #a09e99;
+  --accent: #5046e5;
+  --accent-light: #eeecff;
+  --accent2: #0ea47a;
+  --accent2-light: #e6f9f3;
+  --accent3: #d97706;
+  --accent3-light: #fef3cd;
+  --accent4: #e5465a;
+  --accent4-light: #fdedf0;
+  --green: #0ea47a;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Plus Jakarta Sans', sans-serif;
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 14px rgba(0,0,0,0.06);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.1), 0 12px 30px rgba(0,0,0,0.09);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; overflow-x:hidden; }
+
+/* NAV */
+nav {
+  position:sticky; top:0; z-index:100;
+  background:rgba(245,244,240,0.94); backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:58px;
+}
+.nav-logo { font-family:var(--mono); font-size:12px; color:var(--text2); }
+.nav-logo span { color:var(--accent); font-weight:600; }
+.nav-right { display:flex; align-items:center; gap:10px; }
+.xp-badge {
+  background:var(--accent-light); border:1px solid #d4d0fa;
+  border-radius:30px; padding:5px 14px;
+  font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:600;
+}
+.user-pill { background:var(--text); color:#fff; border-radius:30px; padding:6px 16px; font-size:13px; font-weight:700; }
+
+/* HERO */
+.hero { padding:48px 32px 32px; max-width:1100px; margin:0 auto; }
+.breadcrumb { font-size:12px; color:var(--text3); font-family:var(--mono); margin-bottom:16px; }
+.breadcrumb span { color:var(--accent); }
+.hero-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--accent-light); color:var(--accent);
+  border-radius:6px; padding:4px 12px; font-size:11px; font-weight:800;
+  letter-spacing:0.07em; text-transform:uppercase; margin-bottom:14px;
+}
+.hero h1 { font-size:clamp(30px,4vw,50px); font-weight:800; letter-spacing:-0.02em; line-height:1.1; margin-bottom:10px; }
+.hero h1 span { color:var(--accent); }
+.hero-sub { color:var(--text2); font-size:14.5px; max-width:460px; line-height:1.7; }
+.hero-row { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+
+/* STATS */
+.stats-row { display:flex; gap:10px; flex-wrap:wrap; margin:24px 0 28px; }
+.stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; box-shadow:var(--shadow); }
+.stat-num { font-size:22px; font-weight:800; line-height:1; }
+.stat-label { font-size:11px; color:var(--text3); font-weight:500; margin-top:2px; }
+
+/* PROGRESS */
+.progress-wrap { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px 22px; min-width:260px; box-shadow:var(--shadow); }
+.pw-top { display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px; font-weight:700; }
+.pw-pct { color:var(--accent); font-family:var(--mono); }
+.pw-track { background:var(--bg3); border-radius:100px; height:8px; overflow:hidden; }
+.pw-fill { height:100%; border-radius:100px; background:linear-gradient(90deg,var(--accent) 0%,#7c6fef 100%); transition:width 0.9s cubic-bezier(.4,0,.2,1); }
+
+/* SECTION LABEL */
+.section-label { font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text3); margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* MAIN */
+.main { max-width:1100px; margin:0 auto; padding:0 32px 60px; }
+
+/* TOPIC CARDS */
+.topics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; margin-bottom:44px; }
+.topic-card {
+  background:var(--card); border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:20px 22px; cursor:pointer; box-shadow:var(--shadow);
+  transition:all 0.22s cubic-bezier(.4,0,.2,1);
+  position:relative; overflow:hidden;
+}
+.topic-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--tc,var(--accent)); opacity:0; transition:opacity 0.2s; }
+.topic-card:hover { border-color:var(--tc,var(--accent)); box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+.topic-card:hover::before { opacity:1; }
+.tc-icon { font-size:24px; margin-bottom:10px; display:block; }
+.tc-title { font-size:14.5px; font-weight:700; margin-bottom:5px; }
+.tc-desc { font-size:12.5px; color:var(--text2); line-height:1.55; margin-bottom:14px; }
+.tc-footer { display:flex; align-items:center; justify-content:space-between; }
+.tc-badge { font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; background:var(--tl,var(--accent-light)); color:var(--tc,var(--accent)); }
+.topic-card.done .tc-badge { background:var(--accent2-light); color:var(--green); }
+.tc-xp { font-family:var(--mono); font-size:11px; color:var(--text3); font-weight:600; }
+.tc-bar { margin-top:12px; background:var(--bg3); border-radius:100px; height:3px; overflow:hidden; }
+.tc-fill { height:100%; border-radius:100px; background:var(--tc,var(--accent)); transition:width 0.7s; }
+
+/* TOOLS */
+.tools-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; margin-bottom:44px; }
+.tool-link {
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  padding:13px 15px; display:flex; align-items:center; gap:10px;
+  text-decoration:none; color:var(--text); box-shadow:var(--shadow); transition:all 0.18s;
+}
+.tool-link:hover { border-color:var(--accent); box-shadow:var(--shadow-hover); }
+.tl-icon { font-size:18px; flex-shrink:0; }
+.tl-name { font-size:13px; font-weight:700; }
+.tl-sub { font-size:11px; color:var(--text3); margin-top:1px; }
+
+/* MODAL */
+.overlay {
+  position:fixed; inset:0; background:rgba(20,20,16,0.5); backdrop-filter:blur(4px);
+  z-index:200; display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity 0.2s;
+}
+.overlay.open { opacity:1; pointer-events:all; }
+.modal {
+  background:var(--card); border:1px solid var(--border); border-radius:20px;
+  width:100%; max-width:680px; max-height:90vh; overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,0.16);
+  transform:translateY(16px) scale(0.97); transition:all 0.25s cubic-bezier(.4,0,.2,1);
+}
+.overlay.open .modal { transform:translateY(0) scale(1); }
+.modal-hd {
+  padding:22px 26px 16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  position:sticky; top:0; background:var(--card); z-index:2;
+}
+.modal-tag { font-family:var(--mono); font-size:10px; color:var(--text3); margin-bottom:5px; letter-spacing:0.08em; }
+.modal-title { font-size:21px; font-weight:800; letter-spacing:-0.01em; }
+.modal-x {
+  width:32px; height:32px; border-radius:8px; background:var(--bg3); border:1px solid var(--border);
+  color:var(--text2); font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s;
+}
+.modal-x:hover { background:var(--bg); color:var(--text); }
+.modal-bd { padding:22px 26px; }
+
+/* TABS */
+.tabs { display:flex; gap:2px; background:var(--bg3); border-radius:10px; padding:3px; margin-bottom:20px; flex-wrap:wrap; }
+.tab-btn { flex:1; min-width:68px; padding:7px 9px; border:none; border-radius:8px; background:transparent; color:var(--text2); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; font-family:var(--sans); white-space:nowrap; }
+.tab-btn.active { background:var(--card); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* LEARN */
+.concept-list { display:flex; flex-direction:column; gap:9px; margin-bottom:18px; }
+.concept-item { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:13px 15px; display:flex; align-items:flex-start; gap:11px; }
+.c-num { width:22px; height:22px; background:var(--accent); color:#fff; border-radius:5px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; font-weight:700; flex-shrink:0; }
+.c-text { font-size:13.5px; line-height:1.6; color:var(--text2); }
+.c-text strong { color:var(--text); font-weight:700; }
+.c-text code { background:var(--bg3); border:1px solid var(--border2); border-radius:4px; padding:1px 5px; font-family:var(--mono); font-size:11.5px; color:var(--accent); }
+
+.play-btn {
+  display:flex; align-items:center; gap:11px; background:var(--accent-light); border:1.5px solid #c7c2fa;
+  border-radius:10px; padding:13px 17px; color:var(--accent); text-decoration:none; font-size:13px; font-weight:700; transition:all 0.18s;
+}
+.play-btn:hover { background:#e0ddfb; border-color:var(--accent); }
+.play-btn-arrow { margin-left:auto; }
+.play-btn-sub { font-size:11px; font-weight:400; color:#8880e8; margin-top:1px; }
+
+/* VIDEO */
+.video-box { background:var(--bg3); border:1px solid var(--border); border-radius:12px; overflow:hidden; aspect-ratio:16/9; margin-bottom:13px; }
+.video-box iframe { width:100%; height:100%; border:none; }
+.video-note { font-size:12px; color:var(--text3); margin-bottom:14px; line-height:1.5; }
+
+/* QUIZ */
+.quiz-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin-bottom:12px; }
+.quiz-counter { font-family:var(--mono); font-size:10px; color:var(--text3); margin-bottom:8px; }
+.quiz-q { font-size:14.5px; font-weight:700; margin-bottom:13px; line-height:1.5; }
+.quiz-opts { display:flex; flex-direction:column; gap:7px; }
+.quiz-opt {
+  background:var(--card); border:1.5px solid var(--border); border-radius:8px; padding:11px 14px;
+  cursor:pointer; font-size:13.5px; transition:all 0.14s; display:flex; align-items:center; gap:10px;
+  color:var(--text); font-family:var(--sans); font-weight:500; text-align:left;
+}
+.quiz-opt:hover { border-color:var(--accent); background:var(--accent-light); }
+.quiz-opt.correct { border-color:var(--green); background:var(--accent2-light); color:#0a7a5c; }
+.quiz-opt.wrong   { border-color:var(--accent4); background:var(--accent4-light); color:#b0293a; }
+.opt-k { width:21px; height:21px; background:var(--bg3); border-radius:5px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; font-weight:700; flex-shrink:0; color:var(--text3); }
+.quiz-fb { margin-top:10px; padding:10px 13px; border-radius:8px; font-size:13px; display:none; line-height:1.5; font-weight:500; }
+.quiz-fb.show { display:block; }
+.quiz-fb.ok  { background:var(--accent2-light); border:1px solid #a3e8d5; color:#0a6b50; }
+.quiz-fb.bad { background:var(--accent4-light); border:1px solid #f8c0c8; color:#9b1e2b; }
+.quiz-nav { display:flex; justify-content:flex-end; margin-top:14px; }
+.score-box { text-align:center; padding:30px; display:none; }
+.score-box.show { display:block; }
+.score-big { font-size:52px; font-weight:800; color:var(--accent); line-height:1; }
+.score-label { font-size:14px; color:var(--text2); margin:8px 0 20px; }
+
+/* BTNS */
+.btn { padding:9px 19px; border-radius:8px; border:none; font-size:13px; font-weight:700; cursor:pointer; font-family:var(--sans); transition:all 0.14s; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { background:#3d34c4; }
+.btn-ghost { background:var(--bg3); border:1px solid var(--border); color:var(--text2); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+/* FLASHCARDS */
+.fc-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:13px; }
+.fc-count { font-family:var(--mono); font-size:12px; color:var(--text3); font-weight:600; }
+.fc-scene { perspective:900px; width:100%; height:185px; margin-bottom:14px; cursor:pointer; }
+.fc-inner { position:relative; width:100%; height:100%; transition:transform 0.42s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d; }
+.fc-scene.flipped .fc-inner { transform:rotateY(180deg); }
+.fc-face {
+  position:absolute; inset:0; background:var(--bg); border:1.5px solid var(--border); border-radius:14px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; padding:22px;
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+}
+.fc-face.back { background:var(--accent-light); border-color:#c7c2fa; transform:rotateY(180deg); }
+.fc-lbl { font-family:var(--mono); font-size:9px; letter-spacing:0.12em; color:var(--text3); margin-bottom:9px; text-transform:uppercase; }
+.fc-face.back .fc-lbl { color:var(--accent); }
+.fc-txt { font-size:15px; font-weight:700; text-align:center; line-height:1.4; }
+.fc-face.back .fc-txt { color:var(--accent); }
+.fc-hint { font-size:11px; color:var(--text3); margin-top:9px; }
+.fc-actions { display:flex; gap:8px; }
+.fc-actions .btn { flex:1; }
+
+/* CHALLENGES */
+.ch-item { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:10px; }
+.ch-hd { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:7px; }
+.ch-title { font-size:14px; font-weight:700; }
+.ch-xp { font-family:var(--mono); font-size:10.5px; color:var(--accent3); background:var(--accent3-light); border:1px solid #f6d87a; border-radius:20px; padding:2px 9px; font-weight:700; white-space:nowrap; }
+.ch-desc { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:13px; }
+.ch-btn { background:var(--bg3); border:1.5px solid var(--border); border-radius:8px; padding:8px 15px; font-size:13px; font-weight:700; cursor:pointer; color:var(--text2); font-family:var(--sans); transition:all 0.14s; }
+.ch-btn:hover { border-color:var(--green); color:var(--green); }
+.ch-btn.done { background:var(--accent2-light); border-color:#a3e8d5; color:var(--green); }
+
+/* RESOURCES */
+.res-item {
+  display:flex; align-items:center; gap:11px; background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; padding:12px 15px; margin-bottom:8px; text-decoration:none; color:var(--text); transition:all 0.14s;
+}
+.res-item:hover { border-color:var(--accent); background:var(--accent-light); }
+.res-icon { font-size:18px; flex-shrink:0; }
+.res-name { font-size:13.5px; font-weight:700; }
+.res-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+.res-tag { margin-left:auto; font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; background:var(--bg3); color:var(--text2); border:1px solid var(--border); white-space:nowrap; }
+
+/* WELCOME */
+.welcome {
+  position:fixed; inset:0; background:rgba(26,25,22,0.55); z-index:300;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.welcome-card {
+  background:var(--card); border:1px solid var(--border); border-radius:20px;
+  padding:38px 34px; max-width:390px; width:100%; box-shadow:0 32px 80px rgba(0,0,0,0.18); text-align:center;
+}
+.wc-emoji { font-size:42px; margin-bottom:14px; }
+.wc-h { font-size:25px; font-weight:800; letter-spacing:-0.01em; margin-bottom:9px; }
+.wc-p { color:var(--text2); font-size:14px; line-height:1.7; margin-bottom:24px; }
+.wc-input {
+  width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:10px;
+  padding:13px 15px; font-size:15px; font-family:var(--sans); color:var(--text); margin-bottom:13px; outline:none; transition:border-color 0.14s;
+}
+.wc-input:focus { border-color:var(--accent); }
+.wc-input::placeholder { color:var(--text3); }
+
+/* TOAST */
+.toast {
+  position:fixed; bottom:22px; right:22px; background:var(--text); color:#fff;
+  border-radius:12px; padding:12px 17px; font-size:13.5px; font-weight:600; z-index:999;
+  transform:translateY(66px); opacity:0; transition:all 0.32s cubic-bezier(.4,0,.2,1);
+  max-width:270px; display:flex; align-items:center; gap:9px; box-shadow:0 8px 30px rgba(0,0,0,0.18);
+}
+.toast.show { transform:translateY(0); opacity:1; }
+
+footer { border-top:1px solid var(--border); padding:20px 32px; text-align:center; font-size:11px; color:var(--text3); font-family:var(--mono); background:var(--card); }
+
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.topic-card { animation:fadeUp 0.38s ease backwards; }
+.topic-card:nth-child(1){animation-delay:.04s}.topic-card:nth-child(2){animation-delay:.08s}
+.topic-card:nth-child(3){animation-delay:.12s}.topic-card:nth-child(4){animation-delay:.16s}
+.topic-card:nth-child(5){animation-delay:.20s}.topic-card:nth-child(6){animation-delay:.24s}
+.topic-card:nth-child(7){animation-delay:.28s}.topic-card:nth-child(8){animation-delay:.32s}
+.topic-card:nth-child(9){animation-delay:.36s}.topic-card:nth-child(10){animation-delay:.40s}
+
+@media(max-width:600px){
+  nav,.hero,.main{padding-left:16px;padding-right:16px;}
+  .hero{padding-top:28px;}
+  .modal-hd,.modal-bd{padding:16px 18px;}
+  .tab-btn{font-size:11px;padding:6px 7px;}
+}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div class="welcome" id="wm">
+  <div class="welcome-card">
+    <div class="wc-emoji">🐍</div>
+    <div class="wc-h">Welcome to Python</div>
+    <div class="wc-p">Enter your name to track XP, quiz scores, and challenge completions across the platform.</div>
+    <input class="wc-input" id="nameInput" type="text" placeholder="Your first name..." maxlength="24"/>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;" onclick="startJourney()">Start Learning →</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">AI_ENABLEMENT // <span>Python Fundamentals</span></div>
+  <div class="nav-right">
+    <div class="xp-badge" id="navXP">0 XP</div>
+    <div class="user-pill" id="navUser">...</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb">AI Enablement Platform / <span>Module 01</span> / Python Fundamentals</div>
+  <div class="hero-row">
+    <div>
+      <div class="hero-badge">🐍 Module 01 · Foundations Track</div>
+      <h1>Python<br><span>Fundamentals</span></h1>
+      <p class="hero-sub">The bedrock of every AI system. Master Python from variables to data structures and build real Celonis-relevant skills.</p>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num">10</div><div class="stat-label">Topics</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Levels</div></div>
+        <div class="stat"><div class="stat-num">500</div><div class="stat-label">Max XP</div></div>
+        <div class="stat"><div class="stat-num" id="doneStat">0</div><div class="stat-label">Completed</div></div>
+        <div class="stat"><div class="stat-num" id="xpStat">0</div><div class="stat-label">XP Earned</div></div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="pw-top"><span>Module Progress</span><span class="pw-pct" id="progPct">0%</span></div>
+      <div class="pw-track"><div class="pw-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="section-label">10 Topics — Click Any Card</div>
+  <div class="topics-grid" id="topicsGrid"></div>
+
+  <div class="section-label">Live Playgrounds &amp; Free Resources</div>
+  <div class="tools-grid">
+    <a href="https://python-playground.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🛝</div><div><div class="tl-name">Python Playground</div><div class="tl-sub">Full Python · No install · Free</div></div>
+    </a>
+    <a href="https://colab.research.google.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🔬</div><div><div class="tl-name">Google Colab</div><div class="tl-sub">Free GPU · Notebooks · Pandas</div></div>
+    </a>
+    <a href="https://playcode.io/python-playground" target="_blank" class="tool-link">
+      <div class="tl-icon">⚡</div><div><div class="tl-name">Playcode Python</div><div class="tl-sub">AI-assisted · PyPI packages</div></div>
+    </a>
+    <a href="https://python-fiddle.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🎯</div><div><div class="tl-name">Python Fiddle</div><div class="tl-sub">Tutorials + challenges</div></div>
+    </a>
+    <a href="https://jakevdp.github.io/PythonDataScienceHandbook/" target="_blank" class="tool-link">
+      <div class="tl-icon">📖</div><div><div class="tl-name">Data Science Handbook</div><div class="tl-sub">Free book · VanderPlas</div></div>
+    </a>
+    <a href="https://automatetheboringstuff.com/" target="_blank" class="tool-link">
+      <div class="tl-icon">🤖</div><div><div class="tl-name">Automate Boring Stuff</div><div class="tl-sub">Free book · Al Sweigart</div></div>
+    </a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-tag" id="mTag">TOPIC 01 · BEGINNER</div>
+        <div class="modal-title" id="mTitle">Topic</div>
+      </div>
+      <button class="modal-x" onclick="closeModal2()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="tab('learn',this)">📘 Learn</button>
+        <button class="tab-btn" onclick="tab('video',this)">▶ Video</button>
+        <button class="tab-btn" onclick="tab('quiz',this)">🧠 Quiz</button>
+        <button class="tab-btn" onclick="tab('cards',this)">🃏 Cards</button>
+        <button class="tab-btn" onclick="tab('challenge',this)">⚡ Challenge</button>
+        <button class="tab-btn" onclick="tab('links',this)">🔗 Links</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-learn">
+        <div class="concept-list" id="conceptList"></div>
+        <a href="https://python-playground.com/" target="_blank" class="play-btn">
+          <span>🚀</span>
+          <div><div>Open Python Playground</div><div class="play-btn-sub">Practice in-browser · no install needed</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-video">
+        <div class="video-box"><iframe id="vFrame" src="" allowfullscreen loading="lazy"></iframe></div>
+        <div class="video-note" id="vNote"></div>
+        <a href="https://python-playground.com/" target="_blank" class="play-btn">
+          <span>🐍</span>
+          <div><div>Code Along in Playground</div><div class="play-btn-sub">Open side-by-side while watching</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-quiz">
+        <div id="quizWrap"></div>
+        <div class="score-box" id="scoreBox">
+          <div class="score-big" id="scoreBig">0/5</div>
+          <div class="score-label" id="scoreLbl">Quiz complete!</div>
+          <button class="btn btn-primary" onclick="retryQuiz()">Try Again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-cards">
+        <div class="fc-nav">
+          <button class="btn btn-ghost" onclick="prevFC()">← Prev</button>
+          <div class="fc-count" id="fcCount">1 / 5</div>
+          <button class="btn btn-ghost" onclick="nextFC()">Next →</button>
+        </div>
+        <div class="fc-scene" id="fcScene" onclick="flipFC()">
+          <div class="fc-inner" id="fcInner">
+            <div class="fc-face front">
+              <div class="fc-lbl">Term</div>
+              <div class="fc-txt" id="fcFront">...</div>
+              <div class="fc-hint">Tap to reveal</div>
+            </div>
+            <div class="fc-face back">
+              <div class="fc-lbl">Definition</div>
+              <div class="fc-txt" id="fcBack">...</div>
+              <div class="fc-hint">Tap to flip back</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-actions">
+          <button class="btn btn-ghost" onclick="markKnown()">✓ Got it</button>
+          <button class="btn btn-ghost" onclick="nextFC()">↺ Review again</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-challenge">
+        <div id="chList"></div>
+        <a href="https://python-playground.com/" target="_blank" class="play-btn" style="margin-top:4px">
+          <span>💻</span>
+          <div><div>Open Playground to Complete</div><div class="play-btn-sub">python-playground.com · full Python, free</div></div>
+          <span class="play-btn-arrow">→</span>
+        </a>
+      </div>
+
+      <div class="tab-panel" id="tab-links">
+        <div id="resList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIcon">🎉</span><span id="tMsg">Done!</span></div>
+
+<footer>AI ENABLEMENT PLATFORM · CELONIS CONSULTANTS · MODULE 01 · PYTHON FUNDAMENTALS</footer>
+
+<script>
+const TOPICS=[
+  {id:'variables',num:'01',title:'Variables & Data Types',desc:'How Python stores, classifies, and manages information in memory.',icon:'📦',level:'Beginner',xp:50,tc:'#5046e5',tl:'#eeecff',
+  concepts:[
+    {t:'<strong>Variables</strong> are named labels for data. In Python: <code>case_id = 101</code> — no type declaration needed.'},
+    {t:'<strong>Strings</strong> hold text: <code>"Celonis"</code>. <strong>Integers</strong> hold whole numbers: <code>42</code>. <strong>Floats</strong> hold decimals: <code>3.14</code>.'},
+    {t:'<strong>Booleans</strong> store <code>True</code> or <code>False</code> — critical for AI filtering and process mining conditions.'},
+    {t:'<strong>type()</strong> reveals data type: <code>type(42)</code> → <code>int</code>. Always useful for debugging.'},
+    {t:'<strong>Dynamic typing</strong> means Python infers the type automatically — no need to declare <code>int x</code> like in Java.'},
+  ],
+  vid:'khKv-8q7YmY',vidNote:'▶ Python Variables for Beginners — CS Dojo. Clear, concise, practical.',
+  fc:[{f:'Variable',b:'A named label pointing to a value in memory. e.g. x = 10'},{f:'String (str)',b:'Sequence of text characters in quotes. e.g. "Celonis"'},{f:'Integer (int)',b:'A whole number without a decimal. e.g. 42'},{f:'Float',b:'A number with a decimal point. e.g. 3.14159'},{f:'Boolean (bool)',b:'A value that is either True or False.'}],
+  quiz:[
+    {q:'What does type(3.14) return?',o:['int','float','str','bool'],c:1,e:'Numbers with decimals are floats in Python.'},
+    {q:'Which is a valid Python variable name?',o:['2fast','my_var','my-var','class'],c:1,e:'Names must start with a letter or underscore. No hyphens or reserved words.'},
+    {q:'What does x = "5" + "3" produce?',o:['8','53','Error','None'],c:1,e:'Python concatenates strings: "5"+"3" = "53", not 8.'},
+    {q:'What type does True belong to?',o:['str','int','bool','float'],c:2,e:'True and False are Python boolean values.'},
+    {q:'How do you check a variable\'s type?',o:['typeof()','check_type()','type()','dtype()'],c:2,e:'The built-in type() function returns the data type of any value.'},
+  ],
+  ch:[{t:'Event Log Variables',d:'Create 5 variables for a Celonis event: case_id (int), activity_name (str), duration_secs (float), is_compliant (bool), resource (str). Print each with its type.',xp:25},{t:'Type Detective',d:'Write code that takes 3 values and prints their types using type(). Predict before running.',xp:15}],
+  res:[{n:'Python Built-in Types',u:'https://docs.python.org/3/library/stdtypes.html',i:'📚',m:'Official reference',t:'Docs'},{n:'Python Playground',u:'https://python-playground.com/',i:'🛝',m:'Practice instantly',t:'Playground'},{n:'Automate Boring Stuff Ch.1',u:'https://automatetheboringstuff.com/2e/chapter1/',i:'📖',m:'Free book',t:'Book'}]},
+
+  {id:'io',num:'02',title:'Inputs & Outputs',desc:'Ingesting data from users and systems, displaying results clearly.',icon:'📡',level:'Beginner',xp:50,tc:'#0ea47a',tl:'#e6f9f3',
+  concepts:[
+    {t:'<strong>print()</strong> outputs to the console. Supports f-strings: <code>print(f"Case {case_id} took {dur}s")</code>'},
+    {t:'<strong>input()</strong> captures user input as a string: <code>name = input("Enter name: ")</code>'},
+    {t:'<strong>Type conversion</strong> is critical — input() always returns strings. Convert with <code>int()</code>, <code>float()</code>, <code>str()</code>.'},
+    {t:'<strong>f-strings</strong> are Python\'s most readable way to embed values: <code>f"Score: {score:.2f}"</code>'},
+    {t:'<strong>print() separators</strong>: <code>print(a, b, sep=", ")</code> — control how values join in output.'},
+  ],
+  vid:'_uQrJ0TkZlc',vidNote:'▶ Python Tutorial for Beginners — Programming with Mosh. Covers I/O clearly.',
+  fc:[{f:'print()',b:'Outputs values to console. Supports f-strings, sep, and end parameters.'},{f:'input()',b:'Captures user input — always returns a string.'},{f:'f-string',b:'f"Hello {name}" — inserts variable values directly into strings.'},{f:'int("42")',b:'Converts string "42" to integer 42. Essential after input().'},{f:'str(100)',b:'Converts integer 100 to string "100".'}],
+  quiz:[
+    {q:'What does input() always return?',o:['int','float','str','bool'],c:2,e:'input() always returns a string, even if user types a number.'},
+    {q:'Output of print(f"2+2={2+2}")?',o:['2+2={2+2}','2+2=4','Error','f"2+2=4"'],c:1,e:'f-strings evaluate expressions inside {}.'},
+    {q:'Convert user input "5" to integer?',o:['str("5")','int(input())','float("5")','convert()'],c:1,e:'Wrap input() with int() to convert the returned string.'},
+    {q:'Default separator in print(a, b)?',o:['Comma','Newline','Space','Tab'],c:2,e:'Default sep is a single space. Change with sep=","'},
+    {q:'What does print("Hi", end="") do?',o:['Prints Hi + newline','No newline after Hi','Error','Prints end=""'],c:1,e:'end="" suppresses the default newline character.'},
+  ],
+  ch:[{t:'Process Mining Prompt',d:'Ask for: case_id, activity, duration. Print: "Case #X completed activity Y in Z seconds."',xp:25},{t:'SLA Checker',d:'Ask user for duration. If >3600 print "⚠️ SLA Breach", else print "✅ Within SLA".',xp:20}],
+  res:[{n:'Python f-strings Guide',u:'https://realpython.com/python-f-strings/',i:'📝',m:'Real Python · Comprehensive',t:'Article'},{n:'Python Playground',u:'https://python-playground.com/',i:'🛝',m:'Practice instantly',t:'Playground'}]},
+
+  {id:'conditionals',num:'03',title:'Conditionals',desc:'Building decision logic with if/elif/else — the brain of any algorithm.',icon:'🔀',level:'Beginner',xp:50,tc:'#d97706',tl:'#fef3cd',
+  concepts:[
+    {t:'<strong>if/elif/else</strong> creates branching logic. Python uses 4-space indentation for code blocks — no curly braces.'},
+    {t:'<strong>Comparison operators</strong>: <code>==</code> (equal), <code>!=</code> (not equal), <code>></code>, <code><</code>, <code>>=</code>, <code><=</code>'},
+    {t:'<strong>Logical operators</strong>: <code>and</code>, <code>or</code>, <code>not</code> — combine conditions for complex rules.'},
+    {t:'<strong>in operator</strong>: <code>if activity in ["Approve","Review"]:</code> — powerful for activity checks.'},
+    {t:'<strong>Ternary operator</strong>: <code>result = "pass" if score > 70 else "fail"</code> — one-line conditionals.'},
+  ],
+  vid:'DZwmZ8Usvnk',vidNote:'▶ Python If Else — Bro Code. Fast, practical, modern Python style.',
+  fc:[{f:'if statement',b:'Executes a block only when a condition is True.'},{f:'elif',b:'Checks another condition when the previous if was False.'},{f:'else',b:'Runs when ALL preceding if/elif conditions are False.'},{f:'and operator',b:'Both conditions must be True for the expression to be True.'},{f:'in operator',b:'"x" in ["a","x","z"] → True. Checks membership.'}],
+  quiz:[
+    {q:'Python\'s indentation standard?',o:['2 spaces','4 spaces','1 tab','Curly braces'],c:1,e:'PEP 8 standard is 4 spaces per indentation level.'},
+    {q:'Which operator checks equality?',o:['=','==','equals()','==='],c:1,e:'= assigns, == compares. Very common beginner mistake!'},
+    {q:'"not True" evaluates to?',o:['True','False','None','Error'],c:1,e:'not flips the boolean — not True = False.'},
+    {q:'Max number of else blocks in an if statement?',o:['None','One','Unlimited','Two'],c:1,e:'Exactly one else block — the final default fallback.'},
+    {q:'x=5. What is (x>3 and x<10)?',o:['True','False','5','Error'],c:0,e:'5>3 is True AND 5<10 is True → True.'},
+  ],
+  ch:[{t:'SLA Escalation',d:'Function: duration <1800 → "✅ Green", 1800–3600 → "⚠️ Yellow", >3600 → "🔴 Red — Escalate".',xp:30},{t:'Activity Classifier',d:'Classify activities as "Automated" or "Manual" using the "in" operator.',xp:20}],
+  res:[{n:'Python Control Flow',u:'https://docs.python.org/3/tutorial/controlflow.html',i:'📚',m:'Official Python docs',t:'Docs'},{n:'Python Playground',u:'https://python-playground.com/',i:'🛝',m:'Practice live',t:'Playground'}]},
+
+  {id:'loops',num:'04',title:'Loops',desc:'Automating repetitive tasks with for/while — the engine of data processing.',icon:'🔄',level:'Beginner',xp:50,tc:'#e5465a',tl:'#fdedf0',
+  concepts:[
+    {t:'<strong>for loop</strong> iterates over any sequence: <code>for case in cases:</code> — processes every item.'},
+    {t:'<strong>while loop</strong> repeats while a condition is True. Always ensure the condition eventually becomes False.'},
+    {t:'<strong>range()</strong> generates sequences: <code>range(10)</code> = 0–9. <code>range(1,10,2)</code> = odd numbers.'},
+    {t:'<strong>break</strong> exits a loop. <strong>continue</strong> skips the current iteration.'},
+    {t:'<strong>List comprehensions</strong>: <code>[x*2 for x in data]</code> — creates a new list in one line.'},
+  ],
+  vid:'OnDr4J2UXSA',vidNote:'▶ Python Loops Explained — Tech With Tim. Covers for, while, and comprehensions.',
+  fc:[{f:'for loop',b:'Iterates over each item in a sequence (list, range, string...).'},{f:'while loop',b:'Repeats as long as a condition remains True.'},{f:'break',b:'Immediately exits the current loop.'},{f:'continue',b:'Skips the rest of current iteration, jumps to next.'},{f:'List comprehension',b:'[x for x in items if condition] — create lists in one line.'}],
+  quiz:[
+    {q:'What does range(3) produce?',o:['[1,2,3]','[0,1,2]','[0,1,2,3]','[1,2]'],c:1,e:'range(n) starts at 0 and ends at n-1.'},
+    {q:'Which exits a loop immediately?',o:['exit','stop','break','continue'],c:2,e:'break terminates the loop.'},
+    {q:'[x**2 for x in range(4)] = ?',o:['[1,4,9,16]','[0,1,4,9]','[0,2,4,6]','Error'],c:1,e:'range(4)=0,1,2,3. Squared = 0,1,4,9.'},
+    {q:'Which loop checks condition first?',o:['do-while','for','while','repeat'],c:2,e:'while checks before each iteration.'},
+    {q:'for i in range(5): if i==3: break → last printed?',o:['3','2','4','0'],c:1,e:'break exits when i==3, so last print is i=2.'},
+  ],
+  ch:[{t:'Event Log Iterator',d:'Given 10 process events, print only events where duration > 1800 seconds. Use for loop + conditional.',xp:25},{t:'Throughput Calculator',d:'Use while loop to accumulate durations until total > 86400 (24hrs). Print how many cases processed.',xp:30}],
+  res:[{n:'Python Control Flow',u:'https://docs.python.org/3/tutorial/controlflow.html',i:'📚',m:'Official docs',t:'Docs'},{n:'Google Colab',u:'https://colab.research.google.com/',i:'🔬',m:'Free notebooks',t:'Playground'}]},
+
+  {id:'functions',num:'05',title:'Functions',desc:'Creating reusable, modular code blocks — reducing redundancy in AI pipelines.',icon:'⚙️',level:'Intermediate',xp:50,tc:'#5046e5',tl:'#eeecff',
+  concepts:[
+    {t:'<strong>def</strong> keyword defines a function: <code>def calculate_sla(duration, limit=3600):</code>'},
+    {t:'<strong>Parameters</strong> are in the definition; <strong>arguments</strong> are the values passed when calling.'},
+    {t:'<strong>Default parameters</strong>: <code>def greet(name, greeting="Hello"):</code> — makes parameters optional.'},
+    {t:'<strong>return</strong> sends a value back. Without return, a function returns <code>None</code>.'},
+    {t:'<strong>*args and **kwargs</strong> allow variable numbers of arguments — great for flexible AI utility functions.'},
+  ],
+  vid:'u-OmVr_fT4s',vidNote:'▶ Python Functions — Corey Schafer. The gold standard Python tutorial series.',
+  fc:[{f:'def keyword',b:'Declares a new function. def function_name(params):'},{f:'return statement',b:'Sends a value back from the function to the caller.'},{f:'Default parameter',b:'def f(x, y=10) — y is optional with default value 10.'},{f:'*args',b:'Accepts any number of positional arguments as a tuple.'},{f:'**kwargs',b:'Accepts any number of keyword arguments as a dictionary.'}],
+  quiz:[
+    {q:'Keyword to define a function?',o:['func','define','def','function'],c:2,e:'"def" is Python\'s function declaration keyword.'},
+    {q:'Return value without a return statement?',o:['0','""','None','Error'],c:2,e:'Python implicitly returns None when no return specified.'},
+    {q:'In def f(a, b=5), what is b?',o:['Keyword arg','Default parameter','Both B and C','Mandatory arg'],c:2,e:'b=5 defines b as an optional default parameter.'},
+    {q:'What does *args collect?',o:['Dict of kwargs','Positional args as tuple','List of defaults','Nothing'],c:1,e:'*args gathers extra positional arguments into a tuple.'},
+    {q:'Can a function return multiple values?',o:['No','Yes, as a tuple','Yes, max 2','Only with lists'],c:1,e:'return a, b returns a tuple. Python natively supports this.'},
+  ],
+  ch:[{t:'SLA Checker Function',d:'Write check_sla(duration, limit=3600) returning "Breach" or "OK". Call for 5 cases.',xp:30},{t:'Activity Stats',d:'Write get_stats(*durations) calculating min, max, avg. Return all three as a tuple.',xp:35}],
+  res:[{n:'Defining Functions',u:'https://docs.python.org/3/tutorial/controlflow.html#defining-functions',i:'📚',m:'Official docs',t:'Docs'},{n:'Real Python: Functions',u:'https://realpython.com/defining-your-own-python-function/',i:'🐍',m:'Deep dive',t:'Article'},{n:'Python Playground',u:'https://python-playground.com/',i:'🛝',m:'Practice instantly',t:'Playground'}]},
+
+  {id:'datastructs',num:'06',title:'Data Structures',desc:'Lists, dicts, sets, tuples — organising AI training data and process logs.',icon:'🗃️',level:'Intermediate',xp:50,tc:'#0ea47a',tl:'#e6f9f3',
+  concepts:[
+    {t:'<strong>Lists</strong> are ordered and mutable: <code>events = ["Start","Review","Approve"]</code>. Use for ordered sequences.'},
+    {t:'<strong>Dictionaries</strong> store key-value pairs: <code>case = {"id":101, "status":"open", "dur":3200}</code>.'},
+    {t:'<strong>Sets</strong> hold unique items only: <code>unique = {"Approve","Review"}</code>. Great for deduplication.'},
+    {t:'<strong>Tuples</strong> are immutable: <code>coords = (48.85, 2.35)</code>. Use for fixed data.'},
+    {t:'<strong>Nested structures</strong>: <code>log = [{"case_id":1, "events":[...]}, ...]</code> — how real event logs look.'},
+  ],
+  vid:'R-HLU9Fl5ug',vidNote:'▶ Python Data Structures — freeCodeCamp. Lists, dicts, sets, tuples explained.',
+  fc:[{f:'List',b:'Ordered, mutable sequence. Supports duplicates. e.g. [1,"two",3.0]'},{f:'Dictionary',b:'Key-value pairs. {"key":"value"}. Keys must be unique.'},{f:'Set',b:'Unordered collection of UNIQUE items. {1,2,3}. No duplicates.'},{f:'Tuple',b:'Ordered, IMMUTABLE sequence. (1,2,3). Cannot change after creation.'},{f:'dict.get(key)',b:'Safely retrieves a value — returns None instead of raising KeyError.'}],
+  quiz:[
+    {q:'Which structure guarantees unique items?',o:['List','Tuple','Set','Dict values'],c:2,e:'Sets only store unique values — duplicates are removed.'},
+    {q:'Access dict value by key?',o:['dict[0]','dict.key','dict["key"]','dict.get[key]'],c:2,e:'dict["key"] or dict.get("key"). get() is safer.'},
+    {q:'Which structure is immutable?',o:['List','Dict','Set','Tuple'],c:3,e:'Tuples cannot be modified after creation.'},
+    {q:'len([1,2,3,3,2]) returns?',o:['3','4','5','2'],c:2,e:'len() counts all elements including duplicates.'},
+    {q:'Add item to a list?',o:['list.add()','list.insert()','list.append()','list.push()'],c:2,e:'list.append(item) adds to the end.'},
+  ],
+  ch:[{t:'Event Log Builder',d:'Create a list of 5 dicts: case_id, activity, duration, resource. Print the activity with the longest duration.',xp:35},{t:'Unique Activities',d:'Use a set on a list with duplicate activities. Print how many unique activities exist.',xp:20}],
+  res:[{n:'Python Data Science Handbook',u:'https://jakevdp.github.io/PythonDataScienceHandbook/',i:'📖',m:'Free online',t:'Book'},{n:'Python Data Structures',u:'https://docs.python.org/3/tutorial/datastructures.html',i:'📚',m:'Official reference',t:'Docs'}]},
+
+  {id:'algorithms',num:'07',title:'Algorithms & Sorting',desc:'Search, sort, and filter data to solve process mining challenges.',icon:'🔍',level:'Intermediate',xp:50,tc:'#d97706',tl:'#fef3cd',
+  concepts:[
+    {t:'<strong>sorted()</strong>: <code>sorted(cases, key=lambda x: x["duration"], reverse=True)</code> — sort cases by duration.'},
+    {t:'<strong>Linear search</strong>: iterate through a list to find an item. O(n) time — checks every element.'},
+    {t:'<strong>Binary search</strong>: only on sorted lists, much faster. O(log n). Available via <code>bisect</code> module.'},
+    {t:'<strong>lambda functions</strong>: <code>key = lambda case: case["duration"]</code> — anonymous functions for sort keys.'},
+    {t:'<strong>filter() and map()</strong>: <code>filter(lambda x: x>0, data)</code> — functional programming for large event logs.'},
+  ],
+  vid:'kgBjXUE_Nwc',vidNote:'▶ Algorithms and Data Structures — freeCodeCamp. Covers Python sorting and search.',
+  fc:[{f:'sorted()',b:'Returns a new sorted list. sorted(items, key=func, reverse=False)'},{f:'lambda',b:'Anonymous inline function. lambda x: x*2 equals def f(x): return x*2'},{f:'O(n) complexity',b:'Linear time — doubles when data doubles.'},{f:'O(log n) complexity',b:'Logarithmic time — 1000 items needs only ~10 comparisons.'},{f:'filter()',b:'filter(lambda x: x>0, data) — returns items where condition is True.'}],
+  quiz:[
+    {q:'sorted([3,1,2]) returns?',o:['[3,1,2]','[1,2,3]','[3,2,1]','None'],c:1,e:'sorted() returns a new list in ascending order.'},
+    {q:'What is a lambda function?',o:['Named function','Async function','Anonymous inline function','Class method'],c:2,e:'lambda creates a small anonymous function.'},
+    {q:'Which search requires a sorted list?',o:['Linear','Binary','Both','Neither'],c:1,e:'Binary search requires sorted data.'},
+    {q:'Time complexity of linear search?',o:['O(1)','O(log n)','O(n)','O(n²)'],c:2,e:'In worst case, you check every element — O(n).'},
+    {q:'list.sort() vs sorted(list)?',o:['Identical','sort() in-place, sorted() returns new list','sorted() is faster','sort() works on dicts'],c:1,e:'list.sort() mutates original. sorted() leaves it unchanged.'},
+  ],
+  ch:[{t:'Top 3 Bottlenecks',d:'Sort activities by avg duration descending. Print top 3 bottleneck activities with durations.',xp:30},{t:'SLA Breach Filter',d:'Use filter() with lambda to extract cases where duration > SLA_LIMIT from a list of case dicts.',xp:25}],
+  res:[{n:'Python Sorting HOWTO',u:'https://docs.python.org/3/howto/sorting.html',i:'📚',m:'Official guide',t:'Docs'},{n:'Big-O Cheat Sheet',u:'https://www.bigocheatsheet.com/',i:'📊',m:'Visual complexity reference',t:'Reference'}]},
+
+  {id:'errors',num:'08',title:'Error Handling',desc:'Graceful exception management — building resilient AI apps that never crash.',icon:'🛡️',level:'Intermediate',xp:50,tc:'#e5465a',tl:'#fdedf0',
+  concepts:[
+    {t:'<strong>try/except</strong> catches errors gracefully: <code>try: api_call() except Timeout: retry()</code>'},
+    {t:'<strong>Exception types</strong>: <code>ValueError</code>, <code>TypeError</code>, <code>KeyError</code>, <code>FileNotFoundError</code> — know which to catch.'},
+    {t:'<strong>except Exception as e</strong>: captures the error object. <code>print(f"Error: {e}")</code> for logging.'},
+    {t:'<strong>finally</strong>: always runs regardless of error. Use for cleanup: closing connections, releasing resources.'},
+    {t:'<strong>raise</strong>: create custom exceptions. <code>raise ValueError("Duration cannot be negative")</code>'},
+  ],
+  vid:'NIWwJbo-9_8',vidNote:'▶ Python Exception Handling — Corey Schafer. Industry-standard patterns.',
+  fc:[{f:'try/except',b:'Wraps risky code. If exception occurs, except block runs instead of crashing.'},{f:'finally',b:'ALWAYS runs — whether exception occurred or not. Use for cleanup.'},{f:'raise',b:'Manually throw an exception. raise ValueError("msg") stops with that error.'},{f:'except Exception as e',b:'Catches any exception, stores it in e for logging.'},{f:'KeyError',b:'Raised when accessing a dict key that doesn\'t exist. Use dict.get() instead.'}],
+  quiz:[
+    {q:'What does the finally block do?',o:['Runs on success only','Runs on error only','Always runs','Runs if no except matches'],c:2,e:'finally executes regardless of whether an exception occurred.'},
+    {q:'Exception when dividing by zero?',o:['ValueError','TypeError','ZeroDivisionError','MathError'],c:2,e:'Python raises ZeroDivisionError for division by zero.'},
+    {q:'What does "raise" do?',o:['Catches exception','Logs error','Manually throws exception','Ignores errors'],c:2,e:'raise triggers an exception.'},
+    {q:'Best way to safely get a dict value?',o:['dict[key]','try: dict[key]','dict.get(key)','dict.find(key)'],c:2,e:'dict.get(key) returns None instead of raising KeyError.'},
+    {q:'Catch multiple exception types?',o:['No','Yes: except (TypeError, ValueError)','Yes with comma','Python 3.10+ only'],c:1,e:'except (ValueError, TypeError): catches both in one block.'},
+  ],
+  ch:[{t:'Bulletproof API Call',d:'Wrap a mock API call in try/except. Handle: timeout (retry msg), HTTP error (log code), others (log unknown). Always close in finally.',xp:35},{t:'Safe CSV Reader',d:'Function reading a process log CSV. Handle FileNotFoundError, ValueError, and unknown errors gracefully.',xp:30}],
+  res:[{n:'Python Exceptions',u:'https://docs.python.org/3/tutorial/errors.html',i:'📚',m:'Official reference',t:'Docs'},{n:'Real Python: Exception Handling',u:'https://realpython.com/python-exceptions/',i:'🐍',m:'Comprehensive guide',t:'Article'}]},
+
+  {id:'pandas',num:'09',title:'Pandas for AI Data Prep',desc:'The #1 Python library for data manipulation — essential for feeding AI models.',icon:'🐼',level:'Advanced',xp:50,tc:'#5046e5',tl:'#eeecff',
+  concepts:[
+    {t:'<strong>DataFrame</strong>: Pandas\' core 2D structure — like a spreadsheet. <code>df = pd.DataFrame(event_log)</code>'},
+    {t:'<strong>Reading data</strong>: <code>df = pd.read_csv("process_log.csv")</code> — load process mining data instantly.'},
+    {t:'<strong>Filtering rows</strong>: <code>df[df["duration"] > 3600]</code> — select only SLA breach cases.'},
+    {t:'<strong>groupby()</strong>: <code>df.groupby("activity")["duration"].mean()</code> — average duration per activity.'},
+    {t:'<strong>df.describe()</strong>: instant statistical summary — count, mean, std, min, max.'},
+  ],
+  vid:'vmEHCJofslg',vidNote:'▶ Pandas for Data Analysis — freeCodeCamp. Complete course, free.',
+  fc:[{f:'DataFrame',b:'Pandas 2D labeled data structure — rows and columns.'},{f:'pd.read_csv()',b:'Loads a CSV into a DataFrame. Most common way to import data.'},{f:'df.groupby()',b:'Groups rows by column value. Use with .mean(), .sum(), .count().'},{f:'df.describe()',b:'Returns count, mean, std, min, max for all numeric columns.'},{f:'df.dropna()',b:'Removes rows with missing values. Critical before AI model training.'}],
+  quiz:[
+    {q:'Library imported as "pd"?',o:['Python Data','Pandas','PyData','PandaLib'],c:1,e:'import pandas as pd is the universal convention.'},
+    {q:'What does df.shape return?',o:['Column names','Row count','(rows, cols) tuple','Data types'],c:2,e:'df.shape returns a tuple: (num_rows, num_cols).'},
+    {q:'Select "duration" column from df?',o:['df.duration()','df["duration"]','df->duration','df.col("duration")'],c:1,e:'df["column_name"] is the standard selection syntax.'},
+    {q:'df.groupby("activity")["duration"].mean() computes?',o:['Total duration','Max per activity','Avg per activity','Count'],c:2,e:'groupby + mean aggregates average duration for each activity.'},
+    {q:'What is a NaN value?',o:['Negative number','Not a Number / missing value','Infinity','Zero'],c:1,e:'NaN = missing data. Always handle before training AI models.'},
+  ],
+  ch:[{t:'Process Log Analysis',d:'Create a DataFrame with 10 rows. Calculate: total cases, avg duration, top activity, % SLA breaches. Print a summary.',xp:40},{t:'Data Cleaner',d:'Use dropna(), drop_duplicates(), fillna() to clean a messy DataFrame. Print before/after row counts.',xp:30}],
+  res:[{n:'Python Data Science Handbook — Pandas',u:'https://jakevdp.github.io/PythonDataScienceHandbook/03.00-introduction-to-pandas.html',i:'📖',m:'Free online · Best Pandas intro',t:'Book'},{n:'Pandas Official Docs',u:'https://pandas.pydata.org/docs/getting_started/',i:'📚',m:'Official getting started',t:'Docs'},{n:'Google Colab',u:'https://colab.research.google.com/',i:'🔬',m:'Best playground for Pandas',t:'Playground'}]},
+
+  {id:'oop',num:'10',title:'OOP & AI Patterns',desc:'Classes and design patterns for building scalable AI application components.',icon:'🏗️',level:'Advanced',xp:50,tc:'#0ea47a',tl:'#e6f9f3',
+  concepts:[
+    {t:'<strong>Classes</strong> are blueprints for objects. <code>class ProcessCase:</code> defines a reusable template for cases.'},
+    {t:'<strong>__init__()</strong>: the constructor — runs when a new object is created. Sets initial attributes via <code>self</code>.'},
+    {t:'<strong>self</strong>: refers to the current instance. <code>self.duration = duration</code> stores data on the object.'},
+    {t:'<strong>Inheritance</strong>: <code>class AICase(ProcessCase):</code> — extend classes with new capabilities.'},
+    {t:'<strong>@dataclass</strong> decorator auto-generates __init__, __repr__ — perfect for AI data models.'},
+  ],
+  vid:'JeznW_7DlB0',vidNote:'▶ Python OOP Tutorial — freeCodeCamp. Beginner classes to advanced patterns.',
+  fc:[{f:'Class',b:'A blueprint for creating objects. Defines attributes and methods.'},{f:'__init__()',b:'Constructor — runs when object is created. Sets attribute values via self.'},{f:'self',b:'Reference to the current object instance. First parameter of instance methods.'},{f:'Inheritance',b:'class Child(Parent): — Child gets all attributes and methods of Parent.'},{f:'@dataclass',b:'Decorator that auto-generates __init__, __repr__ from type annotations.'}],
+  quiz:[
+    {q:'What does __init__() do?',o:['Deletes object','Initialises attributes on creation','Imports class','Returns class name'],c:1,e:'__init__ is the constructor — runs when creating a new object.'},
+    {q:'What does "self" represent?',o:['The class','The parent','Current instance','A static method'],c:2,e:'self refers to the specific object instance.'},
+    {q:'What is inheritance in OOP?',o:['Copying code','Child extending parent class','Creating objects','A security feature'],c:1,e:'Inheritance lets a class reuse and extend another class.'},
+    {q:'Create an instance of class Dog?',o:['Dog.new()','new Dog()','Dog()','create Dog()'],c:2,e:'In Python: Dog() creates a new instance.'},
+    {q:'Which decorator simplifies data classes?',o:['@property','@staticmethod','@dataclass','@classmethod'],c:2,e:'@dataclass auto-generates __init__, __repr__ and more.'},
+  ],
+  ch:[{t:'ProcessCase Class',d:'Build ProcessCase: case_id, activities (list), start_time, end_time. Add get_duration() and is_sla_breach(limit=3600). Create 3 instances.',xp:45},{t:'AI Agent Blueprint',d:'Design AIAgent: name, model, tools (list). Add add_tool() and run(prompt). Extend with CelonisAgent subclass.',xp:40}],
+  res:[{n:'Real Python: OOP in Python',u:'https://realpython.com/python3-object-oriented-programming/',i:'🐍',m:'Comprehensive guide',t:'Article'},{n:'Python Classes',u:'https://docs.python.org/3/tutorial/classes.html',i:'📚',m:'Official reference',t:'Docs'},{n:'Python Playground',u:'https://python-playground.com/',i:'🛝',m:'Build and test classes live',t:'Playground'}]}
+];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let S={user:'',xp:0,done:{},chDone:{},qScores:{}};
+let CT=null,qIdx=0,qAns=[],fcIdx=0;
+
+function init(){
+  try{const s=localStorage.getItem('py_v3');if(s)S=JSON.parse(s);}catch(e){}
+  if(S.user){document.getElementById('wm').style.display='none';refresh();}
+  else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
+}
+function save(){localStorage.setItem('py_v3',JSON.stringify(S));}
+function refresh(){updateNav();renderCards();updateProg();}
+
+function startJourney(){
+  const n=document.getElementById('nameInput').value.trim();
+  if(!n)return;
+  S.user=n;save();
+  document.getElementById('wm').style.display='none';
+  refresh();toast('🐍','Welcome '+n+'! Let\'s build!');
+}
+
+function updateNav(){
+  document.getElementById('navUser').textContent=S.user||'?';
+  document.getElementById('navXP').textContent=(S.xp||0)+' XP';
+  document.getElementById('xpStat').textContent=S.xp||0;
+}
+function updateProg(){
+  const d=Object.keys(S.done).filter(k=>S.done[k]).length;
+  const p=Math.round(d/TOPICS.length*100);
+  document.getElementById('progFill').style.width=p+'%';
+  document.getElementById('progPct').textContent=p+'%';
+  document.getElementById('doneStat').textContent=d;
+}
+
+function renderCards(){
+  document.getElementById('topicsGrid').innerHTML=TOPICS.map((t,i)=>{
+    const done=S.done[t.id];
+    const prog=done?100:(S.qScores[t.id]?50:0);
+    return `<div class="topic-card ${done?'done':''}" style="--tc:${t.tc};--tl:${t.tl};" onclick="openTopic('${t.id}')">
+      <span class="tc-icon">${t.icon}</span>
+      <div class="tc-title">${t.title}</div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-footer">
+        <span class="tc-badge">${done?'✓ Complete':t.level}</span>
+        <span class="tc-xp">+${t.xp} XP</span>
+      </div>
+      <div class="tc-bar"><div class="tc-fill" style="width:${prog}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openTopic(id){
+  CT=TOPICS.find(t=>t.id===id);if(!CT)return;
+  document.getElementById('mTag').textContent=`TOPIC ${CT.num} · ${CT.level.toUpperCase()}`;
+  document.getElementById('mTitle').textContent=`${CT.icon}  ${CT.title}`;
+  tab('learn',document.querySelector('.tab-btn'));
+  bLearn();bVideo();bChallenge();bResources();
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+  fcIdx=0;bFC();
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal2(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('vFrame').src='';
+}
+function closeModal(e){if(e.target.id==='modal')closeModal2();}
+
+function tab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const p=document.getElementById('tab-'+name);if(p)p.classList.add('active');
+}
+
+// LEARN
+function bLearn(){
+  document.getElementById('conceptList').innerHTML=CT.concepts.map((c,i)=>`
+    <div class="concept-item">
+      <div class="c-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="c-text">${c.t}</div>
+    </div>`).join('');
+}
+
+// VIDEO
+function bVideo(){
+  document.getElementById('vFrame').src=`https://www.youtube.com/embed/${CT.vid}?rel=0&modestbranding=1`;
+  document.getElementById('vNote').textContent=CT.vidNote;
+}
+
+// QUIZ
+function bQuiz(){
+  const w=document.getElementById('quizWrap');
+  if(qIdx>=CT.quiz.length){
+    const s=qAns.filter(Boolean).length;
+    w.style.display='none';
+    document.getElementById('scoreBox').classList.add('show');
+    const p=Math.round(s/CT.quiz.length*100);
+    document.getElementById('scoreBig').textContent=`${s}/${CT.quiz.length}`;
+    document.getElementById('scoreLbl').textContent=p>=80?'🎉 Excellent! Topic mastered!':p>=60?'👍 Good — try again for full XP!':'💪 Keep practicing!';
+    if(p>=60&&!S.qScores[CT.id]){
+      S.qScores[CT.id]=s;
+      const g=Math.round(s/CT.quiz.length*CT.xp);
+      S.xp=(S.xp||0)+g;
+      if(p>=80)S.done[CT.id]=true;
+      save();refresh();toast('⚡',`+${g} XP earned!`);
+    }
+    return;
+  }
+  const q=CT.quiz[qIdx];
+  const K=['A','B','C','D'];
+  w.innerHTML=`
+    <div class="quiz-box">
+      <div class="quiz-counter">Question ${qIdx+1} of ${CT.quiz.length}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts">
+        ${q.o.map((o,i)=>`<button class="quiz-opt" onclick="ansQ(${i})" id="o${i}"><span class="opt-k">${K[i]}</span>${o}</button>`).join('')}
+      </div>
+      <div class="quiz-fb" id="qfb"></div>
+    </div>
+    <div class="quiz-nav"><button class="btn btn-ghost" onclick="skipQ()">Skip →</button></div>`;
+}
+
+function ansQ(idx){
+  const q=CT.quiz[qIdx];
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
+  const ok=idx===q.c;
+  document.getElementById('o'+idx).classList.add(ok?'correct':'wrong');
+  if(!ok)document.getElementById('o'+q.c).classList.add('correct');
+  qAns.push(ok);
+  const fb=document.getElementById('qfb');
+  fb.textContent=(ok?'✓ Correct! ':'✗ Incorrect. ')+q.e;
+  fb.classList.add('show',ok?'ok':'bad');
+  setTimeout(()=>{qIdx++;bQuiz();},1700);
+}
+function skipQ(){qAns.push(false);qIdx++;bQuiz();}
+function retryQuiz(){
+  qIdx=0;qAns=[];
+  document.getElementById('scoreBox').classList.remove('show');
+  document.getElementById('quizWrap').style.display='block';
+  bQuiz();
+}
+
+// FLASHCARDS
+function bFC(){
+  const fc=CT.fc[fcIdx];
+  document.getElementById('fcFront').textContent=fc.f;
+  document.getElementById('fcBack').textContent=fc.b;
+  document.getElementById('fcCount').textContent=`${fcIdx+1} / ${CT.fc.length}`;
+  document.getElementById('fcScene').classList.remove('flipped');
+}
+function flipFC(){document.getElementById('fcScene').classList.toggle('flipped');}
+function nextFC(){fcIdx=(fcIdx+1)%CT.fc.length;bFC();}
+function prevFC(){fcIdx=(fcIdx-1+CT.fc.length)%CT.fc.length;bFC();}
+function markKnown(){toast('✓','Marked as known!');nextFC();}
+
+// CHALLENGES
+function bChallenge(){
+  document.getElementById('chList').innerHTML=CT.ch.map((c,i)=>{
+    const k=`${CT.id}_${i}`,done=S.chDone[k];
+    return `<div class="ch-item">
+      <div class="ch-hd"><div class="ch-title">${i+1}. ${c.t}</div><div class="ch-xp">+${c.xp} XP</div></div>
+      <div class="ch-desc">${c.d}</div>
+      <button class="ch-btn ${done?'done':''}" onclick="doCh('${k}',${c.xp})">${done?'✅ Completed!':'☐ Mark as Complete'}</button>
+    </div>`;
+  }).join('');
+}
+function doCh(k,xp){
+  if(S.chDone[k])return;
+  S.chDone[k]=true;S.xp=(S.xp||0)+xp;
+  save();refresh();bChallenge();toast('⚡',`+${xp} XP! Challenge done!`);
+}
+
+// RESOURCES
+function bResources(){
+  document.getElementById('resList').innerHTML=CT.res.map(r=>`
+    <a href="${r.u}" target="_blank" class="res-item">
+      <div class="res-icon">${r.i}</div>
+      <div><div class="res-name">${r.n}</div><div class="res-meta">${r.m}</div></div>
+      <div class="res-tag">${r.t}</div>
+    </a>`).join('');
+}
+
+// TOAST
+let tT;
+function toast(icon,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tIcon').textContent=icon;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('show');clearTimeout(tT);
+  tT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+init();
+</script>
+</body>
+</html>

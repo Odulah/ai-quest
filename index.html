@@ -14,5 +14,86 @@
     \u{251C}\u{2500}\u{2500} agentic-workflows.html
     \u{251C}\u{2500}\u{2500} ai-fluency.html
     \u{2514}\u{2500}\u{2500} claude-code-celonis.html`}),(0,o.jsx)("p",{style:{color:"#6366f1",fontSize:12,margin:0},children:'💡 Modules open in-page via iframe. If you see a 404, use the "Open in new tab ↗" button in the topbar to verify the path is correct.'})]}),(0,o.jsxs)("div",{style:{background:"#fff",border:"1px solid #e5e7eb",borderRadius:16,padding:"32px",marginBottom:48},children:[(0,o.jsx)("h3",{style:{fontSize:16,fontWeight:800,color:"#111827",margin:"0 0 20px"},children:"📚 How AI Quest Works"}),(0,o.jsx)("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:20},children:[{icon:"🎯",title:"Pick a Module",desc:"Click any card to open the full interactive module — quizzes, flashcards, challenges, and code demos included."},{icon:"⚡",title:"Earn XP",desc:"Complete topics and challenges to earn XP. Your progress is automatically saved in your browser across sessions."},{icon:"🔄",title:"Come Back",desc:"Press ESC or click 'Back to AI Quest' anytime. Your progress is preserved exactly where you left off."},{icon:"📂",title:"File Structure",desc:"bundle.html is the hub. All 11 module HTML files must be in a modules/ subfolder next to bundle.html."}].map(e=>(0,o.jsxs)("div",{children:[(0,o.jsx)("div",{style:{fontSize:24,marginBottom:8},children:e.icon}),(0,o.jsx)("div",{style:{fontWeight:700,fontSize:14,color:"#111827",marginBottom:4},children:e.title}),(0,o.jsx)("div",{style:{fontSize:13,color:"#6b7280",lineHeight:1.6},children:e.desc})]},e.title))})]})]}),(0,o.jsxs)("div",{style:{borderTop:"1px solid #e5e7eb",padding:"24px",textAlign:"center",background:"#fff"},children:[(0,o.jsx)("div",{style:{fontSize:20,marginBottom:6},children:"🚀"}),(0,o.jsx)("p",{style:{fontWeight:700,color:"#111827",margin:"0 0 4px"},children:"AI Quest"}),(0,o.jsx)("p",{style:{color:"#9ca3af",fontSize:13,margin:"0 0 6px"},children:"11 Modules · 100+ Topics · 500+ Quiz Questions · Curated by Aadil Maqbool"}),(0,o.jsxs)("p",{style:{color:"#d1d5db",fontSize:11,fontFamily:"monospace"},children:["Module path: ",(0,o.jsx)("strong",{style:{color:"#6366f1"},children:"modules/"}),"[module-name].html"]})]})]})},{})}));</script>
+    <script>
+      (function () {
+        const moduleMap = {
+          "python fundamentals": "python-fundamentals.html",
+          "api fundamentals": "api-fundamentals.html",
+          "sql fundamentals": "sql-fundamentals.html",
+          "ai fundamentals": "ai-fundamentals.html",
+          "prompt engineering": "prompt-engineering.html",
+          "context engineering": "context-engineering.html",
+          "claude mastery": "claude-mastery.html",
+          "agentic workflows": "agentic-workflows.html",
+          "ai fluency": "ai-fluency.html",
+          "claude code celonis": "claude-code-celonis.html",
+          "git version control": "git-version-control.html"
+        };
+
+        const normalize = (value) =>
+          String(value || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+
+        const resolveModuleFile = (text) => {
+          const normalizedText = normalize(text);
+          if (!normalizedText) return null;
+
+          for (const [moduleLabel, fileName] of Object.entries(moduleMap)) {
+            if (normalizedText.includes(moduleLabel)) return fileName;
+          }
+
+          return null;
+        };
+
+        const shouldIgnoreClick = (target) => {
+          if (!target) return true;
+          if (target.closest("input, textarea, select, [contenteditable='true']")) return true;
+          return false;
+        };
+
+        const bindDataModuleAttributes = () => {
+          const candidates = document.querySelectorAll("button, a, [role='button'], div, article");
+          candidates.forEach((el) => {
+            if (el.dataset.module) return;
+            const fileName = resolveModuleFile(el.textContent);
+            if (fileName) {
+              el.dataset.module = fileName;
+            }
+          });
+        };
+
+        const redirectToModule = (fileName) => {
+          window.location.href = "modules/" + fileName;
+        };
+
+        document.addEventListener(
+          "click",
+          function (event) {
+            const target = event.target;
+            if (shouldIgnoreClick(target)) return;
+
+            bindDataModuleAttributes();
+
+            const clickable = target && target.closest("[data-module], button, a, [role='button'], div, article");
+            if (!clickable) return;
+
+            const dataModule = clickable.getAttribute("data-module");
+            const moduleFile = dataModule || resolveModuleFile(clickable.textContent);
+            if (!moduleFile) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            redirectToModule(moduleFile);
+          },
+          true
+        );
+
+        const observer = new MutationObserver(bindDataModuleAttributes);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        bindDataModuleAttributes();
+      })();
+    </script>
   
 

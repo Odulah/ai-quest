@@ -68,6 +68,28 @@
           window.location.href = "modules/" + fileName;
         };
 
+        const removeFolderStructurePanel = () => {
+          const candidates = document.querySelectorAll("section, article, div");
+          candidates.forEach((el) => {
+            const text = (el.textContent || "").replace(/\s+/g, " ").trim();
+            const hasHeading = text.includes("Required Folder Structure");
+            const hasHint = text.includes("Modules open in-page via iframe");
+            if (!hasHeading && !hasHint) return;
+
+            let panel = el;
+            while (panel.parentElement && panel.parentElement !== document.body) {
+              const parentText = (panel.parentElement.textContent || "").replace(/\s+/g, " ").trim();
+              if (!parentText.includes("Required Folder Structure") && !parentText.includes("Modules open in-page via iframe")) {
+                break;
+              }
+              panel = panel.parentElement;
+            }
+
+            panel.style.display = "none";
+            if (panel.parentNode) panel.parentNode.removeChild(panel);
+          });
+        };
+
         document.addEventListener(
           "click",
           function (event) {
@@ -90,9 +112,13 @@
           true
         );
 
-        const observer = new MutationObserver(bindDataModuleAttributes);
+        const observer = new MutationObserver(() => {
+          bindDataModuleAttributes();
+          removeFolderStructurePanel();
+        });
         observer.observe(document.documentElement, { childList: true, subtree: true });
         bindDataModuleAttributes();
+        removeFolderStructurePanel();
       })();
     </script>
   

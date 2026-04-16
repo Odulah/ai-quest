@@ -174,6 +174,18 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 </style>
 </head>
 <body>
+<script>
+  // Auth guard — redirect to root if not logged in
+  (function() {
+    var user = localStorage.getItem("currentUser") || localStorage.getItem("aq_user");
+    if (!user) {
+      var depth = location.pathname.split("/").filter(Boolean).length;
+      var root  = depth > 1 ? "../index.html" : "index.html";
+      window.location.replace(root);
+    }
+  })();
+</script>
+
 <div class="wel" id="wm">
   <div class="welc"><span class="em">&#128230;</span><h2>Git & Version Control</h2><p>Enter your name to track XP, quiz scores, and challenge completions across the AI Enablement Platform.</p><input class="weli" id="nameInput" type="text" placeholder="Your first name..." maxlength="24"><button class="btn btnp" style="width:100%;padding:14px;font-size:14px;" onclick="startJourney()">Start Learning &rarr;</button></div>
 </div>

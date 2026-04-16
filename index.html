@@ -497,6 +497,7 @@
       const data = userSnap.data();
       localStorage.setItem("aq_user", name);
       localStorage.setItem("aq_role", data.role || "user");
+      localStorage.setItem("currentUser", name);
 
       dismissOverlay();
       applyRoleUI(data.role || "user");
@@ -512,9 +513,12 @@
   nameInput.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); });
 
   // ── Skip overlay if already logged in ──────────────────────────
-  const storedUser = localStorage.getItem("aq_user");
+  const storedUser = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
   const storedRole = localStorage.getItem("aq_role");
   if (storedUser) {
+    // Ensure both keys are in sync
+    localStorage.setItem("aq_user", storedUser);
+    localStorage.setItem("currentUser", storedUser);
     overlay.style.display = "none";
     applyRoleUI(storedRole || "user");
   }

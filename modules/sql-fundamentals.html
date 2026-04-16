@@ -273,13 +273,11 @@ footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;fo
 </head>
 <body>
 <script>
-  // Auth guard — redirect to root if not logged in
+  // Auth guard — redirect to login if not logged in
   (function() {
-    var user = localStorage.getItem("currentUser") || localStorage.getItem("aq_user");
+    var user = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
     if (!user) {
-      var depth = location.pathname.split("/").filter(Boolean).length;
-      var root  = depth > 1 ? "../index.html" : "index.html";
-      window.location.replace(root);
+      window.location.replace("../index.html");
     }
   })();
 </script>

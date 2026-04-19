@@ -673,7 +673,9 @@ const TOPICS=[
 
 // ── STATE ──────────────────────────────────────────────────────────
 let S={user:'',xp:0,done:{},chDone:{},qScores:{}};
-let CT=null,qIdx=0,qAns=[],fcIdx=0;
+let CT=null,qIdx=0,qAns=[],fcIdx=0,shuffledQuiz=[];
+function shuffleArr(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function prepQuiz(qs){return shuffleArr(qs).map(q=>{const idx=shuffleArr([0,1,2,3]);return{q:q.q,o:idx.map(i=>q.o[i]),c:idx.indexOf(q.c),e:q.e};});}
 
 function init(){
   try{const s=localStorage.getItem('py_v3');if(s)S=JSON.parse(s);}catch(e){}
@@ -728,7 +730,7 @@ function openTopic(id){
   document.getElementById('mTitle').textContent=`${CT.icon}  ${CT.title}`;
   tab('learn',document.querySelector('.tab-btn'));
   bLearn();bVideo();bChallenge();bResources();
-  qIdx=0;qAns=[];
+  qIdx=0;qAns=[];shuffledQuiz=prepQuiz(CT.quiz);
   document.getElementById('scoreBox').classList.remove('show');
   document.getElementById('quizWrap').style.display='block';
   bQuiz();
@@ -769,27 +771,27 @@ function bVideo(){
 // QUIZ
 function bQuiz(){
   const w=document.getElementById('quizWrap');
-  if(qIdx>=CT.quiz.length){
+  if(qIdx>=shuffledQuiz.length){
     const s=qAns.filter(Boolean).length;
     w.style.display='none';
     document.getElementById('scoreBox').classList.add('show');
-    const p=Math.round(s/CT.quiz.length*100);
-    document.getElementById('scoreBig').textContent=`${s}/${CT.quiz.length}`;
+    const p=Math.round(s/shuffledQuiz.length*100);
+    document.getElementById('scoreBig').textContent=`${s}/${shuffledQuiz.length}`;
     document.getElementById('scoreLbl').textContent=p>=80?'🎉 Excellent! Topic mastered!':p>=60?'👍 Good — try again for full XP!':'💪 Keep practicing!';
     if(p>=60&&!S.qScores[CT.id]){
       S.qScores[CT.id]=s;
-      const g=Math.round(s/CT.quiz.length*CT.xp);
+      const g=Math.round(s/shuffledQuiz.length*CT.xp);
       S.xp=(S.xp||0)+g;
       if(p>=80)S.done[CT.id]=true;
       save();refresh();toast('⚡',`+${g} XP earned!`);
     }
     return;
   }
-  const q=CT.quiz[qIdx];
+  const q=shuffledQuiz[qIdx];
   const K=['A','B','C','D'];
   w.innerHTML=`
     <div class="quiz-box">
-      <div class="quiz-counter">Question ${qIdx+1} of ${CT.quiz.length}</div>
+      <div class="quiz-counter">Question ${qIdx+1} of ${shuffledQuiz.length}</div>
       <div class="quiz-q">${q.q}</div>
       <div class="quiz-opts">
         ${q.o.map((o,i)=>`<button class="quiz-opt" onclick="ansQ(${i})" id="o${i}"><span class="opt-k">${K[i]}</span>${o}</button>`).join('')}
@@ -800,7 +802,7 @@ function bQuiz(){
 }
 
 function ansQ(idx){
-  const q=CT.quiz[qIdx];
+  const q=shuffledQuiz[qIdx];
   document.querySelectorAll('.quiz-opt').forEach(o=>o.style.pointerEvents='none');
   const ok=idx===q.c;
   document.getElementById('o'+idx).classList.add(ok?'correct':'wrong');
@@ -813,7 +815,7 @@ function ansQ(idx){
 }
 function skipQ(){qAns.push(false);qIdx++;bQuiz();}
 function retryQuiz(){
-  qIdx=0;qAns=[];
+  shuffledQuiz=prepQuiz(CT.quiz);qIdx=0;qAns=[];
   document.getElementById('scoreBox').classList.remove('show');
   document.getElementById('quizWrap').style.display='block';
   bQuiz();

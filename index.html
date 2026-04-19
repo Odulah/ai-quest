@@ -89,31 +89,6 @@
     min-height: 18px;
   }
 
-  /* Manager FAB */
-  #aq-manager-fab {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    z-index: 9999;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(99,102,241,0.45);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    color: #fff;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  #aq-manager-fab:hover {
-    transform: scale(1.08);
-    box-shadow: 0 8px 28px rgba(99,102,241,0.55);
-  }
-
   /* Manager Modal */
   #aq-manager-backdrop {
     position: fixed;
@@ -453,9 +428,6 @@
 <script src="auth.js"></script>
 <script>initIndexAuth();</script>
 
-<!-- ── MANAGER FAB ─────────────────────────────────────────── -->
-<button id="aq-manager-fab" title="Manager Dashboard">&#x1F465;</button>
-
 <!-- ── MANAGER MODAL ──────────────────────────────────────── -->
 <div id="aq-manager-backdrop">
   <div id="aq-manager-modal">
@@ -586,10 +558,7 @@
   }
 
   function applyRoleUI(role) {
-    if (role.toLowerCase() === "manager") {
-      const fab = document.getElementById("aq-manager-fab");
-      fab.style.display = "flex";
-    }
+    // Manager UI handled via manager.html — no FAB needed
   }
 
   // ──────────────────────────────────────────────────────────────────
@@ -625,7 +594,6 @@
   // ──────────────────────────────────────────────────────────────────
   // MANAGER DASHBOARD
   // ──────────────────────────────────────────────────────────────────
-  const fab      = document.getElementById("aq-manager-fab");
   const backdrop = document.getElementById("aq-manager-backdrop");
   const closeBtn = document.getElementById("aq-manager-close");
   const userList = document.getElementById("aq-user-list");
@@ -735,11 +703,6 @@
       console.error("[AQ Dashboard]", err);
     }
   }
-
-  fab.addEventListener("click", () => {
-    backdrop.classList.add("aq-open");
-    aqLoadDashboard();
-  });
 
   closeBtn.addEventListener("click", () => backdrop.classList.remove("aq-open"));
 

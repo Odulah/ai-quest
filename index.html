@@ -386,6 +386,48 @@
   .aq-label-start    { background: #f1f5f9; color: #64748b; }
   .aq-label-progress { background: #eff6ff; color: #3b82f6; }
   .aq-label-almost   { background: #faf5ff; color: #8b5cf6; }
+
+  /* ── MANAGER LOGIN MODAL ──────────────────────────────────── */
+  #aq-mgr-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 99998;
+    background: rgba(15,23,42,0.65); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #aq-mgr-backdrop.aq-open { display: flex; }
+  #aq-mgr-modal {
+    background: #fff; border-radius: 18px; padding: 36px 32px 28px;
+    width: 100%; max-width: 400px; position: relative; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  }
+  #aq-mgr-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; font-size: 18px; cursor: pointer; color: #94a3b8;
+  }
+  #aq-mgr-close:hover { color: #0f172a; }
+  #aq-mgr-modal h2  { margin: 8px 0 4px; font-size: 22px; color: #0f172a; }
+  #aq-mgr-subtitle  { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+  #aq-mgr-name, #aq-mgr-pass, #aq-mgr-pass2 {
+    width: 100%; box-sizing: border-box;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    padding: 12px 14px; font-size: 15px; margin-bottom: 10px;
+    outline: none; font-family: inherit; transition: border-color 0.2s;
+  }
+  #aq-mgr-name:focus, #aq-mgr-pass:focus, #aq-mgr-pass2:focus { border-color: #6366f1; }
+  #aq-mgr-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: opacity 0.2s; margin-top: 2px;
+  }
+  #aq-mgr-btn:hover { opacity: 0.88; }
+  #aq-mgr-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  #aq-mgr-error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; }
+  #aq-mgr-link {
+    display: block; margin-top: 18px; font-size: 13px;
+    color: #6366f1; cursor: pointer; text-decoration: none; opacity: 0.8;
+  }
+  #aq-mgr-link:hover { opacity: 1; text-decoration: underline; }
 </style>
 
 <!-- ── LOGIN OVERLAY ───────────────────────────────────────── -->
@@ -403,6 +445,7 @@
     />
     <button id="aq-login-btn">Start Learning</button>
     <div id="aq-login-error"></div>
+    <a id="aq-mgr-link" href="#">&#x1F512; Manager Login</a>
   </div>
 </div>
 
@@ -437,6 +480,21 @@
 
     <div id="aq-dashboard-loading">Loading users&hellip;</div>
     <div id="aq-user-list"></div>
+  </div>
+</div>
+
+<!-- ── MANAGER LOGIN MODAL ────────────────────────────────── -->
+<div id="aq-mgr-backdrop">
+  <div id="aq-mgr-modal">
+    <button id="aq-mgr-close">&#x2715;</button>
+    <div style="font-size:36px;margin-bottom:6px;">&#x1F512;</div>
+    <h2>Manager Login</h2>
+    <p id="aq-mgr-subtitle">Enter your credentials to access the dashboard</p>
+    <input id="aq-mgr-name" type="text" placeholder="Your full name..." autocomplete="off" spellcheck="false" />
+    <input id="aq-mgr-pass" type="password" placeholder="Passcode..." autocomplete="off" />
+    <input id="aq-mgr-pass2" type="password" placeholder="Confirm passcode..." autocomplete="off" style="display:none" />
+    <button id="aq-mgr-btn">Sign In</button>
+    <div id="aq-mgr-error"></div>
   </div>
 </div>
 
@@ -755,6 +813,108 @@
 
   // ── Refresh ───────────────────────────────────────────────────────────────
   refreshBtn.addEventListener("click", () => aqLoadDashboard());
+
+  // ──────────────────────────────────────────────────────────────────
+  // MANAGER LOGIN MODAL
+  // ──────────────────────────────────────────────────────────────────
+  const mgrBackdrop = document.getElementById("aq-mgr-backdrop");
+  const mgrClose    = document.getElementById("aq-mgr-close");
+  const mgrLink     = document.getElementById("aq-mgr-link");
+  const mgrName     = document.getElementById("aq-mgr-name");
+  const mgrPass     = document.getElementById("aq-mgr-pass");
+  const mgrPass2    = document.getElementById("aq-mgr-pass2");
+  const mgrBtn      = document.getElementById("aq-mgr-btn");
+  const mgrError    = document.getElementById("aq-mgr-error");
+  const mgrSubtitle = document.getElementById("aq-mgr-subtitle");
+
+  let mgrSettingPasscode = false;
+
+  function openMgrModal()  { mgrBackdrop.classList.add("aq-open"); }
+  function closeMgrModal() { mgrBackdrop.classList.remove("aq-open"); resetMgrForm(); }
+
+  function resetMgrForm() {
+    mgrName.value = ""; mgrPass.value = ""; mgrPass2.value = "";
+    mgrError.textContent = "";
+    mgrPass2.style.display = "none";
+    mgrBtn.textContent = "Sign In";
+    mgrSubtitle.textContent = "Enter your credentials to access the dashboard";
+    mgrSettingPasscode = false;
+    mgrBtn.disabled = false;
+  }
+
+  mgrLink.addEventListener("click", e => { e.preventDefault(); openMgrModal(); });
+  mgrClose.addEventListener("click", closeMgrModal);
+  mgrBackdrop.addEventListener("click", e => { if (e.target === mgrBackdrop) closeMgrModal(); });
+  [mgrName, mgrPass, mgrPass2].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") doMgrLogin(); }));
+  mgrBtn.addEventListener("click", doMgrLogin);
+
+  async function doMgrLogin() {
+    const name = mgrName.value.trim();
+    const pass = mgrPass.value;
+    if (!name) { mgrError.textContent = "Please enter your name."; return; }
+    if (!pass)  { mgrError.textContent = "Please enter your passcode."; return; }
+
+    mgrBtn.disabled = true;
+    mgrBtn.textContent = mgrSettingPasscode ? "Saving…" : "Checking…";
+    mgrError.textContent = "";
+
+    try {
+      const userRef  = doc(db, "users", name);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        mgrError.textContent = "Name not found. Please check with your administrator.";
+        mgrBtn.disabled = false;
+        mgrBtn.textContent = mgrSettingPasscode ? "Set Passcode" : "Sign In";
+        return;
+      }
+
+      const data = userSnap.data();
+      if ((data.role || "user").toLowerCase() !== "manager") {
+        mgrError.textContent = "This account does not have manager access.";
+        mgrBtn.disabled = false;
+        mgrBtn.textContent = "Sign In";
+        return;
+      }
+
+      if (!data.passcode) {
+        // First-time login — prompt to set a passcode
+        if (!mgrSettingPasscode) {
+          mgrSettingPasscode = true;
+          mgrPass2.style.display = "block";
+          mgrSubtitle.textContent = "First login — set a passcode for your account.";
+          mgrBtn.textContent = "Set Passcode";
+          mgrBtn.disabled = false;
+          mgrError.textContent = "No passcode set yet. Enter and confirm a new passcode.";
+          return;
+        }
+        // Confirm and store passcode
+        const pass2 = mgrPass2.value;
+        if (!pass2) { mgrError.textContent = "Please confirm your passcode."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
+        if (pass !== pass2) { mgrError.textContent = "Passcodes do not match. Try again."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
+        await updateDoc(userRef, { passcode: pass });
+      } else {
+        // Returning login — validate passcode
+        if (data.passcode !== pass) {
+          mgrError.textContent = "Incorrect passcode.";
+          mgrBtn.disabled = false;
+          mgrBtn.textContent = "Sign In";
+          return;
+        }
+      }
+
+      // Success — store session and redirect
+      localStorage.setItem("aq_user",    name);
+      localStorage.setItem("currentUser", name);
+      localStorage.setItem("aq_role",    "manager");
+      window.location.href = "manager.html";
+    } catch (err) {
+      mgrError.textContent = "Connection error. Please try again.";
+      console.error("[AQ MgrLogin]", err);
+      mgrBtn.disabled = false;
+      mgrBtn.textContent = mgrSettingPasscode ? "Set Passcode" : "Sign In";
+    }
+  }
 </script>
 
 <!-- ── MODULE CLICK TRACKING (event delegation) ──────────── -->

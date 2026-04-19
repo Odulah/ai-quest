@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manager Dashboard — AI Quest</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8fafc; color: #0f172a; min-height: 100vh; }
+
+  /* ── NAV ── */
+  .nav {
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    padding: 0 32px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; color: #0f172a; }
+  .nav-brand span { font-size: 22px; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-user { font-size: 14px; color: #64748b; }
+  .nav-user strong { color: #0f172a; }
+  .btn-logout {
+    background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 7px 14px; font-size: 13px; font-weight: 600; color: #475569;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-logout:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+
+  /* ── MAIN ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  .page-title { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+  .page-sub   { font-size: 14px; color: #64748b; margin-bottom: 28px; }
+
+  /* ── STAT CARDS ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .card {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 20px 22px; text-align: center;
+  }
+  .card-value { font-size: 32px; font-weight: 800; color: #6366f1; line-height: 1; margin-bottom: 6px; }
+  .card-value.green { color: #10b981; }
+  .card-value.amber { color: #f59e0b; }
+  .card-label { font-size: 13px; color: #64748b; font-weight: 500; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px; flex-wrap: wrap;
+  }
+  .toolbar-title { font-size: 17px; font-weight: 700; color: #0f172a; flex: 1; }
+  .btn {
+    border: none; border-radius: 9px; padding: 9px 18px;
+    font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-outline { background: #fff; border: 1.5px solid #e2e8f0; color: #475569; }
+  .btn-outline:hover { border-color: #6366f1; color: #6366f1; }
+  .btn-green  { background: #ecfdf5; border: 1.5px solid #6ee7b7; color: #059669; }
+  .btn-green:hover { background: #d1fae5; }
+  .input-add {
+    border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 9px 14px;
+    font-size: 13px; font-family: inherit; outline: none; width: 200px;
+    transition: border-color 0.2s;
+  }
+  .input-add:focus { border-color: #6366f1; }
+  .add-error { font-size: 12px; color: #ef4444; margin-top: 4px; min-height: 16px; }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: #f8fafc; padding: 13px 16px;
+    text-align: left; font-size: 11px; font-weight: 700;
+    color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody tr.top-1 { background: #fffbeb; }
+  tbody tr.top-2 { background: #f8fafc; }
+  tbody tr.top-3 { background: #fff7ed; }
+  tbody tr.completed { background: #f0fdf4; }
+  td { padding: 13px 16px; font-size: 14px; vertical-align: middle; }
+
+  .rank-cell { font-weight: 800; color: #94a3b8; font-size: 13px; width: 48px; text-align: center; }
+  .medal { font-size: 18px; }
+  .user-name { font-weight: 700; color: #0f172a; }
+  .user-role-badge {
+    display: inline-block; margin-left: 7px;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+    background: #ede9fe; color: #7c3aed; vertical-align: middle;
+  }
+  .prog-cell { width: 200px; }
+  .prog-bar-track { background: #e2e8f0; border-radius: 99px; height: 7px; margin-top: 5px; overflow: hidden; }
+  .prog-bar-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#6366f1,#8b5cf6); width: 0; transition: width 0.6s ease; }
+  .prog-bar-fill.green { background: linear-gradient(90deg,#10b981,#059669); }
+  .prog-pct { font-size: 13px; font-weight: 700; color: #475569; }
+  .mods-cell { color: #64748b; font-size: 13px; }
+  .btn-delete {
+    background: none; border: 1.5px solid #e2e8f0; border-radius: 7px;
+    padding: 5px 11px; font-size: 12px; color: #94a3b8; cursor: pointer;
+    font-family: inherit; transition: all 0.14s;
+  }
+  .btn-delete:hover { border-color: #fca5a5; color: #dc2626; background: #fee2e2; }
+
+  .empty-state { padding: 48px; text-align: center; color: #94a3b8; font-size: 15px; }
+  .loading-state { padding: 32px; text-align: center; color: #94a3b8; font-size: 14px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+    transform: translateY(8px); transition: all 0.25s;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 640px) {
+    .nav { padding: 0 16px; }
+    .main { padding: 20px 16px 40px; }
+    .toolbar { flex-direction: column; align-items: flex-start; }
+    .input-add { width: 100%; }
+    .prog-cell { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Auth guard -->
+<script src="auth.js"></script>
+<script>
+  (function() {
+    var role = localStorage.getItem("aq_role");
+    if (!role || role.toLowerCase() !== "manager") {
+      window.location.replace("index.html");
+    }
+  })();
+</script>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-brand"><span>&#x1F680;</span> AI Quest</div>
+  <div class="nav-right">
+    <div class="nav-user">Signed in as <strong id="nav-name">—</strong></div>
+    <button class="btn-logout" id="btn-logout">Sign Out</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="page-title">Manager Dashboard</div>
+  <div class="page-sub" id="last-updated">Loading learner data…</div>
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-value" id="stat-total">—</div>
+      <div class="card-label">Total Learners</div>
+    </div>
+    <div class="card">
+      <div class="card-value amber" id="stat-avg">—</div>
+      <div class="card-label">Avg Progress</div>
+    </div>
+    <div class="card">
+      <div class="card-value green" id="stat-completed">—</div>
+      <div class="card-label">Completed (100%)</div>
+    </div>
+    <div class="card">
+      <div class="card-value" id="stat-active" style="color:#f59e0b;">—</div>
+      <div class="card-label">In Progress</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-title">&#x1F3C6; Leaderboard</div>
+    <input class="input-add" id="input-add" type="text" placeholder="New learner name…" autocomplete="off" spellcheck="false" />
+    <button class="btn btn-primary" id="btn-add">Add Learner</button>
+    <button class="btn btn-outline" id="btn-refresh">&#x21BB; Refresh</button>
+    <button class="btn btn-green"   id="btn-download">&#x2B07; Download Report</button>
+  </div>
+  <div class="add-error" id="add-error"></div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="loading-state" id="table-loading">Loading learners&hellip;</div>
+    <div id="table-container" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center">Rank</th>
+            <th>Name</th>
+            <th>Modules</th>
+            <th class="prog-cell">Progress</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="table-empty" style="display:none">No learners found. Add one above.</div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<!-- ── FIREBASE + DASHBOARD LOGIC ── -->
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyA9ZCoaO03uVdZE0jnhO-jDtV3XqHomsp4",
+    authDomain:        "ai-quest-977c3.firebaseapp.com",
+    projectId:         "ai-quest-977c3",
+    storageBucket:     "ai-quest-977c3.firebasestorage.app",
+    messagingSenderId: "231396972103",
+    appId:             "1:231396972103:web:af8d46cccf092331368362"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  // ── Populate nav user name ──
+  const managerName = localStorage.getItem("aq_user") || localStorage.getItem("currentUser") || "Manager";
+  document.getElementById("nav-name").textContent = managerName;
+
+  // ── Logout ──
+  document.getElementById("btn-logout").addEventListener("click", () => {
+    localStorage.removeItem("aq_user");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("aq_role");
+    window.location.replace("index.html");
+  });
+
+  // ── State ──
+  let allUsers = [];
+
+  // ── Load Dashboard ──
+  async function loadDashboard() {
+    document.getElementById("table-loading").style.display = "block";
+    document.getElementById("table-container").style.display = "none";
+    document.getElementById("table-empty").style.display = "none";
+
+    try {
+      const snap = await getDocs(collection(db, "users"));
+      allUsers = [];
+      snap.forEach(d => {
+        const data = d.data();
+        allUsers.push({
+          id:       d.id,
+          role:     data.role || "user",
+          pct:      Math.min(data.progress || 0, 100),
+          modCount: Array.isArray(data.modulesCompleted) ? data.modulesCompleted.length : 0,
+          modules:  Array.isArray(data.modulesCompleted) ? data.modulesCompleted : []
+        });
+      });
+
+      allUsers.sort((a, b) => b.pct - a.pct);
+
+      // Summary stats
+      const total     = allUsers.length;
+      const avg       = total ? Math.round(allUsers.reduce((s, u) => s + u.pct, 0) / total) : 0;
+      const completed = allUsers.filter(u => u.pct >= 100).length;
+      const active    = allUsers.filter(u => u.pct > 0 && u.pct < 100).length;
+
+      document.getElementById("stat-total").textContent     = total;
+      document.getElementById("stat-avg").textContent       = avg + "%";
+      document.getElementById("stat-completed").textContent = completed;
+      document.getElementById("stat-active").textContent    = active;
+
+      // Render table
+      document.getElementById("table-loading").style.display = "none";
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = "";
+
+      if (total === 0) {
+        document.getElementById("table-empty").style.display = "block";
+        return;
+      }
+
+      document.getElementById("table-container").style.display = "block";
+
+      const medals = ["🥇", "🥈", "🥉"];
+
+      allUsers.forEach((u, i) => {
+        const tr = document.createElement("tr");
+        if (i === 0) tr.className = "top-1";
+        else if (i === 1) tr.className = "top-2";
+        else if (i === 2) tr.className = "top-3";
+        else if (u.pct >= 100) tr.className = "completed";
+
+        const rankCell = i < 3
+          ? `<span class="medal">${medals[i]}</span>`
+          : `<span style="color:#cbd5e1">${i + 1}</span>`;
+
+        const roleBadge = u.role === "manager"
+          ? `<span class="user-role-badge">manager</span>`
+          : "";
+
+        const fillClass = u.pct >= 100 ? "prog-bar-fill green" : "prog-bar-fill";
+
+        tr.innerHTML = `
+          <td class="rank-cell">${rankCell}</td>
+          <td><span class="user-name">${u.id}</span>${roleBadge}</td>
+          <td class="mods-cell">${u.modCount} / 10</td>
+          <td class="prog-cell">
+            <span class="prog-pct">${u.pct}%</span>
+            <div class="prog-bar-track">
+              <div class="${fillClass}" data-pct="${u.pct}"></div>
+            </div>
+          </td>
+          <td><button class="btn-delete" data-id="${u.id}">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Animate progress bars
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        document.querySelectorAll(".prog-bar-fill[data-pct]").forEach(el => {
+          el.style.width = el.dataset.pct + "%";
+        });
+      }));
+
+      const now = new Date();
+      document.getElementById("last-updated").textContent =
+        "Last updated: " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    } catch (err) {
+      document.getElementById("table-loading").textContent = "Failed to load data. Check connection.";
+      console.error("[Dashboard]", err);
+    }
+  }
+
+  // ── Add Learner ──
+  const inputAdd = document.getElementById("input-add");
+  const btnAdd   = document.getElementById("btn-add");
+  const addError = document.getElementById("add-error");
+
+  async function addLearner() {
+    const name = inputAdd.value.trim();
+    if (!name) { addError.textContent = "Please enter a name."; return; }
+    addError.textContent = "";
+    btnAdd.disabled = true; btnAdd.textContent = "Adding…";
+
+    try {
+      const ref      = doc(db, "users", name);
+      const existing = await getDoc(ref);
+      if (existing.exists()) {
+        addError.textContent = `"${name}" already exists.`;
+        btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
+        return;
+      }
+      await setDoc(ref, { name, role: "user", progress: 0, modulesCompleted: [] });
+      inputAdd.value = "";
+      btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
+      showToast("✅ Learner added");
+      await loadDashboard();
+    } catch (err) {
+      addError.textContent = "Error adding learner.";
+      console.error("[AddLearner]", err);
+      btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
+    }
+  }
+
+  btnAdd.addEventListener("click", addLearner);
+  inputAdd.addEventListener("keydown", e => { if (e.key === "Enter") addLearner(); });
+
+  // ── Delete (event delegation) ──
+  document.getElementById("table-body").addEventListener("click", async e => {
+    const btn = e.target.closest(".btn-delete");
+    if (!btn) return;
+    const name = btn.dataset.id;
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    btn.disabled = true; btn.textContent = "…";
+    try {
+      await deleteDoc(doc(db, "users", name));
+      showToast("🗑 Learner removed");
+      await loadDashboard();
+    } catch (err) {
+      console.error("[Delete]", err);
+      btn.disabled = false; btn.textContent = "Delete";
+    }
+  });
+
+  // ── Refresh ──
+  document.getElementById("btn-refresh").addEventListener("click", () => loadDashboard());
+
+  // ── Download CSV Report ──
+  document.getElementById("btn-download").addEventListener("click", () => {
+    if (!allUsers.length) { showToast("No data to export yet."); return; }
+
+    const rows = [
+      ["Rank", "Name", "Role", "Progress (%)", "Modules Completed", "Module Names"]
+    ];
+    allUsers.forEach((u, i) => {
+      rows.push([
+        i + 1,
+        u.id,
+        u.role,
+        u.pct,
+        u.modCount,
+        u.modules.join("; ")
+      ]);
+    });
+
+    const csv = rows.map(r =>
+      r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
+    ).join("\r\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    const date = new Date().toISOString().slice(0, 10);
+    a.href     = url;
+    a.download = `ai-quest-report-${date}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("📥 Report downloaded");
+  });
+
+  // ── Toast ──
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2800);
+  }
+
+  // ── Init ──
+  loadDashboard();
+</script>
+</body>
+</html>

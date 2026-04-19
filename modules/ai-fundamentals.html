@@ -177,15 +177,8 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 </style>
 </head>
 <body>
-<script>
-  // Auth guard — redirect to login if not logged in
-  (function() {
-    var user = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
-    if (!user) {
-      window.location.replace("../index.html");
-    }
-  })();
-</script>
+<script src="../auth.js"></script>
+<script>requireAuth();</script>
 
 <div class="wel" id="wm">
   <div class="welc">

@@ -623,6 +623,7 @@ var CT = null, qIdx = 0, qAns = [], fcIdx = 0;
 
 function init(){
   try{ var s=localStorage.getItem('clm_v2'); if(s) S=JSON.parse(s); }catch(e){}
+  if(!S.user){ var u=window.getCurrentUser&&window.getCurrentUser(); if(u){ S.user=u; save(); } }
   if(S.user){ document.getElementById('wm').style.display='none'; refresh(); }
   else{ document.getElementById('nameInput').onkeydown=function(e){ if(e.key==='Enter') startJourney(); }; }
 }

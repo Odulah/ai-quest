@@ -403,7 +403,32 @@
     color: #6366f1; cursor: pointer; text-decoration: none; opacity: 0.8;
   }
   #aq-mgr-link:hover { opacity: 1; text-decoration: underline; }
+
+  /* ── FUNNY GREETING TOAST ─────────────────────────────────── */
+  #aq-greeting {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px);
+    z-index: 99997; background: #fff; border-radius: 16px;
+    padding: 14px 22px; max-width: 420px; width: calc(100% - 40px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14); text-align: center;
+    border: 1.5px solid #e2e8f0;
+    transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+    opacity: 0; pointer-events: none;
+  }
+  #aq-greeting.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1; pointer-events: auto;
+  }
+  #aq-greeting-emoji { font-size: 28px; line-height: 1; margin-bottom: 5px; }
+  #aq-greeting-text  { font-size: 15px; font-weight: 700; color: #0f172a; line-height: 1.4; }
+  #aq-greeting-sub   { font-size: 12px; color: #94a3b8; margin-top: 3px; }
 </style>
+
+<!-- ── FUNNY GREETING TOAST ──────────────────────────────── -->
+<div id="aq-greeting">
+  <div id="aq-greeting-emoji">🎉</div>
+  <div id="aq-greeting-text"></div>
+  <div id="aq-greeting-sub"></div>
+</div>
 
 <!-- ── LOGIN OVERLAY ───────────────────────────────────────── -->
 <div id="aq-login-overlay">
@@ -535,6 +560,7 @@
 
       dismissOverlay();
       applyRoleUI(data.role || "user");
+      showGreeting(name);
     } catch (err) {
       showOverlayError("Connection error. Please try again.");
       console.error("[AQ Login]", err);
@@ -555,10 +581,37 @@
     localStorage.setItem("currentUser", storedUser);
     overlay.style.display = "none";
     applyRoleUI(storedRole || "user");
+    setTimeout(() => showGreeting(storedUser), 300);
   }
 
   function applyRoleUI(role) {
     // Manager UI handled via manager.html — no FAB needed
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // FUNNY GREETING
+  // ──────────────────────────────────────────────────────────────────
+  const greetings = [
+    { e: "🕵️", t: n => `Oh look who it is… ${n}. We were JUST talking about you.`, s: "Suspiciously convenient timing." },
+    { e: "🚀", t: n => `NASA called. They need ${n}'s brain back.`, s: "Apparently the universe isn't running itself." },
+    { e: "🧠", t: n => `WARNING: ${n} has entered the chat.`, s: "IQ levels on this platform just went up." },
+    { e: "🎺", t: n => `🎺 dun dun duuuun… ${n} has arrived!`, s: "The AI trembles. Rightfully so." },
+    { e: "🍕", t: n => `Alert: ${n} is in the building.`, s: "Someone hide the snacks. And the answers." },
+    { e: "😴", t: n => `Oh, ${n} decided to show up today. How lovely.`, s: "We were starting to think you ran away." },
+    { e: "🤖", t: n => `Scanning genius… Scanning genius… FOUND: ${n}.`, s: "AI Quest systems: fully intimidated." },
+    { e: "👀", t: n => `Plot twist: ${n} is back and they mean business.`, s: "The modules are literally shaking." },
+    { e: "🎓", t: n => `${n} walked in. The room got 40% smarter instantly.`, s: "Science can't explain it. We're not trying." },
+    { e: "🦁", t: n => `Ladies and gentlemen… ${n} has logged in.`, s: "Please hold your applause. Just kidding, don't." },
+  ];
+
+  function showGreeting(name) {
+    const g   = greetings[Math.floor(Math.random() * greetings.length)];
+    const el  = document.getElementById("aq-greeting");
+    document.getElementById("aq-greeting-emoji").textContent = g.e;
+    document.getElementById("aq-greeting-text").textContent  = g.t(name);
+    document.getElementById("aq-greeting-sub").textContent   = g.s;
+    el.classList.add("show");
+    setTimeout(() => el.classList.remove("show"), 4500);
   }
 
   // ──────────────────────────────────────────────────────────────────

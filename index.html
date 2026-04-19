@@ -434,18 +434,15 @@
 <div id="aq-login-overlay">
   <div id="aq-login-box">
     <div class="aq-logo">&#x1F680;</div>
-    <h2>Welcome to AI Quest</h2>
-    <p>Enter your name to continue your learning journey</p>
-    <input
-      id="aq-name-input"
-      type="text"
-      placeholder="Your full name..."
-      autocomplete="off"
-      spellcheck="false"
-    />
-    <button id="aq-login-btn">Start Learning</button>
+    <h2 id="aq-login-title">Welcome to AI Quest</h2>
+    <p  id="aq-login-subtitle">Enter your name to begin your learning journey</p>
+    <input id="aq-name-input"  type="text"     placeholder="Your full name..."    autocomplete="off" spellcheck="false" />
+    <input id="aq-pass-input"  type="password" placeholder="Your passcode..."     autocomplete="off" style="display:none" />
+    <input id="aq-pass2-input" type="password" placeholder="Confirm passcode..."  autocomplete="off" style="display:none" />
+    <button id="aq-login-btn">Continue</button>
     <div id="aq-login-error"></div>
-    <a id="aq-mgr-link" href="#">&#x1F512; Manager Login</a>
+    <a id="aq-back-link"  href="#" style="display:none;font-size:12px;color:#94a3b8;margin-top:8px;">&#x2190; Use a different name</a>
+    <a id="aq-mgr-link"  href="#">&#x1F512; Manager Login</a>
   </div>
 </div>
 
@@ -484,14 +481,16 @@
 <div id="aq-mgr-backdrop">
   <div id="aq-mgr-modal">
     <button id="aq-mgr-close">&#x2715;</button>
-    <div style="font-size:36px;margin-bottom:6px;">&#x1F512;</div>
-    <h2>Manager Login</h2>
+    <div style="font-size:36px;margin-bottom:6px;" id="aq-mgr-icon">&#x1F512;</div>
+    <h2 id="aq-mgr-title">Manager Login</h2>
     <p id="aq-mgr-subtitle">Enter your credentials to access the dashboard</p>
-    <input id="aq-mgr-name" type="text" placeholder="Your full name..." autocomplete="off" spellcheck="false" />
-    <input id="aq-mgr-pass" type="password" placeholder="Passcode..." autocomplete="off" />
-    <input id="aq-mgr-pass2" type="password" placeholder="Confirm passcode..." autocomplete="off" style="display:none" />
+    <input id="aq-mgr-name"  type="text"     placeholder="Your full name..."      autocomplete="off" spellcheck="false" />
+    <input id="aq-mgr-pass"  type="password" placeholder="Passcode..."            autocomplete="off" />
+    <input id="aq-mgr-pass2" type="password" placeholder="Confirm passcode..."    autocomplete="off" style="display:none" />
+    <input id="aq-mgr-code"  type="text"     placeholder="Manager access code..." autocomplete="off" style="display:none" spellcheck="false" />
     <button id="aq-mgr-btn">Sign In</button>
     <div id="aq-mgr-error"></div>
+    <a id="aq-mgr-toggle" href="#" style="display:block;margin-top:14px;font-size:13px;color:#6366f1;text-decoration:none;">New manager? Register here</a>
   </div>
 </div>
 
@@ -535,42 +534,110 @@
     setTimeout(() => { overlay.style.display = "none"; }, 400);
   }
 
+  const passInput  = document.getElementById("aq-pass-input");
+  const pass2Input = document.getElementById("aq-pass2-input");
+  const backLink   = document.getElementById("aq-back-link");
+  const loginTitle = document.getElementById("aq-login-title");
+  const loginSub   = document.getElementById("aq-login-subtitle");
+
+  let loginStep = "name";   // "name" | "set-pass" | "enter-pass"
+  let pendingName = "";
+  let pendingData = null;
+
+  function resetLoginForm() {
+    loginStep = "name";
+    pendingName = ""; pendingData = null;
+    nameInput.style.display = "block"; nameInput.value = "";
+    passInput.style.display = "none";  passInput.value = "";
+    pass2Input.style.display = "none"; pass2Input.value = "";
+    backLink.style.display = "none";
+    loginTitle.textContent = "Welcome to AI Quest";
+    loginSub.textContent   = "Enter your name to begin your learning journey";
+    loginBtn.textContent   = "Continue";
+    loginBtn.disabled = false;
+    errorEl.textContent = "";
+  }
+
+  backLink.addEventListener("click", e => { e.preventDefault(); resetLoginForm(); nameInput.focus(); });
+
   async function aqDoLogin() {
-    const name = nameInput.value.trim();
-    if (!name) { showOverlayError("Please enter your name."); return; }
-    loginBtn.disabled    = true;
-    loginBtn.textContent = "Checking…";
-    errorEl.textContent  = "";
+    errorEl.textContent = "";
 
-    try {
-      const userRef  = doc(db, "users", name);
-      const userSnap = await getDoc(userRef);
+    if (loginStep === "name") {
+      const name = nameInput.value.trim();
+      if (!name) { showOverlayError("Please enter your name."); return; }
+      loginBtn.disabled = true; loginBtn.textContent = "Checking…";
+      try {
+        const snap = await getDoc(doc(db, "users", name));
+        if (!snap.exists()) {
+          showOverlayError("Name not found. Please check with your manager.");
+          loginBtn.disabled = false; loginBtn.textContent = "Continue"; return;
+        }
+        pendingName = name; pendingData = snap.data();
+        nameInput.style.display = "none";
+        backLink.style.display  = "block";
+        loginTitle.textContent  = `Hey ${name}! 👋`;
 
-      if (!userSnap.exists()) {
-        showOverlayError("Name not found. Please check with your manager.");
-        loginBtn.disabled    = false;
-        loginBtn.textContent = "Start Learning";
-        return;
+        if (!pendingData.passcode) {
+          loginStep = "set-pass";
+          loginSub.textContent      = "First time? Create a private passcode to secure your account.";
+          passInput.placeholder     = "Create a passcode (min 4 chars)…";
+          passInput.style.display   = "block";
+          pass2Input.style.display  = "block";
+          loginBtn.textContent      = "Set Passcode";
+          loginBtn.disabled = false; passInput.focus();
+        } else {
+          loginStep = "enter-pass";
+          loginSub.textContent    = "Enter your passcode to continue.";
+          passInput.placeholder   = "Your passcode…";
+          passInput.style.display = "block";
+          loginBtn.textContent    = "Sign In";
+          loginBtn.disabled = false; passInput.focus();
+        }
+      } catch (err) {
+        showOverlayError("Connection error. Please try again.");
+        loginBtn.disabled = false; loginBtn.textContent = "Continue";
+        console.error("[AQ Login]", err);
       }
 
-      const data = userSnap.data();
-      localStorage.setItem("aq_user", name);
-      localStorage.setItem("aq_role", data.role || "user");
-      localStorage.setItem("currentUser", name);
+    } else if (loginStep === "set-pass") {
+      const p1 = passInput.value, p2 = pass2Input.value;
+      if (!p1) { showOverlayError("Please create a passcode."); return; }
+      if (p1.length < 4) { showOverlayError("Passcode must be at least 4 characters."); return; }
+      if (p1 !== p2) { showOverlayError("Passcodes don't match. Try again."); pass2Input.value = ""; pass2Input.focus(); return; }
+      loginBtn.disabled = true; loginBtn.textContent = "Saving…";
+      try {
+        await updateDoc(doc(db, "users", pendingName), { passcode: p1 });
+        completeLogin(pendingName, pendingData.role || "user");
+      } catch (err) {
+        showOverlayError("Connection error. Please try again.");
+        loginBtn.disabled = false; loginBtn.textContent = "Set Passcode";
+      }
 
-      dismissOverlay();
-      applyRoleUI(data.role || "user");
-      showGreeting(name);
-    } catch (err) {
-      showOverlayError("Connection error. Please try again.");
-      console.error("[AQ Login]", err);
-      loginBtn.disabled    = false;
-      loginBtn.textContent = "Start Learning";
+    } else if (loginStep === "enter-pass") {
+      const p = passInput.value;
+      if (!p) { showOverlayError("Please enter your passcode."); return; }
+      if (pendingData.passcode !== p) {
+        showOverlayError("Incorrect passcode. Try again.");
+        passInput.value = ""; passInput.focus(); return;
+      }
+      completeLogin(pendingName, pendingData.role || "user");
     }
   }
 
+  function completeLogin(name, role) {
+    localStorage.setItem("aq_user",      name);
+    localStorage.setItem("currentUser",  name);
+    localStorage.setItem("aq_role",      role);
+    localStorage.setItem("ai_quest_user", name); // sync React component
+    dismissOverlay();
+    applyRoleUI(role);
+    showGreeting(name);
+  }
+
   loginBtn.addEventListener("click", aqDoLogin);
-  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); });
+  [nameInput, passInput, pass2Input].forEach(el =>
+    el.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); }));
 
   // ── Skip overlay if already logged in ──────────────────────────
   const storedUser = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
@@ -833,38 +900,108 @@
   refreshBtn.addEventListener("click", () => aqLoadDashboard());
 
   // ──────────────────────────────────────────────────────────────────
-  // MANAGER LOGIN MODAL
+  // MANAGER LOGIN + SELF-REGISTRATION
   // ──────────────────────────────────────────────────────────────────
+  const MGR_ACCESS_CODE = "AIQUEST-MGR"; // change this to your secret code
+
   const mgrBackdrop = document.getElementById("aq-mgr-backdrop");
   const mgrClose    = document.getElementById("aq-mgr-close");
   const mgrLink     = document.getElementById("aq-mgr-link");
   const mgrName     = document.getElementById("aq-mgr-name");
   const mgrPass     = document.getElementById("aq-mgr-pass");
   const mgrPass2    = document.getElementById("aq-mgr-pass2");
+  const mgrCodeIn   = document.getElementById("aq-mgr-code");
   const mgrBtn      = document.getElementById("aq-mgr-btn");
   const mgrError    = document.getElementById("aq-mgr-error");
   const mgrSubtitle = document.getElementById("aq-mgr-subtitle");
+  const mgrTitle    = document.getElementById("aq-mgr-title");
+  const mgrIcon     = document.getElementById("aq-mgr-icon");
+  const mgrToggle   = document.getElementById("aq-mgr-toggle");
 
-  let mgrSettingPasscode = false;
+  let mgrMode = "login";  // "login" | "register"
+  let mgrStep = "creds";  // "creds" | "set-pass"
+  let mgrPending = null;
 
   function openMgrModal()  { mgrBackdrop.classList.add("aq-open"); }
   function closeMgrModal() { mgrBackdrop.classList.remove("aq-open"); resetMgrForm(); }
 
   function resetMgrForm() {
-    mgrName.value = ""; mgrPass.value = ""; mgrPass2.value = "";
+    mgrMode = "login"; mgrStep = "creds"; mgrPending = null;
+    mgrName.value = ""; mgrPass.value = ""; mgrPass2.value = ""; mgrCodeIn.value = "";
     mgrError.textContent = "";
-    mgrPass2.style.display = "none";
-    mgrBtn.textContent = "Sign In";
+    mgrPass2.style.display = "none"; mgrCodeIn.style.display = "none";
+    mgrTitle.textContent    = "Manager Login";
+    mgrIcon.textContent     = "🔒";
     mgrSubtitle.textContent = "Enter your credentials to access the dashboard";
-    mgrSettingPasscode = false;
+    mgrBtn.textContent      = "Sign In";
+    mgrToggle.textContent   = "New manager? Register here";
     mgrBtn.disabled = false;
   }
+
+  mgrToggle.addEventListener("click", e => {
+    e.preventDefault();
+    if (mgrMode === "login") {
+      mgrMode = "register";
+      mgrTitle.textContent    = "Register as Manager";
+      mgrIcon.textContent     = "👔";
+      mgrSubtitle.textContent = "Enter your name and the manager access code to register.";
+      mgrCodeIn.style.display = "block";
+      mgrPass2.style.display  = "block";
+      mgrPass.placeholder     = "Create your passcode…";
+      mgrBtn.textContent      = "Register";
+      mgrToggle.textContent   = "Already registered? Sign in";
+    } else {
+      resetMgrForm();
+    }
+  });
 
   mgrLink.addEventListener("click", e => { e.preventDefault(); openMgrModal(); });
   mgrClose.addEventListener("click", closeMgrModal);
   mgrBackdrop.addEventListener("click", e => { if (e.target === mgrBackdrop) closeMgrModal(); });
-  [mgrName, mgrPass, mgrPass2].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") doMgrLogin(); }));
-  mgrBtn.addEventListener("click", doMgrLogin);
+  [mgrName, mgrPass, mgrPass2, mgrCodeIn].forEach(el =>
+    el.addEventListener("keydown", e => { if (e.key === "Enter") doMgrAction(); }));
+  mgrBtn.addEventListener("click", doMgrAction);
+
+  async function doMgrAction() {
+    mgrError.textContent = "";
+    if (mgrMode === "register") {
+      await doMgrRegister();
+    } else {
+      await doMgrLogin();
+    }
+  }
+
+  async function doMgrRegister() {
+    const name = mgrName.value.trim();
+    const code = mgrCodeIn.value.trim();
+    const pass = mgrPass.value;
+    const pass2 = mgrPass2.value;
+    if (!name) { mgrError.textContent = "Please enter your name."; return; }
+    if (!code) { mgrError.textContent = "Please enter the access code."; return; }
+    if (code !== MGR_ACCESS_CODE) { mgrError.textContent = "Invalid access code. Contact your administrator."; return; }
+    if (!pass) { mgrError.textContent = "Please create a passcode."; return; }
+    if (pass.length < 4) { mgrError.textContent = "Passcode must be at least 4 characters."; return; }
+    if (pass !== pass2) { mgrError.textContent = "Passcodes don't match."; return; }
+
+    mgrBtn.disabled = true; mgrBtn.textContent = "Registering…";
+    try {
+      const ref = doc(db, "users", name);
+      const existing = await getDoc(ref);
+      if (existing.exists() && existing.data().role === "manager") {
+        mgrError.textContent = "A manager with this name already exists. Use Sign In.";
+        mgrBtn.disabled = false; mgrBtn.textContent = "Register"; return;
+      }
+      await setDoc(ref, { name, role: "manager", progress: 0, modulesCompleted: [], passcode: pass });
+      localStorage.setItem("aq_user", name);
+      localStorage.setItem("currentUser", name);
+      localStorage.setItem("aq_role", "manager");
+      window.location.href = "manager.html";
+    } catch (err) {
+      mgrError.textContent = "Error registering. Please try again.";
+      mgrBtn.disabled = false; mgrBtn.textContent = "Register";
+      console.error("[AQ MgrRegister]", err);
+    }
+  }
 
   async function doMgrLogin() {
     const name = mgrName.value.trim();
@@ -872,65 +1009,44 @@
     if (!name) { mgrError.textContent = "Please enter your name."; return; }
     if (!pass)  { mgrError.textContent = "Please enter your passcode."; return; }
 
-    mgrBtn.disabled = true;
-    mgrBtn.textContent = mgrSettingPasscode ? "Saving…" : "Checking…";
-    mgrError.textContent = "";
+    mgrBtn.disabled = true; mgrBtn.textContent = "Checking…"; mgrError.textContent = "";
 
     try {
-      const userRef  = doc(db, "users", name);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        mgrError.textContent = "Name not found. Please check with your administrator.";
-        mgrBtn.disabled = false;
-        mgrBtn.textContent = mgrSettingPasscode ? "Set Passcode" : "Sign In";
-        return;
+      const snap = await getDoc(doc(db, "users", name));
+      if (!snap.exists()) {
+        mgrError.textContent = "Name not found. Register first or check with your administrator.";
+        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
       }
-
-      const data = userSnap.data();
+      const data = snap.data();
       if ((data.role || "user").toLowerCase() !== "manager") {
         mgrError.textContent = "This account does not have manager access.";
-        mgrBtn.disabled = false;
-        mgrBtn.textContent = "Sign In";
-        return;
+        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
       }
-
       if (!data.passcode) {
-        // First-time login — prompt to set a passcode
-        if (!mgrSettingPasscode) {
-          mgrSettingPasscode = true;
-          mgrPass2.style.display = "block";
+        if (mgrStep === "creds") {
+          mgrStep = "set-pass";
+          mgrPass2.style.display  = "block";
           mgrSubtitle.textContent = "First login — set a passcode for your account.";
-          mgrBtn.textContent = "Set Passcode";
+          mgrBtn.textContent      = "Set Passcode";
           mgrBtn.disabled = false;
-          mgrError.textContent = "No passcode set yet. Enter and confirm a new passcode.";
-          return;
+          mgrError.textContent    = "No passcode yet. Enter and confirm a new one."; return;
         }
-        // Confirm and store passcode
-        const pass2 = mgrPass2.value;
-        if (!pass2) { mgrError.textContent = "Please confirm your passcode."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
-        if (pass !== pass2) { mgrError.textContent = "Passcodes do not match. Try again."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
-        await updateDoc(userRef, { passcode: pass });
-      } else {
-        // Returning login — validate passcode
-        if (data.passcode !== pass) {
-          mgrError.textContent = "Incorrect passcode.";
-          mgrBtn.disabled = false;
-          mgrBtn.textContent = "Sign In";
-          return;
-        }
+        const p2 = mgrPass2.value;
+        if (!p2) { mgrError.textContent = "Please confirm your passcode."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
+        if (pass !== p2) { mgrError.textContent = "Passcodes don't match."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
+        await updateDoc(doc(db, "users", name), { passcode: pass });
+      } else if (data.passcode !== pass) {
+        mgrError.textContent = "Incorrect passcode.";
+        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
       }
-
-      // Success — store session and redirect
-      localStorage.setItem("aq_user",    name);
+      localStorage.setItem("aq_user", name);
       localStorage.setItem("currentUser", name);
-      localStorage.setItem("aq_role",    "manager");
+      localStorage.setItem("aq_role", "manager");
       window.location.href = "manager.html";
     } catch (err) {
       mgrError.textContent = "Connection error. Please try again.";
+      mgrBtn.disabled = false; mgrBtn.textContent = "Sign In";
       console.error("[AQ MgrLogin]", err);
-      mgrBtn.disabled = false;
-      mgrBtn.textContent = mgrSettingPasscode ? "Set Passcode" : "Sign In";
     }
   }
 </script>

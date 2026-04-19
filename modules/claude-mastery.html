@@ -619,7 +619,9 @@ const TOPICS = [
 
 // ── STATE & INIT ──────────────────────────────────────────────────
 var S = {user:'', xp:0, done:{}, chDone:{}, qScores:{}};
-var CT = null, qIdx = 0, qAns = [], fcIdx = 0;
+var CT = null, qIdx = 0, qAns = [], fcIdx = 0, shuffledQuiz = [];
+function shuffleArr(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function prepQuiz(qs){return shuffleArr(qs).map(function(q){var idx=shuffleArr([0,1,2,3]);return{q:q.q,o:idx.map(function(i){return q.o[i];}),c:idx.indexOf(q.c),e:q.e};});}
 
 function init(){
   try{ var s=localStorage.getItem('clm_v2'); if(s) S=JSON.parse(s); }catch(e){}
@@ -674,7 +676,7 @@ function openTopic(id){
   document.getElementById('mTit').textContent = CT.icon + '  ' + CT.title;
   tab('learn', document.querySelector('.tbtn'));
   buildLearn(); buildDeep(); buildVideo(); buildDemo(); buildChallenge(); buildResources();
-  qIdx=0; qAns=[];
+  qIdx=0; qAns=[];shuffledQuiz=prepQuiz(CT.quiz);
   document.getElementById('scBox').classList.remove('show');
   document.getElementById('quizWrap').style.display = 'block';
   buildQuiz(); fcIdx=0; buildFC(); buildFCDots();
@@ -765,41 +767,41 @@ function buildDemo(){
 // ── QUIZ ──────────────────────────────────────────────────────────
 function buildQuiz(){
   var w = document.getElementById('quizWrap');
-  if(qIdx >= CT.quiz.length){
+  if(qIdx >= shuffledQuiz.length){
     var s = qAns.filter(Boolean).length;
     w.style.display = 'none';
     document.getElementById('scBox').classList.add('show');
-    var p = Math.round(s/CT.quiz.length*100);
+    var p = Math.round(s/shuffledQuiz.length*100);
     document.getElementById('scNum').textContent = s;
-    document.getElementById('scDen').textContent = '/' + CT.quiz.length;
+    document.getElementById('scDen').textContent = '/' + shuffledQuiz.length;
     document.getElementById('scLbl').textContent = p>=80 ? '\uD83C\uDF89 Excellent! Topic mastered!' : p>=60 ? '\uD83D\uDC4D Good work!' : '\uD83D\uDCAA Keep practicing!';
     document.getElementById('scDtl').textContent = p + '% \u2014 ' + (p>=80 ? 'Full XP unlocked!' : p>=60 ? 'Partial XP earned.' : 'Try again for XP.');
     if(p>=60 && !S.qScores[CT.id]){
       S.qScores[CT.id] = s;
-      var g = Math.round(s/CT.quiz.length * CT.xp);
+      var g = Math.round(s/shuffledQuiz.length * CT.xp);
       S.xp = (S.xp||0) + g;
       if(p>=80) S.done[CT.id] = true;
       save(); refresh(); showToast('\u26A1', '+' + g + ' XP earned!');
     }
     return;
   }
-  var q = CT.quiz[qIdx];
+  var q = shuffledQuiz[qIdx];
   var K = ['A','B','C','D'];
   var prog = qAns.filter(Boolean).length;
   w.innerHTML =
-    '<div class="qbox"><div class="qctr">Question ' + (qIdx+1) + ' of ' + CT.quiz.length + ' \u00b7 ' + prog + ' correct so far</div>' +
+    '<div class="qbox"><div class="qctr">Question ' + (qIdx+1) + ' of ' + shuffledQuiz.length + ' \u00b7 ' + prog + ' correct so far</div>' +
     '<div class="qq">' + q.q + '</div>' +
     '<div class="qopts">' +
     q.o.map(function(o,i){
       return '<button class="qopt" onclick="ansQ(' + i + ')" id="qo' + i + '"><span class="optk">' + K[i] + '</span>' + o + '</button>';
     }).join('') +
     '</div><div class="qfb" id="qfb"></div></div>' +
-    '<div class="qnav"><div class="qprog">' + (qIdx+1) + '/' + CT.quiz.length + '</div>' +
+    '<div class="qnav"><div class="qprog">' + (qIdx+1) + '/' + shuffledQuiz.length + '</div>' +
     '<button class="btn btng btnsm" onclick="skipQ()">Skip \u2192</button></div>';
 }
 
 function ansQ(idx){
-  var q = CT.quiz[qIdx];
+  var q = shuffledQuiz[qIdx];
   document.querySelectorAll('.qopt').forEach(function(o){ o.style.pointerEvents='none'; });
   var ok = idx === q.c;
   document.getElementById('qo' + idx).classList.add(ok ? 'correct' : 'wrong');
@@ -812,7 +814,7 @@ function ansQ(idx){
 }
 function skipQ(){ qAns.push(false); qIdx++; buildQuiz(); }
 function retryQ(){
-  qIdx=0; qAns=[];
+  shuffledQuiz=prepQuiz(CT.quiz);qIdx=0; qAns=[];
   document.getElementById('scBox').classList.remove('show');
   document.getElementById('quizWrap').style.display = 'block';
   buildQuiz();

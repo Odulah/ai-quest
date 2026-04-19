@@ -395,7 +395,7 @@ var TOPICS=[
 ];
 var S={user:'',xp:0,done:{},chDone:{},qScores:{}};
 var CT=null,qIdx=0,qAns=[],fcIdx=0;
-function init(){try{var s=localStorage.getItem('cc_v1');if(s)S=JSON.parse(s);}catch(e){}if(S.user){document.getElementById('wm').style.display='none';refresh();}else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}}
+function init(){try{var s=localStorage.getItem('cc_v1');if(s)S=JSON.parse(s);}catch(e){}if(!S.user){var u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}if(S.user){document.getElementById('wm').style.display='none';refresh();}else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}}
 function save(){localStorage.setItem('cc_v1',JSON.stringify(S));}
 function refresh(){updateNav();renderCards();updateProg();}
 function startJourney(){var n=document.getElementById('nameInput').value.trim();if(!n)return;S.user=n;save();document.getElementById('wm').style.display='none';refresh();showToast('\u26A1','Welcome '+n+'! Let\'s master Claude Code + Celonis!');}

@@ -992,6 +992,7 @@ let CT=null,qIdx=0,qAns=[],fcIdx=0;
 
 function init(){
   try{const s=localStorage.getItem('sql_v1');if(s)S=JSON.parse(s);}catch(e){}
+  if(!S.user){const u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }

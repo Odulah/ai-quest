@@ -570,8 +570,15 @@
       try {
         const snap = await getDoc(doc(db, "users", name));
         if (!snap.exists()) {
-          showOverlayError("Name not found. Please check with your manager.");
-          loginBtn.disabled = false; loginBtn.textContent = "Continue"; return;
+          pendingName = name; pendingData = { role: "user", isNew: true };
+          nameInput.style.display = "none"; backLink.style.display = "block";
+          loginTitle.textContent  = `Hey ${name}! 👋`;
+          loginStep = "set-pass";
+          loginSub.textContent     = "Welcome! Create a passcode to secure your account.";
+          passInput.placeholder    = "Create a passcode (min 4 chars)…";
+          passInput.style.display  = "block"; pass2Input.style.display = "block";
+          loginBtn.textContent     = "Create Account";
+          loginBtn.disabled = false; passInput.focus(); return;
         }
         pendingName = name; pendingData = snap.data();
         nameInput.style.display = "none";
@@ -607,7 +614,12 @@
       if (p1 !== p2) { showOverlayError("Passcodes don't match. Try again."); pass2Input.value = ""; pass2Input.focus(); return; }
       loginBtn.disabled = true; loginBtn.textContent = "Saving…";
       try {
-        await updateDoc(doc(db, "users", pendingName), { passcode: p1 });
+        const userRef = doc(db, "users", pendingName);
+        if (pendingData.isNew) {
+          await setDoc(userRef, { name: pendingName, role: "user", progress: 0, modulesCompleted: [], passcode: p1 });
+        } else {
+          await updateDoc(userRef, { passcode: p1 });
+        }
         completeLogin(pendingName, pendingData.role || "user");
       } catch (err) {
         showOverlayError("Connection error. Please try again.");

@@ -183,8 +183,12 @@
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="toolbar-title">&#x1F3C6; Leaderboard</div>
-    <input class="input-add" id="input-add" type="text" placeholder="New learner name…" autocomplete="off" spellcheck="false" />
-    <button class="btn btn-primary" id="btn-add">Add Learner</button>
+    <input class="input-add" id="input-add" type="text" placeholder="Full name…" autocomplete="off" spellcheck="false" />
+    <select class="input-add" id="select-role" style="width:130px;cursor:pointer;">
+      <option value="user">👤 User</option>
+      <option value="manager">🔑 Manager</option>
+    </select>
+    <button class="btn btn-primary" id="btn-add">&#x2B; Add Person</button>
     <button class="btn btn-outline" id="btn-refresh">&#x21BB; Refresh</button>
     <button class="btn btn-green"   id="btn-download">&#x2B07; Download Report</button>
   </div>
@@ -359,18 +363,19 @@
       const existing = await getDoc(ref);
       if (existing.exists()) {
         addError.textContent = `"${name}" already exists.`;
-        btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
+        btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
         return;
       }
-      await setDoc(ref, { name, role: "user", progress: 0, modulesCompleted: [] });
+      const role = document.getElementById("select-role").value || "user";
+      await setDoc(ref, { name, role, progress: 0, modulesCompleted: [] });
       inputAdd.value = "";
-      btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
-      showToast("✅ Learner added");
+      btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
+      showToast(`✅ ${role === "manager" ? "Manager" : "User"} added`);
       await loadDashboard();
     } catch (err) {
       addError.textContent = "Error adding learner.";
       console.error("[AddLearner]", err);
-      btnAdd.disabled = false; btnAdd.textContent = "Add Learner";
+      btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
     }
   }
 

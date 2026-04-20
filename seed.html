@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seed Data — AI Quest Admin</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 40px 24px; }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  p  { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+  .section { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+  .section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  textarea { width: 100%; box-sizing: border-box; border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 12px 14px; font-family: inherit; font-size: 13px; resize: vertical; min-height: 180px; outline: none; }
+  textarea:focus { border-color: #6366f1; }
+  .btn { border: none; border-radius: 9px; padding: 11px 22px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; margin-top: 12px; }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; width: 100%; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .log { margin-top: 16px; background: #0f172a; color: #94a3b8; border-radius: 10px; padding: 14px 16px; font-size: 13px; font-family: monospace; max-height: 300px; overflow-y: auto; white-space: pre-wrap; min-height: 60px; }
+  .log .ok  { color: #34d399; }
+  .log .err { color: #f87171; }
+  .log .info{ color: #60a5fa; }
+  .gate { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 32px; text-align: center; }
+  .gate input { border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 10px 14px; font-size: 14px; font-family: inherit; outline: none; width: 100%; max-width: 280px; box-sizing: border-box; margin-bottom: 12px; }
+  .gate input:focus { border-color: #6366f1; }
+  .gate-err { color: #ef4444; font-size: 13px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌱 AI Quest — Seed Data</h1>
+  <p>Admin-only page. Bulk-load users and managers into Firestore. Existing records are skipped (no overwrite).</p>
+
+  <!-- Gate -->
+  <div class="gate" id="gate">
+    <div style="font-size:36px;margin-bottom:10px;">🔑</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px;">Admin Access</div>
+    <div style="font-size:14px;color:#64748b;margin-bottom:18px;">Enter the organisation code to continue</div>
+    <input type="password" id="gate-input" placeholder="Organisation code…" autocomplete="off" />
+    <br/>
+    <button class="btn btn-primary" onclick="checkGate()" style="width:auto;padding:10px 28px;">Unlock →</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+
+  <!-- Seed UI (hidden until unlocked) -->
+  <div id="seed-ui" style="display:none">
+
+    <div class="section">
+      <h2>👤 Consultants / Users</h2>
+      <p style="font-size:13px;color:#64748b;margin-bottom:10px;">One name per line. These will be added as role: "user".</p>
+      <textarea id="users-input" placeholder="Ahmed Maqbool&#10;Sara Khan&#10;James Smith&#10;…one name per line"></textarea>
+    </div>
+
+    <div class="section">
+      <h2>🔑 Managers</h2>
+      <p style="font-size:13px;color:#64748b;margin-bottom:10px;">One name per line. These will be added as role: "manager".</p>
+      <textarea id="managers-input" placeholder="Reporting Manager 1&#10;Reporting Manager 2&#10;…one name per line"></textarea>
+    </div>
+
+    <button class="btn btn-primary" id="seed-btn" onclick="runSeed()">🚀 Seed to Firestore</button>
+    <div class="log" id="log">Waiting to seed…</div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyA9ZCoaO03uVdZE0jnhO-jDtV3XqHomsp4",
+    authDomain:        "ai-quest-977c3.firebaseapp.com",
+    projectId:         "ai-quest-977c3",
+    storageBucket:     "ai-quest-977c3.firebasestorage.app",
+    messagingSenderId: "231396972103",
+    appId:             "1:231396972103:web:af8d46cccf092331368362"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const ORG_CODE = "Celonis2026";
+
+  window.checkGate = function() {
+    const val = document.getElementById("gate-input").value.trim();
+    if (val !== ORG_CODE) {
+      document.getElementById("gate-err").textContent = "Incorrect code.";
+      return;
+    }
+    document.getElementById("gate").style.display = "none";
+    document.getElementById("seed-ui").style.display = "block";
+  };
+
+  document.getElementById("gate-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") window.checkGate();
+  });
+
+  function log(msg, type = "info") {
+    const el = document.getElementById("log");
+    el.innerHTML += `<span class="${type}">${msg}</span>\n`;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  window.runSeed = async function() {
+    const btn = document.getElementById("seed-btn");
+    btn.disabled = true; btn.textContent = "Seeding…";
+    document.getElementById("log").innerHTML = "";
+
+    const userLines = document.getElementById("users-input").value
+      .split("\n").map(s => s.trim()).filter(Boolean);
+    const mgrLines  = document.getElementById("managers-input").value
+      .split("\n").map(s => s.trim()).filter(Boolean);
+
+    const total = userLines.length + mgrLines.length;
+    if (total === 0) { log("Nothing to seed — paste some names first.", "err"); btn.disabled = false; btn.textContent = "🚀 Seed to Firestore"; return; }
+
+    log(`Starting seed: ${userLines.length} users + ${mgrLines.length} managers`, "info");
+
+    let added = 0, skipped = 0, errors = 0;
+
+    async function seedOne(name, role) {
+      try {
+        const ref = doc(db, "users", name);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          log(`  ⏭  Skipped (exists): ${name}`, "info");
+          skipped++;
+          return;
+        }
+        await setDoc(ref, { name, role, progress: 0, modulesCompleted: [] });
+        log(`  ✅ Added ${role}: ${name}`, "ok");
+        added++;
+      } catch (err) {
+        log(`  ❌ Error: ${name} — ${err.message}`, "err");
+        errors++;
+      }
+    }
+
+    for (const name of userLines)  await seedOne(name, "user");
+    for (const name of mgrLines)   await seedOne(name, "manager");
+
+    log(`\nDone! ✅ Added: ${added}  ⏭ Skipped: ${skipped}  ❌ Errors: ${errors}`, added > 0 ? "ok" : "info");
+    btn.disabled = false; btn.textContent = "🚀 Seed to Firestore";
+  };
+</script>
+</body>
+</html>

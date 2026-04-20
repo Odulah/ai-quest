@@ -66,6 +66,13 @@
   #aq-name-input:focus {
     border-color: #6366f1;
   }
+  #aq-org-input {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 14px; font-family: inherit; outline: none;
+    margin-bottom: 12px; color: #0f172a; transition: border-color 0.2s;
+  }
+  #aq-org-input:focus { border-color: #6366f1; }
   #aq-login-btn {
     margin-top: 14px;
     width: 100%;
@@ -362,48 +369,6 @@
   .aq-label-progress { background: #eff6ff; color: #3b82f6; }
   .aq-label-almost   { background: #faf5ff; color: #8b5cf6; }
 
-  /* ── MANAGER LOGIN MODAL ──────────────────────────────────── */
-  #aq-mgr-backdrop {
-    display: none; position: fixed; inset: 0; z-index: 99998;
-    background: rgba(15,23,42,0.65); backdrop-filter: blur(6px);
-    align-items: center; justify-content: center;
-  }
-  #aq-mgr-backdrop.aq-open { display: flex; }
-  #aq-mgr-modal {
-    background: #fff; border-radius: 18px; padding: 36px 32px 28px;
-    width: 100%; max-width: 400px; position: relative; text-align: center;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-  }
-  #aq-mgr-close {
-    position: absolute; top: 14px; right: 16px;
-    background: none; border: none; font-size: 18px; cursor: pointer; color: #94a3b8;
-  }
-  #aq-mgr-close:hover { color: #0f172a; }
-  #aq-mgr-modal h2  { margin: 8px 0 4px; font-size: 22px; color: #0f172a; }
-  #aq-mgr-subtitle  { color: #64748b; font-size: 14px; margin-bottom: 20px; }
-  #aq-mgr-name, #aq-mgr-pass, #aq-mgr-pass2 {
-    width: 100%; box-sizing: border-box;
-    border: 1.5px solid #e2e8f0; border-radius: 10px;
-    padding: 12px 14px; font-size: 15px; margin-bottom: 10px;
-    outline: none; font-family: inherit; transition: border-color 0.2s;
-  }
-  #aq-mgr-name:focus, #aq-mgr-pass:focus, #aq-mgr-pass2:focus { border-color: #6366f1; }
-  #aq-mgr-btn {
-    width: 100%; padding: 13px;
-    background: linear-gradient(135deg,#6366f1,#8b5cf6);
-    color: #fff; border: none; border-radius: 10px;
-    font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
-    transition: opacity 0.2s; margin-top: 2px;
-  }
-  #aq-mgr-btn:hover { opacity: 0.88; }
-  #aq-mgr-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  #aq-mgr-error { color: #ef4444; font-size: 13px; margin-top: 10px; min-height: 18px; }
-  #aq-mgr-link {
-    display: block; margin-top: 18px; font-size: 13px;
-    color: #6366f1; cursor: pointer; text-decoration: none; opacity: 0.8;
-  }
-  #aq-mgr-link:hover { opacity: 1; text-decoration: underline; }
-
   /* ── FUNNY GREETING TOAST ─────────────────────────────────── */
   #aq-greeting {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px);
@@ -435,64 +400,17 @@
   <div id="aq-login-box">
     <div class="aq-logo">&#x1F680;</div>
     <h2 id="aq-login-title">Welcome to AI Quest</h2>
-    <p  id="aq-login-subtitle">Enter your name to begin your learning journey</p>
-    <input id="aq-name-input"  type="text"     placeholder="Your full name..."    autocomplete="off" spellcheck="false" />
-    <input id="aq-pass-input"  type="password" placeholder="Your passcode..."     autocomplete="off" style="display:none" />
-    <input id="aq-pass2-input" type="password" placeholder="Confirm passcode..."  autocomplete="off" style="display:none" />
-    <button id="aq-login-btn">Continue</button>
+    <p id="aq-login-subtitle">Enter your organisation code and name to continue</p>
+    <input id="aq-org-input"  type="password" placeholder="Organisation code…"  autocomplete="off" />
+    <input id="aq-name-input" type="text"     placeholder="Your full name…"     autocomplete="off" spellcheck="false" />
+    <button id="aq-login-btn">Enter AI Quest →</button>
     <div id="aq-login-error"></div>
-    <a id="aq-back-link"  href="#" style="display:none;font-size:12px;color:#94a3b8;margin-top:8px;">&#x2190; Use a different name</a>
-    <a id="aq-mgr-link"  href="#">&#x1F512; Manager Login</a>
   </div>
 </div>
 
 <!-- Synchronous session check — runs before module scripts, no flicker -->
 <script src="auth.js"></script>
 <script>initIndexAuth();</script>
-
-<!-- ── MANAGER MODAL ──────────────────────────────────────── -->
-<div id="aq-manager-backdrop">
-  <div id="aq-manager-modal">
-    <button id="aq-manager-close" title="Close">&#x2715;</button>
-    <h2>Manager Dashboard</h2>
-    <div class="aq-sub">All learners and their progress</div>
-
-    <!-- Summary cards -->
-    <div id="aq-summary-cards">
-      <div class="aq-stat-card"><div class="aq-stat-value" id="aq-stat-total">—</div><div class="aq-stat-label">Total Users</div></div>
-      <div class="aq-stat-card"><div class="aq-stat-value" id="aq-stat-avg">—</div><div class="aq-stat-label">Avg Progress</div></div>
-      <div class="aq-stat-card aq-stat-card--green"><div class="aq-stat-value" id="aq-stat-completed">—</div><div class="aq-stat-label">Completed</div></div>
-    </div>
-
-    <!-- Add User toolbar -->
-    <div id="aq-add-user-bar">
-      <input id="aq-new-user-input" type="text" placeholder="Full name..." autocomplete="off" spellcheck="false" />
-      <button id="aq-add-user-btn">Add User</button>
-      <button id="aq-refresh-btn" title="Refresh">&#x21BB; Refresh</button>
-    </div>
-    <div id="aq-add-user-error"></div>
-
-    <div id="aq-dashboard-loading">Loading users&hellip;</div>
-    <div id="aq-user-list"></div>
-  </div>
-</div>
-
-<!-- ── MANAGER LOGIN MODAL ────────────────────────────────── -->
-<div id="aq-mgr-backdrop">
-  <div id="aq-mgr-modal">
-    <button id="aq-mgr-close">&#x2715;</button>
-    <div style="font-size:36px;margin-bottom:6px;" id="aq-mgr-icon">&#x1F512;</div>
-    <h2 id="aq-mgr-title">Manager Login</h2>
-    <p id="aq-mgr-subtitle">Enter your credentials to access the dashboard</p>
-    <input id="aq-mgr-name"  type="text"     placeholder="Your full name..."      autocomplete="off" spellcheck="false" />
-    <input id="aq-mgr-pass"  type="password" placeholder="Passcode..."            autocomplete="off" />
-    <input id="aq-mgr-pass2" type="password" placeholder="Confirm passcode..."    autocomplete="off" style="display:none" />
-    <input id="aq-mgr-code"  type="text"     placeholder="Manager access code..." autocomplete="off" style="display:none" spellcheck="false" />
-    <button id="aq-mgr-btn">Sign In</button>
-    <div id="aq-mgr-error"></div>
-    <a id="aq-mgr-toggle" href="#" style="display:block;margin-top:14px;font-size:13px;color:#6366f1;text-decoration:none;">New manager? Register here</a>
-  </div>
-</div>
 
 <!-- ── FIREBASE v10 (modular CDN) + ALL LOGIC ─────────────── -->
 <script type="module">
@@ -518,138 +436,64 @@
   window._aqDB = db;
 
   // ──────────────────────────────────────────────────────────────────
-  // LOGIN
+  // LOGIN — Org Code + Name lookup
   // ──────────────────────────────────────────────────────────────────
+  const ORG_CODE = "Celonis2026";
+
   const overlay   = document.getElementById("aq-login-overlay");
+  const orgInput  = document.getElementById("aq-org-input");
   const nameInput = document.getElementById("aq-name-input");
   const loginBtn  = document.getElementById("aq-login-btn");
   const errorEl   = document.getElementById("aq-login-error");
 
-  function showOverlayError(msg) {
-    errorEl.textContent = msg;
-  }
+  function showOverlayError(msg) { errorEl.textContent = msg; }
 
   function dismissOverlay() {
     overlay.classList.add("aq-hidden");
     setTimeout(() => { overlay.style.display = "none"; }, 400);
   }
 
-  const passInput  = document.getElementById("aq-pass-input");
-  const pass2Input = document.getElementById("aq-pass2-input");
-  const backLink   = document.getElementById("aq-back-link");
-  const loginTitle = document.getElementById("aq-login-title");
-  const loginSub   = document.getElementById("aq-login-subtitle");
-
-  let loginStep = "name";   // "name" | "set-pass" | "enter-pass"
-  let pendingName = "";
-  let pendingData = null;
-
-  function resetLoginForm() {
-    loginStep = "name";
-    pendingName = ""; pendingData = null;
-    nameInput.style.display = "block"; nameInput.value = "";
-    passInput.style.display = "none";  passInput.value = "";
-    pass2Input.style.display = "none"; pass2Input.value = "";
-    backLink.style.display = "none";
-    loginTitle.textContent = "Welcome to AI Quest";
-    loginSub.textContent   = "Enter your name to begin your learning journey";
-    loginBtn.textContent   = "Continue";
-    loginBtn.disabled = false;
-    errorEl.textContent = "";
-  }
-
-  backLink.addEventListener("click", e => { e.preventDefault(); resetLoginForm(); nameInput.focus(); });
-
   async function aqDoLogin() {
     errorEl.textContent = "";
+    const code = orgInput.value.trim();
+    const name = nameInput.value.trim();
 
-    if (loginStep === "name") {
-      const name = nameInput.value.trim();
-      if (!name) { showOverlayError("Please enter your name."); return; }
-      loginBtn.disabled = true; loginBtn.textContent = "Checking…";
-      try {
-        const snap = await getDoc(doc(db, "users", name));
-        if (!snap.exists()) {
-          pendingName = name; pendingData = { role: "user", isNew: true };
-          nameInput.style.display = "none"; backLink.style.display = "block";
-          loginTitle.textContent  = `Hey ${name}! 👋`;
-          loginStep = "set-pass";
-          loginSub.textContent     = "Welcome! Create a passcode to secure your account.";
-          passInput.placeholder    = "Create a passcode (min 4 chars)…";
-          passInput.style.display  = "block"; pass2Input.style.display = "block";
-          loginBtn.textContent     = "Create Account";
-          loginBtn.disabled = false; passInput.focus(); return;
-        }
-        pendingName = name; pendingData = snap.data();
-        nameInput.style.display = "none";
-        backLink.style.display  = "block";
-        loginTitle.textContent  = `Hey ${name}! 👋`;
+    if (!code) { showOverlayError("Please enter the organisation code."); orgInput.focus(); return; }
+    if (code !== ORG_CODE) { showOverlayError("Incorrect organisation code. Please check with your manager."); orgInput.select(); return; }
+    if (!name) { showOverlayError("Please enter your full name."); nameInput.focus(); return; }
 
-        if (!pendingData.passcode) {
-          loginStep = "set-pass";
-          loginSub.textContent      = "First time? Create a private passcode to secure your account.";
-          passInput.placeholder     = "Create a passcode (min 4 chars)…";
-          passInput.style.display   = "block";
-          pass2Input.style.display  = "block";
-          loginBtn.textContent      = "Set Passcode";
-          loginBtn.disabled = false; passInput.focus();
-        } else {
-          loginStep = "enter-pass";
-          loginSub.textContent    = "Enter your passcode to continue.";
-          passInput.placeholder   = "Your passcode…";
-          passInput.style.display = "block";
-          loginBtn.textContent    = "Sign In";
-          loginBtn.disabled = false; passInput.focus();
-        }
-      } catch (err) {
-        showOverlayError("Connection error. Please try again.");
-        loginBtn.disabled = false; loginBtn.textContent = "Continue";
-        console.error("[AQ Login]", err);
+    loginBtn.disabled = true; loginBtn.textContent = "Checking…";
+    try {
+      const snap = await getDoc(doc(db, "users", name));
+      if (!snap.exists()) {
+        showOverlayError("Name not recognised. Please contact your manager to be added.");
+        loginBtn.disabled = false; loginBtn.textContent = "Enter AI Quest →"; return;
       }
-
-    } else if (loginStep === "set-pass") {
-      const p1 = passInput.value, p2 = pass2Input.value;
-      if (!p1) { showOverlayError("Please create a passcode."); return; }
-      if (p1.length < 4) { showOverlayError("Passcode must be at least 4 characters."); return; }
-      if (p1 !== p2) { showOverlayError("Passcodes don't match. Try again."); pass2Input.value = ""; pass2Input.focus(); return; }
-      loginBtn.disabled = true; loginBtn.textContent = "Saving…";
-      try {
-        const userRef = doc(db, "users", pendingName);
-        if (pendingData.isNew) {
-          await setDoc(userRef, { name: pendingName, role: "user", progress: 0, modulesCompleted: [], passcode: p1 });
-        } else {
-          await updateDoc(userRef, { passcode: p1 });
-        }
-        completeLogin(pendingName, pendingData.role || "user");
-      } catch (err) {
-        showOverlayError("Connection error. Please try again.");
-        loginBtn.disabled = false; loginBtn.textContent = "Set Passcode";
-      }
-
-    } else if (loginStep === "enter-pass") {
-      const p = passInput.value;
-      if (!p) { showOverlayError("Please enter your passcode."); return; }
-      if (pendingData.passcode !== p) {
-        showOverlayError("Incorrect passcode. Try again.");
-        passInput.value = ""; passInput.focus(); return;
-      }
-      completeLogin(pendingName, pendingData.role || "user");
+      completeLogin(name, snap.data().role || "user");
+    } catch (err) {
+      showOverlayError("Connection error. Please try again.");
+      loginBtn.disabled = false; loginBtn.textContent = "Enter AI Quest →";
+      console.error("[AQ Login]", err);
     }
   }
 
+  loginBtn.addEventListener("click", aqDoLogin);
+  [orgInput, nameInput].forEach(el =>
+    el.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); }));
+
   function completeLogin(name, role) {
-    localStorage.setItem("aq_user",      name);
-    localStorage.setItem("currentUser",  name);
-    localStorage.setItem("aq_role",      role);
-    localStorage.setItem("ai_quest_user", name); // sync React component
+    localStorage.setItem("aq_user",       name);
+    localStorage.setItem("currentUser",   name);
+    localStorage.setItem("aq_role",       role);
+    localStorage.setItem("ai_quest_user", name);
+    if (role === "manager") {
+      window.location.replace("manager.html");
+      return;
+    }
     dismissOverlay();
     applyRoleUI(role);
     showGreeting(name);
   }
-
-  loginBtn.addEventListener("click", aqDoLogin);
-  [nameInput, passInput, pass2Input].forEach(el =>
-    el.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); }));
 
   // ── Skip overlay if already logged in ──────────────────────────
   const storedUser = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
@@ -725,342 +569,7 @@
     }
   };
 
-  // ──────────────────────────────────────────────────────────────────
-  // MANAGER DASHBOARD
-  // ──────────────────────────────────────────────────────────────────
-  const backdrop = document.getElementById("aq-manager-backdrop");
-  const closeBtn = document.getElementById("aq-manager-close");
-  const userList = document.getElementById("aq-user-list");
-  const dashLoad = document.getElementById("aq-dashboard-loading");
 
-  async function aqLoadDashboard() {
-    userList.innerHTML      = "";
-    dashLoad.style.display  = "block";
-    dashLoad.textContent    = "Loading users…";
-
-    try {
-      const snap = await getDocs(collection(db, "users"));
-      dashLoad.style.display = "none";
-
-      if (snap.empty) {
-        userList.innerHTML =
-          '<p style="color:#94a3b8;font-size:14px;text-align:center;padding:20px 0">No users found.</p>';
-        return;
-      }
-
-      // Build table
-      const table = document.createElement("table");
-      table.id = "aq-user-table";
-      table.innerHTML =
-        '<thead><tr>' +
-          '<th>Name</th>' +
-          '<th>Modules</th>' +
-          '<th>Progress</th>' +
-          '<th></th>' +
-        '</tr></thead>' +
-        '<tbody id="aq-table-body"></tbody>';
-      userList.appendChild(table);
-
-      const tbody = document.getElementById("aq-table-body");
-
-      // Collect, sort descending by progress
-      const users = [];
-      snap.forEach(docSnap => {
-        const d = docSnap.data();
-        users.push({
-          id:       docSnap.id,
-          role:     d.role || "user",
-          pct:      Math.min(d.progress || 0, 100),
-          modCount: Array.isArray(d.modulesCompleted) ? d.modulesCompleted.length : 0
-        });
-      });
-      users.sort((a, b) => b.pct - a.pct);
-
-      // Summary stats
-      const totalUsers     = users.length;
-      const avgProgress    = totalUsers ? Math.round(users.reduce((s, u) => s + u.pct, 0) / totalUsers) : 0;
-      const completedUsers = users.filter(u => u.pct === 100).length;
-      document.getElementById("aq-stat-total").textContent     = totalUsers;
-      document.getElementById("aq-stat-avg").textContent       = avgProgress + "%";
-      document.getElementById("aq-stat-completed").textContent = completedUsers;
-
-      const medals = ["&#x1F947;", "&#x1F948;", "&#x1F949;"]; // 🥇🥈🥉
-      const medalClass = ["aq-medal-gold", "aq-medal-silver", "aq-medal-bronze"];
-
-      users.forEach((u, i) => {
-        const uName    = u.id;
-        const role     = u.role;
-        const pct      = u.pct;
-        const modCount = u.modCount;
-        const medal    = i < 3 ? '<span class="aq-medal ' + medalClass[i] + '">' + medals[i] + '</span>' : '';
-        const completedBadge = pct === 100
-          ? '<span class="aq-completed-badge">&#x2713; Completed AI Quest</span>'
-          : '';
-
-        const motLabel = pct === 100 ? ''
-          : pct < 30  ? '<span class="aq-progress-label aq-label-start">Getting Started</span>'
-          : pct <= 70 ? '<span class="aq-progress-label aq-label-progress">In Progress</span>'
-                      : '<span class="aq-progress-label aq-label-almost">Almost There</span>';
-
-        const tr = document.createElement("tr");
-        if (i < 3) tr.classList.add("aq-top-row-" + (i + 1));
-        if (pct === 100) tr.classList.add("aq-row-completed");
-        tr.innerHTML =
-          '<td>' +
-            medal +
-            '<span class="aq-user-name">' + uName + '</span>' +
-            '<span class="aq-user-role">' + role + '</span>' +
-            completedBadge +
-            motLabel +
-          '</td>' +
-          '<td class="aq-mod-count">' + modCount + ' / 10</td>' +
-          '<td><button class="aq-delete-btn" data-id="' + uName + '">Delete</button></td>' +
-          '<td class="aq-pct-cell">' +
-            '<span class="aq-pct-label">' + pct + '%</span>' +
-            '<div class="aq-progress-bar-track">' +
-              '<div class="aq-progress-bar-fill" data-pct="' + pct + '"></div>' +
-            '</div>' +
-          '</td>';
-        tbody.appendChild(tr);
-      });
-
-      // Animate bars after DOM paint
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          document.querySelectorAll(".aq-progress-bar-fill[data-pct]").forEach(el => {
-            el.style.width = el.dataset.pct + "%";
-          });
-        });
-      });
-    } catch (err) {
-      dashLoad.textContent = "Failed to load users.";
-      console.error("[AQ Dashboard]", err);
-    }
-  }
-
-  closeBtn.addEventListener("click", () => backdrop.classList.remove("aq-open"));
-
-  backdrop.addEventListener("click", e => {
-    if (e.target === backdrop) backdrop.classList.remove("aq-open");
-  });
-
-  // ── Add User ──────────────────────────────────────────────────────────────
-  const addInput  = document.getElementById("aq-new-user-input");
-  const addBtn    = document.getElementById("aq-add-user-btn");
-  const addError  = document.getElementById("aq-add-user-error");
-  const refreshBtn = document.getElementById("aq-refresh-btn");
-
-  addBtn.addEventListener("click", async () => {
-    const name = addInput.value.trim();
-    if (!name) { addError.textContent = "Please enter a name."; return; }
-    addError.textContent = "";
-    addBtn.disabled = true;
-    addBtn.textContent = "Adding…";
-
-    try {
-      const userRef  = doc(db, "users", name);
-      const existing = await getDoc(userRef);
-      if (existing.exists()) {
-        addError.textContent = "User \"" + name + "\" already exists.";
-        addBtn.disabled = false;
-        addBtn.textContent = "Add User";
-        return;
-      }
-
-      await setDoc(userRef, {
-        name:             name,
-        role:             "user",
-        progress:         0,
-        modulesCompleted: []
-      });
-
-      addInput.value = "";
-      addBtn.textContent = "Add User";
-      addBtn.disabled = false;
-      await aqLoadDashboard();
-    } catch (err) {
-      addError.textContent = "Error adding user.";
-      console.error("[AQ AddUser]", err);
-      addBtn.disabled = false;
-      addBtn.textContent = "Add User";
-    }
-  });
-
-  addInput.addEventListener("keydown", e => { if (e.key === "Enter") addBtn.click(); });
-
-  // ── Delete User (event delegation on userList) ────────────────────────────
-  userList.addEventListener("click", async e => {
-    const btn = e.target.closest(".aq-delete-btn");
-    if (!btn) return;
-    const name = btn.dataset.id;
-    if (!name) return;
-    if (!confirm('Delete user "' + name + '"? This cannot be undone.')) return;
-
-    btn.disabled = true;
-    btn.textContent = "…";
-    try {
-      await deleteDoc(doc(db, "users", name));
-      await aqLoadDashboard();
-    } catch (err) {
-      console.error("[AQ DeleteUser]", err);
-      btn.disabled = false;
-      btn.textContent = "Delete";
-    }
-  });
-
-  // ── Refresh ───────────────────────────────────────────────────────────────
-  refreshBtn.addEventListener("click", () => aqLoadDashboard());
-
-  // ──────────────────────────────────────────────────────────────────
-  // MANAGER LOGIN + SELF-REGISTRATION
-  // ──────────────────────────────────────────────────────────────────
-  const MGR_ACCESS_CODE = "AIQUEST-MGR"; // change this to your secret code
-
-  const mgrBackdrop = document.getElementById("aq-mgr-backdrop");
-  const mgrClose    = document.getElementById("aq-mgr-close");
-  const mgrLink     = document.getElementById("aq-mgr-link");
-  const mgrName     = document.getElementById("aq-mgr-name");
-  const mgrPass     = document.getElementById("aq-mgr-pass");
-  const mgrPass2    = document.getElementById("aq-mgr-pass2");
-  const mgrCodeIn   = document.getElementById("aq-mgr-code");
-  const mgrBtn      = document.getElementById("aq-mgr-btn");
-  const mgrError    = document.getElementById("aq-mgr-error");
-  const mgrSubtitle = document.getElementById("aq-mgr-subtitle");
-  const mgrTitle    = document.getElementById("aq-mgr-title");
-  const mgrIcon     = document.getElementById("aq-mgr-icon");
-  const mgrToggle   = document.getElementById("aq-mgr-toggle");
-
-  let mgrMode = "login";  // "login" | "register"
-  let mgrStep = "creds";  // "creds" | "set-pass"
-  let mgrPending = null;
-
-  function openMgrModal()  { mgrBackdrop.classList.add("aq-open"); }
-  function closeMgrModal() { mgrBackdrop.classList.remove("aq-open"); resetMgrForm(); }
-
-  function resetMgrForm() {
-    mgrMode = "login"; mgrStep = "creds"; mgrPending = null;
-    mgrName.value = ""; mgrPass.value = ""; mgrPass2.value = ""; mgrCodeIn.value = "";
-    mgrError.textContent = "";
-    mgrPass2.style.display = "none"; mgrCodeIn.style.display = "none";
-    mgrTitle.textContent    = "Manager Login";
-    mgrIcon.textContent     = "🔒";
-    mgrSubtitle.textContent = "Enter your credentials to access the dashboard";
-    mgrBtn.textContent      = "Sign In";
-    mgrToggle.textContent   = "New manager? Register here";
-    mgrBtn.disabled = false;
-  }
-
-  mgrToggle.addEventListener("click", e => {
-    e.preventDefault();
-    if (mgrMode === "login") {
-      mgrMode = "register";
-      mgrTitle.textContent    = "Register as Manager";
-      mgrIcon.textContent     = "👔";
-      mgrSubtitle.textContent = "Enter your name and the manager access code to register.";
-      mgrCodeIn.style.display = "block";
-      mgrPass2.style.display  = "block";
-      mgrPass.placeholder     = "Create your passcode…";
-      mgrBtn.textContent      = "Register";
-      mgrToggle.textContent   = "Already registered? Sign in";
-    } else {
-      resetMgrForm();
-    }
-  });
-
-  mgrLink.addEventListener("click", e => { e.preventDefault(); openMgrModal(); });
-  mgrClose.addEventListener("click", closeMgrModal);
-  mgrBackdrop.addEventListener("click", e => { if (e.target === mgrBackdrop) closeMgrModal(); });
-  [mgrName, mgrPass, mgrPass2, mgrCodeIn].forEach(el =>
-    el.addEventListener("keydown", e => { if (e.key === "Enter") doMgrAction(); }));
-  mgrBtn.addEventListener("click", doMgrAction);
-
-  async function doMgrAction() {
-    mgrError.textContent = "";
-    if (mgrMode === "register") {
-      await doMgrRegister();
-    } else {
-      await doMgrLogin();
-    }
-  }
-
-  async function doMgrRegister() {
-    const name = mgrName.value.trim();
-    const code = mgrCodeIn.value.trim();
-    const pass = mgrPass.value;
-    const pass2 = mgrPass2.value;
-    if (!name) { mgrError.textContent = "Please enter your name."; return; }
-    if (!code) { mgrError.textContent = "Please enter the access code."; return; }
-    if (code !== MGR_ACCESS_CODE) { mgrError.textContent = "Invalid access code. Contact your administrator."; return; }
-    if (!pass) { mgrError.textContent = "Please create a passcode."; return; }
-    if (pass.length < 4) { mgrError.textContent = "Passcode must be at least 4 characters."; return; }
-    if (pass !== pass2) { mgrError.textContent = "Passcodes don't match."; return; }
-
-    mgrBtn.disabled = true; mgrBtn.textContent = "Registering…";
-    try {
-      const ref = doc(db, "users", name);
-      const existing = await getDoc(ref);
-      if (existing.exists() && existing.data().role === "manager") {
-        mgrError.textContent = "A manager with this name already exists. Use Sign In.";
-        mgrBtn.disabled = false; mgrBtn.textContent = "Register"; return;
-      }
-      await setDoc(ref, { name, role: "manager", progress: 0, modulesCompleted: [], passcode: pass });
-      localStorage.setItem("aq_user", name);
-      localStorage.setItem("currentUser", name);
-      localStorage.setItem("aq_role", "manager");
-      window.location.href = "manager.html";
-    } catch (err) {
-      mgrError.textContent = "Error registering. Please try again.";
-      mgrBtn.disabled = false; mgrBtn.textContent = "Register";
-      console.error("[AQ MgrRegister]", err);
-    }
-  }
-
-  async function doMgrLogin() {
-    const name = mgrName.value.trim();
-    const pass = mgrPass.value;
-    if (!name) { mgrError.textContent = "Please enter your name."; return; }
-    if (!pass)  { mgrError.textContent = "Please enter your passcode."; return; }
-
-    mgrBtn.disabled = true; mgrBtn.textContent = "Checking…"; mgrError.textContent = "";
-
-    try {
-      const snap = await getDoc(doc(db, "users", name));
-      if (!snap.exists()) {
-        mgrError.textContent = "Name not found. Register first or check with your administrator.";
-        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
-      }
-      const data = snap.data();
-      if ((data.role || "user").toLowerCase() !== "manager") {
-        mgrError.textContent = "This account does not have manager access.";
-        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
-      }
-      if (!data.passcode) {
-        if (mgrStep === "creds") {
-          mgrStep = "set-pass";
-          mgrPass2.style.display  = "block";
-          mgrSubtitle.textContent = "First login — set a passcode for your account.";
-          mgrBtn.textContent      = "Set Passcode";
-          mgrBtn.disabled = false;
-          mgrError.textContent    = "No passcode yet. Enter and confirm a new one."; return;
-        }
-        const p2 = mgrPass2.value;
-        if (!p2) { mgrError.textContent = "Please confirm your passcode."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
-        if (pass !== p2) { mgrError.textContent = "Passcodes don't match."; mgrBtn.disabled = false; mgrBtn.textContent = "Set Passcode"; return; }
-        await updateDoc(doc(db, "users", name), { passcode: pass });
-      } else if (data.passcode !== pass) {
-        mgrError.textContent = "Incorrect passcode.";
-        mgrBtn.disabled = false; mgrBtn.textContent = "Sign In"; return;
-      }
-      localStorage.setItem("aq_user", name);
-      localStorage.setItem("currentUser", name);
-      localStorage.setItem("aq_role", "manager");
-      window.location.href = "manager.html";
-    } catch (err) {
-      mgrError.textContent = "Connection error. Please try again.";
-      mgrBtn.disabled = false; mgrBtn.textContent = "Sign In";
-      console.error("[AQ MgrLogin]", err);
-    }
-  }
 </script>
 
 <!-- ── MODULE CLICK TRACKING (event delegation) ──────────── -->

@@ -6,130 +6,240 @@
 <title>Manager Dashboard — AI Quest</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f8fafc; color: #0f172a; min-height: 100vh; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f1f5f9; color: #0f172a; min-height: 100vh; }
 
   /* ── NAV ── */
   .nav {
     background: #fff; border-bottom: 1px solid #e2e8f0;
-    padding: 0 32px; height: 60px;
+    padding: 0 32px; height: 62px;
     display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 100;
+    position: sticky; top: 0; z-index: 200;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
   }
   .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; color: #0f172a; }
   .nav-brand span { font-size: 22px; }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
   .nav-user { font-size: 14px; color: #64748b; }
   .nav-user strong { color: #0f172a; }
   .btn-logout {
-    background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px;
-    padding: 7px 14px; font-size: 13px; font-weight: 600; color: #475569;
+    background: #f1f5f9; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; font-weight: 600; color: #475569;
     cursor: pointer; transition: all 0.15s;
   }
   .btn-logout:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
 
-  /* ── MAIN ── */
-  .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+  /* ── HERO HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    padding: 32px 32px 28px; color: #fff;
+  }
+  .hero-inner { max-width: 1140px; margin: 0 auto; }
+  .hero-greeting { font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 4px; letter-spacing: 0.02em; }
+  .hero-title { font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 6px; }
+  .hero-sub { font-size: 14px; opacity: 0.75; }
+  .hero-sync { font-size: 12px; opacity: 0.6; margin-top: 8px; }
 
-  .page-title { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
-  .page-sub   { font-size: 14px; color: #64748b; margin-bottom: 28px; }
+  /* ── MAIN ── */
+  .main { max-width: 1140px; margin: 0 auto; padding: 28px 24px 60px; }
 
   /* ── STAT CARDS ── */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
   .card {
-    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
-    padding: 20px 22px; text-align: center;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 22px 24px; position: relative; overflow: hidden;
+    transition: box-shadow 0.15s;
   }
-  .card-value { font-size: 32px; font-weight: 800; color: #6366f1; line-height: 1; margin-bottom: 6px; }
-  .card-value.green { color: #10b981; }
-  .card-value.amber { color: #f59e0b; }
-  .card-label { font-size: 13px; color: #64748b; font-weight: 500; }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+  .card-value { font-size: 34px; font-weight: 800; color: #0f172a; line-height: 1; }
+  .card-value.purple { color: #6366f1; }
+  .card-value.green  { color: #10b981; }
+  .card-value.amber  { color: #f59e0b; }
+  .card-value.blue   { color: #3b82f6; }
+  .card-label { font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
+  .card-bar-track { background: #f1f5f9; border-radius: 99px; height: 4px; margin-top: 12px; overflow: hidden; }
+  .card-bar-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#6366f1,#8b5cf6); transition: width 1s ease; }
+  .card-accent { position: absolute; right: -10px; bottom: -10px; font-size: 56px; opacity: 0.06; pointer-events: none; }
+
+  /* ── PANEL ── */
+  .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
 
   /* ── TOOLBAR ── */
   .toolbar {
     display: flex; align-items: center; gap: 10px;
-    margin-bottom: 18px; flex-wrap: wrap;
+    padding: 18px 20px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap;
   }
-  .toolbar-title { font-size: 17px; font-weight: 700; color: #0f172a; flex: 1; }
+  .toolbar-left { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+  .toolbar-title { font-size: 16px; font-weight: 800; color: #0f172a; white-space: nowrap; }
+  .count-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #eef2ff; color: #6366f1; font-size: 12px; font-weight: 700;
+    border-radius: 20px; padding: 2px 10px; min-width: 28px;
+  }
+
+  /* Search */
+  .search-wrap { position: relative; }
+  .search-wrap::before { content: "🔍"; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
+  .search-input {
+    border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 8px 12px 8px 34px;
+    font-size: 13px; font-family: inherit; outline: none; width: 220px;
+    transition: border-color 0.2s; background: #f8fafc; color: #0f172a;
+  }
+  .search-input:focus { border-color: #6366f1; background: #fff; }
+
+  /* Status filter pills */
+  .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 5px 13px;
+    font-size: 12px; font-weight: 600; cursor: pointer; background: #fff; color: #64748b;
+    transition: all 0.14s; font-family: inherit;
+  }
+  .pill:hover { border-color: #6366f1; color: #6366f1; }
+  .pill.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+
+  /* Action buttons */
   .btn {
     border: none; border-radius: 9px; padding: 9px 18px;
     font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
-    transition: all 0.15s; white-space: nowrap;
+    transition: all 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;
   }
-  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; }
-  .btn-primary:hover { opacity: 0.88; }
-  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; box-shadow: 0 2px 10px rgba(99,102,241,0.3); }
+  .btn-primary:hover { opacity: 0.88; box-shadow: 0 4px 16px rgba(99,102,241,0.4); }
   .btn-outline { background: #fff; border: 1.5px solid #e2e8f0; color: #475569; }
   .btn-outline:hover { border-color: #6366f1; color: #6366f1; }
   .btn-green  { background: #ecfdf5; border: 1.5px solid #6ee7b7; color: #059669; }
   .btn-green:hover { background: #d1fae5; }
-  .input-add {
-    border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 9px 14px;
-    font-size: 13px; font-family: inherit; outline: none; width: 200px;
-    transition: border-color 0.2s;
-  }
-  .input-add:focus { border-color: #6366f1; }
-  .add-error { font-size: 12px; color: #ef4444; margin-top: 4px; min-height: 16px; }
 
   /* ── TABLE ── */
-  .table-wrap {
-    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
-    overflow: hidden;
-  }
   table { width: 100%; border-collapse: collapse; }
   thead th {
-    background: #f8fafc; padding: 13px 16px;
+    background: #f8fafc; padding: 12px 16px;
     text-align: left; font-size: 11px; font-weight: 700;
     color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none;
+    white-space: nowrap;
   }
-  tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+  thead th:hover { color: #6366f1; }
+  thead th.sorted { color: #6366f1; }
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+  tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #f8fafc; }
-  tbody tr.top-1 { background: #fffbeb; }
-  tbody tr.top-2 { background: #f8fafc; }
-  tbody tr.top-3 { background: #fff7ed; }
-  tbody tr.completed { background: #f0fdf4; }
-  td { padding: 13px 16px; font-size: 14px; vertical-align: middle; }
+  tbody tr.row-gold   { background: #fffbeb; }
+  tbody tr.row-silver { background: #f8fafc; }
+  tbody tr.row-bronze { background: #fff7ed; }
+  tbody tr.row-done   { background: #f0fdf4; }
+  td { padding: 14px 16px; font-size: 14px; vertical-align: middle; }
 
-  .rank-cell { font-weight: 800; color: #94a3b8; font-size: 13px; width: 48px; text-align: center; }
+  .rank-cell { width: 52px; text-align: center; font-weight: 800; }
   .medal { font-size: 18px; }
-  .user-name { font-weight: 700; color: #0f172a; }
-  .user-role-badge {
-    display: inline-block; margin-left: 7px;
-    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
-    background: #ede9fe; color: #7c3aed; vertical-align: middle;
-  }
-  .prog-cell { width: 200px; }
-  .prog-bar-track { background: #e2e8f0; border-radius: 99px; height: 7px; margin-top: 5px; overflow: hidden; }
-  .prog-bar-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#6366f1,#8b5cf6); width: 0; transition: width 0.6s ease; }
-  .prog-bar-fill.green { background: linear-gradient(90deg,#10b981,#059669); }
-  .prog-pct { font-size: 13px; font-weight: 700; color: #475569; }
-  .mods-cell { color: #64748b; font-size: 13px; }
-  .btn-delete {
-    background: none; border: 1.5px solid #e2e8f0; border-radius: 7px;
-    padding: 5px 11px; font-size: 12px; color: #94a3b8; cursor: pointer;
-    font-family: inherit; transition: all 0.14s;
-  }
-  .btn-delete:hover { border-color: #fca5a5; color: #dc2626; background: #fee2e2; }
 
-  .empty-state { padding: 48px; text-align: center; color: #94a3b8; font-size: 15px; }
-  .loading-state { padding: 32px; text-align: center; color: #94a3b8; font-size: 14px; }
+  .name-cell .uname { font-weight: 700; color: #0f172a; }
+  .name-cell .usub  { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; border-radius: 20px; padding: 3px 10px;
+  }
+  .status-badge.done     { background: #dcfce7; color: #16a34a; }
+  .status-badge.active   { background: #eff6ff; color: #3b82f6; }
+  .status-badge.nostart  { background: #f1f5f9; color: #94a3b8; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Progress */
+  .prog-wrap { min-width: 140px; }
+  .prog-top  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .prog-pct  { font-size: 13px; font-weight: 700; color: #475569; }
+  .prog-mods { font-size: 11px; color: #94a3b8; }
+  .prog-track { background: #e2e8f0; border-radius: 99px; height: 6px; overflow: hidden; }
+  .prog-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#6366f1,#8b5cf6); width: 0; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
+  .prog-fill.green { background: linear-gradient(90deg,#10b981,#059669); }
+  .prog-fill.amber { background: linear-gradient(90deg,#f59e0b,#d97706); }
+
+  /* Module pills */
+  .mod-pills { display: flex; flex-wrap: wrap; gap: 4px; max-width: 280px; }
+  .mod-pill  {
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe;
+  }
+  .mod-pill.empty { background: #f1f5f9; color: #cbd5e1; border-color: #e2e8f0; }
+
+  /* Action btns in table */
+  .btn-remove {
+    background: none; border: 1.5px solid #e2e8f0; border-radius: 7px;
+    padding: 5px 12px; font-size: 12px; color: #94a3b8; cursor: pointer;
+    font-family: inherit; transition: all 0.14s; white-space: nowrap;
+  }
+  .btn-remove:hover { border-color: #fca5a5; color: #dc2626; background: #fee2e2; }
+
+  .empty-state  { padding: 56px; text-align: center; color: #94a3b8; font-size: 15px; }
+  .empty-state p { margin-top: 8px; font-size: 13px; }
+  .loading-state { padding: 36px; text-align: center; color: #94a3b8; font-size: 14px; }
+
+  /* ── ADD USER MODAL ── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 9998;
+    background: rgba(15,23,42,0.55); backdrop-filter: blur(5px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 20px; padding: 36px 32px 28px;
+    width: 100%; max-width: 440px; position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+    animation: modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes modal-in { from { opacity:0; transform:scale(0.92) translateY(16px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  .modal-close {
+    position: absolute; top: 16px; right: 18px;
+    background: #f1f5f9; border: none; border-radius: 8px;
+    width: 32px; height: 32px; font-size: 16px; cursor: pointer; color: #64748b;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .modal-close:hover { background: #fee2e2; color: #dc2626; }
+  .modal-icon  { font-size: 36px; margin-bottom: 8px; }
+  .modal-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+  .modal-sub   { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+  .form-label  { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+  .form-group  { margin-bottom: 18px; }
+  .form-input  {
+    width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px;
+    padding: 11px 14px; font-size: 14px; font-family: inherit; outline: none;
+    transition: border-color 0.2s; color: #0f172a;
+  }
+  .form-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
+  .form-input:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+  .form-note   { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+  .form-error  { font-size: 12px; color: #ef4444; min-height: 18px; margin-top: 4px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+  .modal-actions .btn { flex: 1; justify-content: center; padding: 12px; }
+  .btn-cancel { background: #f1f5f9; border: none; color: #64748b; }
+  .btn-cancel:hover { background: #e2e8f0; }
 
   /* ── TOAST ── */
   #toast {
     position: fixed; bottom: 28px; right: 28px; z-index: 9999;
-    background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px;
+    background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 12px;
     font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
-    transform: translateY(8px); transition: all 0.25s;
+    transform: translateY(10px); transition: all 0.25s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
   }
   #toast.show { opacity: 1; transform: translateY(0); }
 
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .hero { padding: 24px 20px 20px; }
+  }
   @media (max-width: 640px) {
     .nav { padding: 0 16px; }
-    .main { padding: 20px 16px 40px; }
-    .toolbar { flex-direction: column; align-items: flex-start; }
-    .input-add { width: 100%; }
-    .prog-cell { display: none; }
+    .main { padding: 16px 12px 40px; }
+    .cards { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .toolbar { padding: 14px 14px; }
+    .search-input { width: 160px; }
+    td:nth-child(5) { display: none; }
   }
 </style>
 </head>
@@ -148,72 +258,134 @@
 
 <!-- ── NAV ── -->
 <nav class="nav">
-  <div class="nav-brand"><span>&#x1F680;</span> AI Quest</div>
+  <div class="nav-brand"><span>🚀</span> AI Quest</div>
   <div class="nav-right">
-    <div class="nav-user">Signed in as <strong id="nav-name">—</strong></div>
+    <div class="nav-user">Manager: <strong id="nav-name">—</strong></div>
     <button class="btn-logout" id="btn-logout">Sign Out</button>
   </div>
 </nav>
 
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-greeting" id="hero-greeting">Good day,</div>
+    <div class="hero-title" id="hero-title">My Team Dashboard</div>
+    <div class="hero-sub" id="hero-sub">Track your team's learning progress across all AI Quest modules</div>
+    <div class="hero-sync" id="hero-sync">Loading…</div>
+  </div>
+</div>
+
 <!-- ── MAIN ── -->
 <main class="main">
-  <div class="page-title">Manager Dashboard</div>
-  <div class="page-sub" id="last-updated">Loading learner data…</div>
 
-  <!-- Summary cards -->
+  <!-- Stat cards -->
   <div class="cards">
     <div class="card">
-      <div class="card-value" id="stat-total">—</div>
-      <div class="card-label">Total Learners</div>
+      <span class="card-icon">👥</span>
+      <div class="card-value purple" id="stat-total">—</div>
+      <div class="card-label">My Team</div>
+      <span class="card-accent">👥</span>
     </div>
     <div class="card">
-      <div class="card-value amber" id="stat-avg">—</div>
-      <div class="card-label">Avg Progress</div>
+      <span class="card-icon">🔥</span>
+      <div class="card-value amber" id="stat-active">—</div>
+      <div class="card-label">Active Learners</div>
+      <span class="card-accent">🔥</span>
     </div>
     <div class="card">
+      <span class="card-icon">✅</span>
       <div class="card-value green" id="stat-completed">—</div>
-      <div class="card-label">Completed (100%)</div>
+      <div class="card-label">Completed All</div>
+      <span class="card-accent">✅</span>
     </div>
     <div class="card">
-      <div class="card-value" id="stat-active" style="color:#f59e0b;">—</div>
-      <div class="card-label">In Progress</div>
+      <span class="card-icon">📊</span>
+      <div class="card-value blue" id="stat-avg">—</div>
+      <div class="card-label">Team Avg Progress</div>
+      <div class="card-bar-track"><div class="card-bar-fill" id="stat-avg-bar" style="width:0%"></div></div>
+      <span class="card-accent">📊</span>
     </div>
   </div>
 
-  <!-- Toolbar -->
-  <div class="toolbar">
-    <div class="toolbar-title">&#x1F3C6; Leaderboard</div>
-    <input class="input-add" id="input-add" type="text" placeholder="Full name…" autocomplete="off" spellcheck="false" />
-    <select class="input-add" id="select-role" style="width:130px;cursor:pointer;">
-      <option value="user">👤 User</option>
-      <option value="manager">🔑 Manager</option>
-    </select>
-    <button class="btn btn-primary" id="btn-add">&#x2B; Add Person</button>
-    <button class="btn btn-outline" id="btn-refresh">&#x21BB; Refresh</button>
-    <button class="btn btn-green"   id="btn-download">&#x2B07; Download Report</button>
-  </div>
-  <div class="add-error" id="add-error"></div>
+  <!-- Team table panel -->
+  <div class="panel">
 
-  <!-- Table -->
-  <div class="table-wrap">
-    <div class="loading-state" id="table-loading">Loading learners&hellip;</div>
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-title">🏆 Leaderboard</span>
+        <span class="count-badge" id="visible-count">0</span>
+
+        <div class="search-wrap">
+          <input class="search-input" id="search-input" type="text" placeholder="Search by name…" autocomplete="off" spellcheck="false" />
+        </div>
+
+        <div class="filter-pills">
+          <button class="pill active" data-filter="all">All</button>
+          <button class="pill" data-filter="active">🔥 Active</button>
+          <button class="pill" data-filter="completed">✅ Done</button>
+          <button class="pill" data-filter="notstarted">⏳ Not Started</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-add-user">➕ Add User</button>
+      <button class="btn btn-outline" id="btn-refresh">↻ Refresh</button>
+      <button class="btn btn-green"   id="btn-download">⬇ Export</button>
+    </div>
+
+    <!-- Table -->
+    <div class="loading-state" id="table-loading">Loading your team…</div>
     <div id="table-container" style="display:none">
       <table>
         <thead>
           <tr>
-            <th style="text-align:center">Rank</th>
-            <th>Name</th>
-            <th>Modules</th>
-            <th class="prog-cell">Progress</th>
+            <th class="rank-cell">Rank</th>
+            <th data-sort="name">Name <span class="sort-arrow">↕</span></th>
+            <th>Status</th>
+            <th data-sort="pct">Progress <span class="sort-arrow">↕</span></th>
+            <th>Modules Completed</th>
             <th></th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
       </table>
     </div>
-    <div class="empty-state" id="table-empty" style="display:none">No learners found. Add one above.</div>
+    <div class="empty-state" id="table-empty" style="display:none">
+      <div style="font-size:40px">🔍</div>
+      <p>No team members found.</p>
+      <p>Try a different search or add someone with the ➕ button.</p>
+    </div>
+
   </div>
 </main>
+
+<!-- ── ADD USER MODAL ── -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-icon">👤</div>
+    <div class="modal-title">Add Team Member</div>
+    <div class="modal-sub">They'll appear in your dashboard immediately and can log in with the org code.</div>
+
+    <div class="form-group">
+      <label class="form-label" for="add-name">Full Name</label>
+      <input class="form-input" id="add-name" type="text" placeholder="e.g. Priya Sharma" autocomplete="off" spellcheck="false" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="add-manager">Reporting Manager</label>
+      <input class="form-input" id="add-manager" type="text" disabled />
+      <div class="form-note">Automatically set to you.</div>
+    </div>
+
+    <div class="form-error" id="add-error"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" id="modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-submit">➕ Add to Team</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -221,7 +393,7 @@
 <script type="module">
   import { initializeApp }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc }
+  import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -236,212 +408,315 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
-  // ── Populate nav user name ──
+  // ── Manager identity ──
   const managerName = localStorage.getItem("aq_user") || localStorage.getItem("currentUser") || "Manager";
-  document.getElementById("nav-name").textContent = managerName;
+  document.getElementById("nav-name").textContent    = managerName;
+  document.getElementById("add-manager").value       = managerName;
+
+  // Hero greeting by time
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? "Good morning," : hr < 17 ? "Good afternoon," : "Good evening,";
+  document.getElementById("hero-greeting").textContent = greet;
+  document.getElementById("hero-title").textContent    = `${managerName}'s Team Dashboard`;
 
   // ── Logout ──
   document.getElementById("btn-logout").addEventListener("click", () => {
-    localStorage.removeItem("aq_user");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("aq_role");
+    ["aq_user","currentUser","aq_role","ai_quest_user"].forEach(k => localStorage.removeItem(k));
     window.location.replace("index.html");
   });
 
   // ── State ──
-  let allUsers = [];
+  let teamUsers    = [];    // all team members (filtered to this manager)
+  let sortKey      = "pct"; // current sort column
+  let sortAsc      = false; // desc by default
+  let activeFilter = "all";
+  let searchQuery  = "";
 
-  // ── Load Dashboard ──
+  const MOD_LABELS = {
+    "python-fundamentals":   "Python",
+    "api-fundamentals":      "API",
+    "claude-mastery":        "Claude",
+    "context-engineering":   "Context",
+    "ai-fluency":            "AI Fluency",
+    "git-version-control":   "Git",
+    "prompt-engineering":    "Prompts",
+    "agentic-workflows":     "Agents",
+    "claude-code-celonis":   "CC+Celonis",
+    "ai-fundamentals":       "AI Basics",
+    "sql-fundamentals":      "SQL",
+  };
+
+  // ── Load team data ──
   async function loadDashboard() {
-    document.getElementById("table-loading").style.display = "block";
+    document.getElementById("table-loading").style.display  = "block";
     document.getElementById("table-container").style.display = "none";
-    document.getElementById("table-empty").style.display = "none";
+    document.getElementById("table-empty").style.display    = "none";
 
     try {
       const snap = await getDocs(collection(db, "users"));
-      allUsers = [];
+      teamUsers = [];
       snap.forEach(d => {
         const data = d.data();
-        allUsers.push({
+        // Only this manager's direct reports (exclude managers)
+        if ((data.manager || "") !== managerName) return;
+        if (data.role === "manager") return;
+        teamUsers.push({
           id:       d.id,
-          role:     data.role || "user",
           pct:      Math.min(data.progress || 0, 100),
           modCount: Array.isArray(data.modulesCompleted) ? data.modulesCompleted.length : 0,
-          modules:  Array.isArray(data.modulesCompleted) ? data.modulesCompleted : []
+          modules:  Array.isArray(data.modulesCompleted) ? data.modulesCompleted : [],
         });
       });
 
-      allUsers.sort((a, b) => b.pct - a.pct);
-
-      // Summary stats
-      const total     = allUsers.length;
-      const avg       = total ? Math.round(allUsers.reduce((s, u) => s + u.pct, 0) / total) : 0;
-      const completed = allUsers.filter(u => u.pct >= 100).length;
-      const active    = allUsers.filter(u => u.pct > 0 && u.pct < 100).length;
-
-      document.getElementById("stat-total").textContent     = total;
-      document.getElementById("stat-avg").textContent       = avg + "%";
-      document.getElementById("stat-completed").textContent = completed;
-      document.getElementById("stat-active").textContent    = active;
-
-      // Render table
-      document.getElementById("table-loading").style.display = "none";
-      const tbody = document.getElementById("table-body");
-      tbody.innerHTML = "";
-
-      if (total === 0) {
-        document.getElementById("table-empty").style.display = "block";
-        return;
-      }
-
-      document.getElementById("table-container").style.display = "block";
-
-      const medals = ["🥇", "🥈", "🥉"];
-
-      allUsers.forEach((u, i) => {
-        const tr = document.createElement("tr");
-        if (i === 0) tr.className = "top-1";
-        else if (i === 1) tr.className = "top-2";
-        else if (i === 2) tr.className = "top-3";
-        else if (u.pct >= 100) tr.className = "completed";
-
-        const rankCell = i < 3
-          ? `<span class="medal">${medals[i]}</span>`
-          : `<span style="color:#cbd5e1">${i + 1}</span>`;
-
-        const roleBadge = u.role === "manager"
-          ? `<span class="user-role-badge">manager</span>`
-          : "";
-
-        const fillClass = u.pct >= 100 ? "prog-bar-fill green" : "prog-bar-fill";
-
-        tr.innerHTML = `
-          <td class="rank-cell">${rankCell}</td>
-          <td><span class="user-name">${u.id}</span>${roleBadge}</td>
-          <td class="mods-cell">${u.modCount} / 10</td>
-          <td class="prog-cell">
-            <span class="prog-pct">${u.pct}%</span>
-            <div class="prog-bar-track">
-              <div class="${fillClass}" data-pct="${u.pct}"></div>
-            </div>
-          </td>
-          <td><button class="btn-delete" data-id="${u.id}">Delete</button></td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      // Animate progress bars
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        document.querySelectorAll(".prog-bar-fill[data-pct]").forEach(el => {
-          el.style.width = el.dataset.pct + "%";
-        });
-      }));
+      updateStats();
+      renderTable();
 
       const now = new Date();
-      document.getElementById("last-updated").textContent =
-        "Last updated: " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("hero-sync").textContent =
+        "Last synced: " + now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     } catch (err) {
-      document.getElementById("table-loading").textContent = "Failed to load data. Check connection.";
+      document.getElementById("table-loading").textContent = "⚠ Failed to load. Check connection.";
       console.error("[Dashboard]", err);
     }
   }
 
-  // ── Add Learner ──
-  const inputAdd = document.getElementById("input-add");
-  const btnAdd   = document.getElementById("btn-add");
-  const addError = document.getElementById("add-error");
+  // ── Stats ──
+  function updateStats() {
+    const total     = teamUsers.length;
+    const completed = teamUsers.filter(u => u.pct >= 100).length;
+    const active    = teamUsers.filter(u => u.pct > 0 && u.pct < 100).length;
+    const avg       = total ? Math.round(teamUsers.reduce((s, u) => s + u.pct, 0) / total) : 0;
 
-  async function addLearner() {
-    const name = inputAdd.value.trim();
-    if (!name) { addError.textContent = "Please enter a name."; return; }
-    addError.textContent = "";
-    btnAdd.disabled = true; btnAdd.textContent = "Adding…";
+    document.getElementById("stat-total").textContent     = total;
+    document.getElementById("stat-active").textContent    = active;
+    document.getElementById("stat-completed").textContent = completed;
+    document.getElementById("stat-avg").textContent       = avg + "%";
+    document.getElementById("hero-sub").textContent       =
+      `${total} team member${total !== 1 ? "s" : ""} · ${active} actively learning · ${completed} completed`;
+    requestAnimationFrame(() => {
+      document.getElementById("stat-avg-bar").style.width = avg + "%";
+    });
+  }
+
+  // ── Render table ──
+  function renderTable() {
+    document.getElementById("table-loading").style.display = "none";
+
+    let filtered = teamUsers.filter(u => {
+      const q = searchQuery.toLowerCase();
+      if (q && !u.id.toLowerCase().includes(q)) return false;
+      if (activeFilter === "completed"  && u.pct < 100)            return false;
+      if (activeFilter === "active"     && (u.pct === 0 || u.pct >= 100)) return false;
+      if (activeFilter === "notstarted" && u.pct > 0)              return false;
+      return true;
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      let va = sortKey === "name" ? a.id.toLowerCase() : a.pct;
+      let vb = sortKey === "name" ? b.id.toLowerCase() : b.pct;
+      if (va < vb) return sortAsc ? -1 : 1;
+      if (va > vb) return sortAsc ?  1 : -1;
+      return 0;
+    });
+
+    document.getElementById("visible-count").textContent = filtered.length;
+
+    const tbody = document.getElementById("table-body");
+    tbody.innerHTML = "";
+
+    if (filtered.length === 0) {
+      document.getElementById("table-container").style.display = "none";
+      document.getElementById("table-empty").style.display     = "block";
+      return;
+    }
+
+    document.getElementById("table-container").style.display = "block";
+    document.getElementById("table-empty").style.display     = "none";
+
+    const medals = ["🥇","🥈","🥉"];
+
+    filtered.forEach((u, i) => {
+      const tr = document.createElement("tr");
+      if      (i === 0) tr.className = "row-gold";
+      else if (i === 1) tr.className = "row-silver";
+      else if (i === 2) tr.className = "row-bronze";
+      else if (u.pct >= 100) tr.className = "row-done";
+
+      const rankCell = i < 3
+        ? `<span class="medal">${medals[i]}</span>`
+        : `<span style="color:#cbd5e1;font-weight:700">${i + 1}</span>`;
+
+      let statusBadge;
+      if      (u.pct >= 100) statusBadge = `<span class="status-badge done"><span class="status-dot"></span>Completed</span>`;
+      else if (u.pct > 0)    statusBadge = `<span class="status-badge active"><span class="status-dot"></span>In Progress</span>`;
+      else                   statusBadge = `<span class="status-badge nostart"><span class="status-dot"></span>Not Started</span>`;
+
+      const fillClass = u.pct >= 100 ? "prog-fill green" : u.pct >= 60 ? "prog-fill" : u.pct > 0 ? "prog-fill amber" : "prog-fill";
+
+      // Module pills — show completed, grey placeholders for rest
+      const allKeys  = Object.keys(MOD_LABELS);
+      const modPills = u.modules.length > 0
+        ? u.modules.slice(0, 6).map(m => `<span class="mod-pill">${MOD_LABELS[m] || m}</span>`).join("") +
+          (u.modules.length > 6 ? `<span class="mod-pill">+${u.modules.length - 6}</span>` : "")
+        : `<span style="font-size:12px;color:#cbd5e1">None yet</span>`;
+
+      tr.innerHTML = `
+        <td class="rank-cell">${rankCell}</td>
+        <td class="name-cell">
+          <div class="uname">${u.id}</div>
+          <div class="usub">${u.modCount} of 11 modules</div>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          <div class="prog-wrap">
+            <div class="prog-top">
+              <span class="prog-pct">${u.pct}%</span>
+              <span class="prog-mods">${u.modCount}/11</span>
+            </div>
+            <div class="prog-track"><div class="${fillClass}" data-pct="${u.pct}"></div></div>
+          </div>
+        </td>
+        <td><div class="mod-pills">${modPills}</div></td>
+        <td><button class="btn-remove" data-id="${u.id}">Remove</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Animate bars
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      tbody.querySelectorAll(".prog-fill[data-pct]").forEach(el => {
+        el.style.width = el.dataset.pct + "%";
+      });
+    }));
+  }
+
+  // ── Search ──
+  document.getElementById("search-input").addEventListener("input", e => {
+    searchQuery = e.target.value;
+    renderTable();
+  });
+
+  // ── Status filter pills ──
+  document.querySelectorAll(".pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      activeFilter = pill.dataset.filter;
+      renderTable();
+    });
+  });
+
+  // ── Column sorting ──
+  document.querySelectorAll("thead th[data-sort]").forEach(th => {
+    th.addEventListener("click", () => {
+      if (sortKey === th.dataset.sort) {
+        sortAsc = !sortAsc;
+      } else {
+        sortKey = th.dataset.sort;
+        sortAsc = th.dataset.sort === "name";
+      }
+      document.querySelectorAll("thead th").forEach(t => t.classList.remove("sorted"));
+      th.classList.add("sorted");
+      th.querySelector(".sort-arrow").textContent = sortAsc ? "↑" : "↓";
+      renderTable();
+    });
+  });
+
+  // ── Delete (event delegation) ──
+  document.getElementById("table-body").addEventListener("click", async e => {
+    const btn = e.target.closest(".btn-remove");
+    if (!btn) return;
+    const name = btn.dataset.id;
+    if (!confirm(`Remove "${name}" from the platform? This cannot be undone.`)) return;
+    btn.disabled = true; btn.textContent = "…";
+    try {
+      await deleteDoc(doc(db, "users", name));
+      teamUsers = teamUsers.filter(u => u.id !== name);
+      updateStats();
+      renderTable();
+      showToast(`🗑 ${name} removed`);
+    } catch (err) {
+      console.error("[Delete]", err);
+      btn.disabled = false; btn.textContent = "Remove";
+    }
+  });
+
+  // ── Refresh ──
+  document.getElementById("btn-refresh").addEventListener("click", loadDashboard);
+
+  // ── Add User Modal ──
+  const backdrop    = document.getElementById("modal-backdrop");
+  const addNameEl   = document.getElementById("add-name");
+  const addErrorEl  = document.getElementById("add-error");
+  const modalSubmit = document.getElementById("modal-submit");
+
+  function openModal() {
+    backdrop.classList.add("open");
+    addNameEl.value = "";
+    addErrorEl.textContent = "";
+    modalSubmit.disabled = false; modalSubmit.textContent = "➕ Add to Team";
+    setTimeout(() => addNameEl.focus(), 80);
+  }
+  function closeModal() { backdrop.classList.remove("open"); }
+
+  document.getElementById("btn-add-user").addEventListener("click", openModal);
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("modal-cancel").addEventListener("click", closeModal);
+  backdrop.addEventListener("click", e => { if (e.target === backdrop) closeModal(); });
+  addNameEl.addEventListener("keydown", e => { if (e.key === "Enter") submitAddUser(); });
+
+  async function submitAddUser() {
+    const name = addNameEl.value.trim();
+    if (!name) { addErrorEl.textContent = "Please enter a full name."; return; }
+    addErrorEl.textContent = "";
+    modalSubmit.disabled = true; modalSubmit.textContent = "Adding…";
 
     try {
       const ref      = doc(db, "users", name);
       const existing = await getDoc(ref);
       if (existing.exists()) {
-        addError.textContent = `"${name}" already exists.`;
-        btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
+        addErrorEl.textContent = `"${name}" already exists in the system.`;
+        modalSubmit.disabled = false; modalSubmit.textContent = "➕ Add to Team";
         return;
       }
-      const role = document.getElementById("select-role").value || "user";
-      await setDoc(ref, { name, role, progress: 0, modulesCompleted: [] });
-      inputAdd.value = "";
-      btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
-      showToast(`✅ ${role === "manager" ? "Manager" : "User"} added`);
+      await setDoc(ref, { name, role: "user", manager: managerName, progress: 0, modulesCompleted: [] });
+      closeModal();
+      showToast(`✅ ${name} added to your team`);
       await loadDashboard();
     } catch (err) {
-      addError.textContent = "Error adding learner.";
-      console.error("[AddLearner]", err);
-      btnAdd.disabled = false; btnAdd.textContent = "＋ Add Person";
+      addErrorEl.textContent = "Connection error. Please try again.";
+      console.error("[AddUser]", err);
+      modalSubmit.disabled = false; modalSubmit.textContent = "➕ Add to Team";
     }
   }
 
-  btnAdd.addEventListener("click", addLearner);
-  inputAdd.addEventListener("keydown", e => { if (e.key === "Enter") addLearner(); });
+  modalSubmit.addEventListener("click", submitAddUser);
 
-  // ── Delete (event delegation) ──
-  document.getElementById("table-body").addEventListener("click", async e => {
-    const btn = e.target.closest(".btn-delete");
-    if (!btn) return;
-    const name = btn.dataset.id;
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    btn.disabled = true; btn.textContent = "…";
-    try {
-      await deleteDoc(doc(db, "users", name));
-      showToast("🗑 Learner removed");
-      await loadDashboard();
-    } catch (err) {
-      console.error("[Delete]", err);
-      btn.disabled = false; btn.textContent = "Delete";
-    }
-  });
-
-  // ── Refresh ──
-  document.getElementById("btn-refresh").addEventListener("click", () => loadDashboard());
-
-  // ── Download CSV Report ──
+  // ── Download CSV ──
   document.getElementById("btn-download").addEventListener("click", () => {
-    if (!allUsers.length) { showToast("No data to export yet."); return; }
-
-    const rows = [
-      ["Rank", "Name", "Role", "Progress (%)", "Modules Completed", "Module Names"]
-    ];
-    allUsers.forEach((u, i) => {
-      rows.push([
-        i + 1,
-        u.id,
-        u.role,
-        u.pct,
-        u.modCount,
-        u.modules.join("; ")
-      ]);
+    if (!teamUsers.length) { showToast("No data to export."); return; }
+    const rows = [["Rank","Name","Status","Progress (%)","Modules Completed","Module Names"]];
+    const sorted = [...teamUsers].sort((a, b) => b.pct - a.pct);
+    sorted.forEach((u, i) => {
+      const status = u.pct >= 100 ? "Completed" : u.pct > 0 ? "In Progress" : "Not Started";
+      rows.push([i+1, u.id, status, u.pct, u.modCount, u.modules.join("; ")]);
     });
-
-    const csv = rows.map(r =>
-      r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")
-    ).join("\r\n");
-
+    const csv  = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
-    const date = new Date().toISOString().slice(0, 10);
-    a.href     = url;
-    a.download = `ai-quest-report-${date}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    a.href = url; a.download = `${managerName.replace(/ /g,"-")}-team-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
     showToast("📥 Report downloaded");
   });
 
   // ── Toast ──
   function showToast(msg) {
     const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
+    t.textContent = msg; t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2800);
   }
 

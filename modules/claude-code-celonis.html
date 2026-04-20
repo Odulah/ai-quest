@@ -170,6 +170,18 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 .tc:nth-child(7){animation-delay:.29s}.tc:nth-child(8){animation-delay:.33s}.tc:nth-child(9){animation-delay:.37s}
 .tc:nth-child(10){animation-delay:.41s}
 @media(max-width:640px){nav,.hero,.main{padding-left:16px;padding-right:16px;}.hero{padding-top:30px;}.mhd,.mbd{padding:18px 20px;}.tbtn{font-size:10.5px;padding:6px 5px;}.modal{border-radius:16px;}}
+
+  /* ── COMPLETION BANNER ── */
+  #completion-banner{position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+  #completion-banner.show{display:flex;}
+  #completion-inner{background:#fff;border-radius:24px;padding:44px 36px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:cpop 0.45s cubic-bezier(0.34,1.56,0.64,1);}
+  @keyframes cpop{from{opacity:0;transform:scale(0.8) translateY(24px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  #completion-trophy{font-size:56px;line-height:1;margin-bottom:12px;}
+  #completion-title{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px;}
+  #completion-xp{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#6366f1;font-size:13px;font-weight:700;border-radius:20px;padding:4px 14px;margin-bottom:16px;}
+  #completion-quote{font-size:14px;color:#475569;line-height:1.6;margin-bottom:24px;font-style:italic;}
+  #completion-close{width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.2s;}
+  #completion-close:hover{opacity:0.88;}
 </style>
 </head>
 <body>
@@ -256,6 +268,16 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 </div>
 <div class="toast" id="toast"><span id="tIco">&#9889;</span><span id="tMsg">Done!</span></div>
 <footer>AI ENABLEMENT PLATFORM &middot; CELONIS CONSULTANTS &middot; MODULE 11 &middot; CLAUDE CODE + CELONIS &middot; FROM REAL IMPLEMENTATION EXPERIENCE</footer>
+
+<div id="completion-banner">
+  <div id="completion-inner">
+    <div id="completion-trophy">🏆</div>
+    <div id="completion-title">Topic Mastered!</div>
+    <div id="completion-xp" id="completion-xp-label">⚡ +0 XP</div>
+    <div id="completion-quote"></div>
+    <button id="completion-close" onclick="document.getElementById('completion-banner').classList.remove('show')">Keep Going →</button>
+  </div>
+</div>
 
 <script>
 var HL=function(c){return c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\b(import|from|def|return|if|else|for|in|with|as|class|True|False|None|async|await|and|or|not|while|print|raise|try|except|pass)\b/g,'<span class="ck">$1</span>').replace(/\b(anthropic|client|response|json|messages|print|append|get|dict|str|int|bool)\b/g,'<span class="cn">$1</span>').replace(/"([^"\\]*(\\.[^"\\]*)*)"/g,'<span class="cs2">"$1"</span>').replace(/#[^\n]*/g,'<span class="cc">$&</span>').replace(/\b(\d+\.?\d*)\b/g,'<span class="cp">$1</span>');};
@@ -411,7 +433,7 @@ function tab(name,btn){document.querySelectorAll('.tbtn').forEach(function(b){b.
 function buildLearn(){document.getElementById('conceptList').innerHTML=CT.concepts.map(function(c,i){return '<div class="ci"><div class="cnum">'+String(i+1).padStart(2,'0')+'</div><div class="ctxt">'+c+'</div></div>';}).join('');document.getElementById('learnX').innerHTML='<a href="https://docs.anthropic.com/en/docs/claude-code" target="_blank" class="plbtn"><span>&#9889;</span><div><div>Claude Code Official Documentation</div><div class="sub">Complete reference from Anthropic</div></div><span class="ar">&#8594;</span></a>';}
 function buildVideo(){document.getElementById('vFrame').src='https://www.youtube.com/embed/'+CT.vid+'?rel=0&modestbranding=1';document.getElementById('vNote').textContent=CT.vidNote;}
 function buildDemo(){var d=document.getElementById('demoDiv');if(CT.codeB64){d.innerHTML='<div class="cb"><div class="cblbl">'+CT.codeLabel+'</div><button class="cpbtn" onclick="copyCode(this)">Copy</button><pre>'+hlB64(CT.codeB64)+'</pre></div><a href="https://developer.celonis.com" target="_blank" class="plbtn"><span>&#128202;</span><div><div>Celonis Developer Portal</div><div class="sub">API documentation and implementation guides</div></div><span class="ar">&#8594;</span></a>';}else{d.innerHTML='<p style="color:var(--text3)">No demo for this topic.</p>';}}
-function buildQuiz(){var w=document.getElementById('quizWrap');if(qIdx>=shuffledQuiz.length){var s=qAns.filter(Boolean).length;w.style.display='none';document.getElementById('scBox').classList.add('show');var p=Math.round(s/shuffledQuiz.length*100);document.getElementById('scNum').textContent=s;document.getElementById('scDen').textContent='/'+shuffledQuiz.length;document.getElementById('scLbl').textContent=p>=80?'\uD83C\uDF89 Mastered!':p>=60?'\uD83D\uDC4D Good!':'\uD83D\uDCAA Keep going!';document.getElementById('scDtl').textContent=p+'% \u2014 '+(p>=80?'Full XP unlocked!':p>=60?'Partial XP earned.':'Try again for XP.');if(p>=60&&!S.qScores[CT.id]){S.qScores[CT.id]=s;var g=Math.round(s/shuffledQuiz.length*CT.xp);S.xp=(S.xp||0)+g;if(p>=80)S.done[CT.id]=true;save();refresh();showToast('\u26A1','+'+g+' XP earned!');}return;}var q=shuffledQuiz[qIdx];var K=['A','B','C','D'];var prog=qAns.filter(Boolean).length;w.innerHTML='<div class="qbox"><div class="qctr">Question '+(qIdx+1)+' of '+shuffledQuiz.length+' \u00b7 '+prog+' correct</div><div class="qq">'+q.q+'</div><div class="qopts">'+q.o.map(function(o,i){return '<button class="qopt" onclick="ansQ('+i+')" id="qo'+i+'"><span class="optk">'+K[i]+'</span>'+o+'</button>';}).join('')+'</div><div class="qfb" id="qfb"></div></div><div class="qnav"><div class="qprog">'+(qIdx+1)+'/'+shuffledQuiz.length+'</div><button class="btn btng btnsm" onclick="skipQ()">Skip &#8594;</button></div>';}
+function buildQuiz(){var w=document.getElementById('quizWrap');if(qIdx>=shuffledQuiz.length){var s=qAns.filter(Boolean).length;w.style.display='none';document.getElementById('scBox').classList.add('show');var p=Math.round(s/shuffledQuiz.length*100);document.getElementById('scNum').textContent=s;document.getElementById('scDen').textContent='/'+shuffledQuiz.length;document.getElementById('scLbl').textContent=p>=80?'\uD83C\uDF89 Mastered!':p>=60?'\uD83D\uDC4D Good!':'\uD83D\uDCAA Keep going!';document.getElementById('scDtl').textContent=p+'% \u2014 '+(p>=80?'Full XP unlocked!':p>=60?'Partial XP earned.':'Try again for XP.');if(p>=60&&!S.qScores[CT.id]){S.qScores[CT.id]=s;var g=Math.round(s/shuffledQuiz.length*CT.xp);S.xp=(S.xp||0)+g;if(p>=80){S.done[CT.id]=true;setTimeout(function(){showCompletionBanner(g);},900);}save();refresh();showToast('\u26A1','+'+g+' XP earned!');}return;}var q=shuffledQuiz[qIdx];var K=['A','B','C','D'];var prog=qAns.filter(Boolean).length;w.innerHTML='<div class="qbox"><div class="qctr">Question '+(qIdx+1)+' of '+shuffledQuiz.length+' \u00b7 '+prog+' correct</div><div class="qq">'+q.q+'</div><div class="qopts">'+q.o.map(function(o,i){return '<button class="qopt" onclick="ansQ('+i+')" id="qo'+i+'"><span class="optk">'+K[i]+'</span>'+o+'</button>';}).join('')+'</div><div class="qfb" id="qfb"></div></div><div class="qnav"><div class="qprog">'+(qIdx+1)+'/'+shuffledQuiz.length+'</div><button class="btn btng btnsm" onclick="skipQ()">Skip &#8594;</button></div>';}
 function ansQ(idx){var q=shuffledQuiz[qIdx];document.querySelectorAll('.qopt').forEach(function(o){o.style.pointerEvents='none';});var ok=idx===q.c;document.getElementById('qo'+idx).classList.add(ok?'correct':'wrong');if(!ok)document.getElementById('qo'+q.c).classList.add('correct');qAns.push(ok);var fb=document.getElementById('qfb');fb.textContent=(ok?'\u2713 Correct! ':'\u2717 Incorrect. ')+q.e;fb.classList.add('show',ok?'ok':'bad');setTimeout(function(){qIdx++;buildQuiz();},1800);}
 function skipQ(){qAns.push(false);qIdx++;buildQuiz();}
 function retryQ(){shuffledQuiz=prepQuiz(CT.quiz);qIdx=0;qAns=[];document.getElementById('scBox').classList.remove('show');document.getElementById('quizWrap').style.display='block';buildQuiz();}
@@ -425,6 +447,31 @@ function buildChallenge(){document.getElementById('chList').innerHTML=CT.ch.map(
 function doCh(k,xp){if(S.chDone[k])return;S.chDone[k]=true;S.xp=(S.xp||0)+xp;save();refresh();buildChallenge();showToast('\uD83C\uDFC6','+'+xp+' XP! Done!');}
 function buildResources(){document.getElementById('resList').innerHTML=CT.res.map(function(r){return '<a href="'+r.u+'" target="_blank" class="ri"><div class="ric">'+r.i+'</div><div><div class="rin">'+r.n+'</div><div class="rim">'+r.m+'</div></div><div class="ritg">'+r.t+'</div></a>';}).join('');}
 var tT;function showToast(icon,msg){var t=document.getElementById('toast');document.getElementById('tIco').textContent=icon;document.getElementById('tMsg').textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('show');},3200);}
+var _completionQuotes=[
+  "Your neurons are flexing so hard right now. The AI is filing a complaint. 😤",
+  "Achievement unlocked: Officially smarter than 73% of corporate emails. 📧",
+  "Plot twist: You were the AI all along. 🤖",
+  "Somewhere, a robot just updated its resume because of you.",
+  "Science has confirmed: that was impressive. We may have made that up, but it felt right. 🔬",
+  "That performance was so clean, even the bugs started clapping. 🐛👏",
+  "You just made the impossible look like a lazy Tuesday afternoon.",
+  "Einstein called. He wants his brain back. We told him you're still using it. 🧠",
+  "Certified Galaxy Brain moment. NASA is taking notes. 🚀",
+  "You passed with flying colors. The colors are currently filing a noise complaint. 🎨",
+  "This topic has been defeated. It will not recover. RIP difficulty. 🪦",
+  "Brains: 1. Difficulty: 0. Celebratory snacks: strongly recommended. 🍕",
+  "Breaking: local learner absolutely demolishes quiz. Experts baffled. More at 11. 📺",
+  "You did that like you were born knowing it. Were you? That would explain a lot. 👀",
+  "The quiz saw you coming and immediately questioned its life choices. 😅",
+  "Statistically speaking, you are now unstoppable. Don't tell anyone we said that. 📊",
+  "Level up! Your future self just high-fived you through the space-time continuum. 🤝"
+];
+function showCompletionBanner(xp){
+  var q=_completionQuotes[Math.floor(Math.random()*_completionQuotes.length)];
+  document.getElementById('completion-quote').textContent='"'+q+'"';
+  document.getElementById('completion-xp').textContent='⚡ +'+xp+' XP earned!';
+  document.getElementById('completion-banner').classList.add('show');
+}
 init();
 
 </script>

@@ -181,6 +181,18 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 .tc:nth-child(7){animation-delay:.29s}.tc:nth-child(8){animation-delay:.33s}.tc:nth-child(9){animation-delay:.37s}
 .tc:nth-child(10){animation-delay:.41s}
 @media(max-width:640px){nav,.hero,.main{padding-left:16px;padding-right:16px;}.hero{padding-top:30px;}.mhd,.mbd{padding:18px 20px;}.tbtn{font-size:10.5px;padding:6px 5px;}.modal{border-radius:16px;}}
+
+  /* ── COMPLETION BANNER ── */
+  #completion-banner{position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+  #completion-banner.show{display:flex;}
+  #completion-inner{background:#fff;border-radius:24px;padding:44px 36px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:cpop 0.45s cubic-bezier(0.34,1.56,0.64,1);}
+  @keyframes cpop{from{opacity:0;transform:scale(0.8) translateY(24px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  #completion-trophy{font-size:56px;line-height:1;margin-bottom:12px;}
+  #completion-title{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px;}
+  #completion-xp{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#6366f1;font-size:13px;font-weight:700;border-radius:20px;padding:4px 14px;margin-bottom:16px;}
+  #completion-quote{font-size:14px;color:#475569;line-height:1.6;margin-bottom:24px;font-style:italic;}
+  #completion-close{width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.2s;}
+  #completion-close:hover{opacity:0.88;}
 </style>
 </head>
 <body>
@@ -291,6 +303,16 @@ footer{border-top:1px solid var(--border);padding:22px 32px;text-align:center;fo
 </div>
 <div class="toast" id="toast"><span id="tIco">&#127881;</span><span id="tMsg">Done!</span></div>
 <footer>AI ENABLEMENT PLATFORM &middot; CELONIS CONSULTANTS &middot; MODULE 06 &middot; CONTEXT ENGINEERING</footer>
+
+<div id="completion-banner">
+  <div id="completion-inner">
+    <div id="completion-trophy">🏆</div>
+    <div id="completion-title">Topic Mastered!</div>
+    <div id="completion-xp" id="completion-xp-label">⚡ +0 XP</div>
+    <div id="completion-quote"></div>
+    <button id="completion-close" onclick="document.getElementById('completion-banner').classList.remove('show')">Keep Going →</button>
+  </div>
+</div>
 
 <script>
 var HL=function(c){return c.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\b(import|from|def|return|if|else|for|in|with|as|class|True|False|None|async|await|and|or|not|while|break|continue)\b/g,'<span class="ck">$1</span>').replace(/\b(anthropic|client|response|print|len|str|int|json|base64|dict|list|append|extend|get|set)\b/g,'<span class="cn">$1</span>').replace(/"([^"\\]*(\\.[^"\\]*)*)"/g,'<span class="cs2">"$1"</span>').replace(/#[^\n]*/g,'<span class="cc">$&</span>').replace(/\b(\d+\.?\d*)\b/g,'<span class="cp">$1</span>');};
@@ -525,7 +547,7 @@ function buildQuiz(){
     document.getElementById('scDtl').textContent=p+'% \u2014 '+(p>=80?'Full XP unlocked!':p>=60?'Partial XP earned.':'Try again for XP.');
     if(p>=60&&!S.qScores[CT.id]){
       S.qScores[CT.id]=s;var g=Math.round(s/shuffledQuiz.length*CT.xp);
-      S.xp=(S.xp||0)+g;if(p>=80)S.done[CT.id]=true;
+      S.xp=(S.xp||0)+g;if(p>=80){S.done[CT.id]=true;setTimeout(function(){showCompletionBanner(g);},900);}
       save();refresh();showToast('\u26A1','+'+g+' XP earned!');
     }
     return;
@@ -593,6 +615,31 @@ function showToast(icon,msg){
   document.getElementById('tMsg').textContent=msg;
   t.classList.add('show');clearTimeout(tT);
   tT=setTimeout(function(){t.classList.remove('show');},3200);
+}
+var _completionQuotes=[
+  "Your neurons are flexing so hard right now. The AI is filing a complaint. 😤",
+  "Achievement unlocked: Officially smarter than 73% of corporate emails. 📧",
+  "Plot twist: You were the AI all along. 🤖",
+  "Somewhere, a robot just updated its resume because of you.",
+  "Science has confirmed: that was impressive. We may have made that up, but it felt right. 🔬",
+  "That performance was so clean, even the bugs started clapping. 🐛👏",
+  "You just made the impossible look like a lazy Tuesday afternoon.",
+  "Einstein called. He wants his brain back. We told him you're still using it. 🧠",
+  "Certified Galaxy Brain moment. NASA is taking notes. 🚀",
+  "You passed with flying colors. The colors are currently filing a noise complaint. 🎨",
+  "This topic has been defeated. It will not recover. RIP difficulty. 🪦",
+  "Brains: 1. Difficulty: 0. Celebratory snacks: strongly recommended. 🍕",
+  "Breaking: local learner absolutely demolishes quiz. Experts baffled. More at 11. 📺",
+  "You did that like you were born knowing it. Were you? That would explain a lot. 👀",
+  "The quiz saw you coming and immediately questioned its life choices. 😅",
+  "Statistically speaking, you are now unstoppable. Don't tell anyone we said that. 📊",
+  "Level up! Your future self just high-fived you through the space-time continuum. 🤝"
+];
+function showCompletionBanner(xp){
+  var q=_completionQuotes[Math.floor(Math.random()*_completionQuotes.length)];
+  document.getElementById('completion-quote').textContent='"'+q+'"';
+  document.getElementById('completion-xp').textContent='⚡ +'+xp+' XP earned!';
+  document.getElementById('completion-banner').classList.add('show');
 }
 init();
 

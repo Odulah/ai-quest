@@ -469,7 +469,7 @@ function init(){
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}
 }
-function save(){localStorage.setItem('pe_v1',JSON.stringify(S));}
+function save(){localStorage.setItem('pe_v1',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();}
 function startJourney(){
   var n=document.getElementById('nameInput').value.trim();if(!n)return;

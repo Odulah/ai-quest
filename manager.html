@@ -432,6 +432,18 @@
   let activeFilter = "all";
   let searchQuery  = "";
 
+  // Relative time helper (e.g. "2h ago", "3d ago")
+  function _aqRelTime(iso) {
+    try {
+      var diff = (Date.now() - new Date(iso).getTime()) / 1000;
+      if (diff < 60)   return 'just now';
+      if (diff < 3600) return Math.floor(diff/60)   + 'm ago';
+      if (diff < 86400)return Math.floor(diff/3600) + 'h ago';
+      if (diff < 604800)return Math.floor(diff/86400)+ 'd ago';
+      return Math.floor(diff/604800) + 'w ago';
+    } catch(e) { return ''; }
+  }
+
   const MOD_LABELS = {
     "python-fundamentals":   "Python",
     "api-fundamentals":      "API",
@@ -461,10 +473,11 @@
         if ((data.manager || "") !== managerName) return;
         if (data.role === "manager") return;
         teamUsers.push({
-          id:       d.id,
-          pct:      Math.min(data.progress || 0, 100),
-          modCount: Array.isArray(data.modulesCompleted) ? data.modulesCompleted.length : 0,
-          modules:  Array.isArray(data.modulesCompleted) ? data.modulesCompleted : [],
+          id:         d.id,
+          pct:        Math.min(data.progress || 0, 100),
+          modCount:   Array.isArray(data.modulesCompleted) ? data.modulesCompleted.length : 0,
+          modules:    Array.isArray(data.modulesCompleted) ? data.modulesCompleted : [],
+          lastActive: data.lastActive || null,
         });
       });
 
@@ -566,7 +579,7 @@
         <td class="rank-cell">${rankCell}</td>
         <td class="name-cell">
           <div class="uname">${u.id}</div>
-          <div class="usub">${u.modCount} of 11 modules</div>
+          <div class="usub">${u.modCount} of 11 modules${u.lastActive ? ` &middot; active ${_aqRelTime(u.lastActive)}` : ''}</div>
         </td>
         <td>${statusBadge}</td>
         <td>

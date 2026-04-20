@@ -651,7 +651,7 @@ function init(){
   if(S.user){ document.getElementById('wm').style.display='none'; refresh(); }
   else{ document.getElementById('nameInput').onkeydown=function(e){ if(e.key==='Enter') startJourney(); }; }
 }
-function save(){ localStorage.setItem('clm_v2', JSON.stringify(S)); }
+function save(){ localStorage.setItem('clm_v2', JSON.stringify(S)); window.syncProgressToFirestore&&window.syncProgressToFirestore(); }
 function refresh(){ updateNav(); renderCards(); updateProg(); }
 
 function startJourney(){

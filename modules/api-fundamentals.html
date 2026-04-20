@@ -850,7 +850,7 @@ function init(){
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }
-function save(){localStorage.setItem('api_v1',JSON.stringify(S));}
+function save(){localStorage.setItem('api_v1',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();}
 
 function startJourney(){

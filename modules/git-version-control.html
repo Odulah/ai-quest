@@ -421,7 +421,7 @@ var CT=null,qIdx=0,qAns=[],fcIdx=0,shuffledQuiz=[];
 function shuffleArr(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function prepQuiz(qs){return shuffleArr(qs).map(function(q){var idx=shuffleArr([0,1,2,3]);return{q:q.q,o:idx.map(function(i){return q.o[i];}),c:idx.indexOf(q.c),e:q.e};});}
 function init(){try{var s=localStorage.getItem('git_v1');if(s)S=JSON.parse(s);}catch(e){}if(!S.user){var u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}if(S.user){document.getElementById('wm').style.display='none';refresh();}else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}}
-function save(){localStorage.setItem('git_v1',JSON.stringify(S));}
+function save(){localStorage.setItem('git_v1',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();}
 function startJourney(){var n=document.getElementById('nameInput').value.trim();if(!n)return;S.user=n;save();document.getElementById('wm').style.display='none';refresh();showToast('\uD83D\uDCE6','Welcome '+n+'! Let\'s master Git!');}
 function updateNav(){document.getElementById('navUser').textContent=S.user||'?';document.getElementById('navXP').textContent=(S.xp||0)+' XP';document.getElementById('xpStat').textContent=S.xp||0;}

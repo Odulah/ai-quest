@@ -369,6 +369,52 @@
   .aq-label-progress { background: #eff6ff; color: #3b82f6; }
   .aq-label-almost   { background: #faf5ff; color: #8b5cf6; }
 
+  /* ── ROLE PICKER CARDS ───────────────────────────────────── */
+  .aq-role-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+  .aq-role-card {
+    border: 2px solid #e2e8f0; border-radius: 14px; padding: 22px 14px;
+    cursor: pointer; background: #f8fafc; transition: all 0.18s;
+    text-align: center; font-family: inherit; width: 100%;
+  }
+  .aq-role-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(99,102,241,0.14); }
+  .aq-role-user:hover    { border-color: #6366f1; background: #eef2ff; }
+  .aq-role-manager:hover { border-color: #7c3aed; background: #f5f3ff; }
+  .aq-role-icon  { font-size: 34px; margin-bottom: 9px; line-height: 1; }
+  .aq-role-label { font-size: 14px; font-weight: 700; color: #0f172a; }
+  .aq-role-sub   { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+  .aq-back-btn {
+    background: none; border: none; color: #94a3b8; font-size: 13px;
+    cursor: pointer; margin-top: 14px; font-family: inherit;
+    padding: 4px 8px; border-radius: 6px; transition: color 0.15s; display: block; width: 100%;
+  }
+  .aq-back-btn:hover { color: #6366f1; }
+  #aq-step-form #aq-org-input, #aq-step-form #aq-name-input { display: block; box-sizing: border-box; }
+
+  /* ── TOP NAV BAR ──────────────────────────────────────────── */
+  #aq-topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9990;
+    background: #fff; border-bottom: 1px solid #e2e8f0;
+    height: 54px; display: none; align-items: center;
+    justify-content: space-between; padding: 0 28px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    box-shadow: 0 1px 10px rgba(0,0,0,0.06);
+  }
+  #aq-topbar.visible { display: flex; }
+  #aq-topbar-brand { font-weight: 800; font-size: 17px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+  #aq-topbar-right { display: flex; align-items: center; gap: 14px; }
+  #aq-topbar-user  { font-size: 14px; color: #64748b; }
+  #aq-topbar-user strong { color: #0f172a; }
+  #aq-topbar-logout {
+    background: #f1f5f9; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    padding: 7px 16px; font-size: 13px; font-weight: 600; color: #475569;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  #aq-topbar-logout:hover { background: #fee2e2; border-color: #fca5a5; color: #dc2626; }
+  @media (max-width: 480px) {
+    #aq-topbar { padding: 0 16px; }
+    #aq-topbar-user { display: none; }
+  }
+
   /* ── FUNNY GREETING TOAST ─────────────────────────────────── */
   #aq-greeting {
     position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-120px);
@@ -388,6 +434,15 @@
   #aq-greeting-sub   { font-size: 12px; color: #94a3b8; margin-top: 3px; }
 </style>
 
+<!-- ── TOP NAV BAR ────────────────────────────────────────── -->
+<div id="aq-topbar">
+  <div id="aq-topbar-brand">🚀 AI Quest</div>
+  <div id="aq-topbar-right">
+    <span id="aq-topbar-user">Hi, <strong>—</strong></span>
+    <button id="aq-topbar-logout">Sign Out</button>
+  </div>
+</div>
+
 <!-- ── FUNNY GREETING TOAST ──────────────────────────────── -->
 <div id="aq-greeting">
   <div id="aq-greeting-emoji">🎉</div>
@@ -398,13 +453,38 @@
 <!-- ── LOGIN OVERLAY ───────────────────────────────────────── -->
 <div id="aq-login-overlay">
   <div id="aq-login-box">
-    <div class="aq-logo">&#x1F680;</div>
-    <h2 id="aq-login-title">Welcome to AI Quest</h2>
-    <p id="aq-login-subtitle">Enter your organisation code and name to continue</p>
-    <input id="aq-org-input"  type="password" placeholder="Organisation code…"  autocomplete="off" />
-    <input id="aq-name-input" type="text"     placeholder="Your full name…"     autocomplete="off" spellcheck="false" />
-    <button id="aq-login-btn">Enter AI Quest →</button>
-    <div id="aq-login-error"></div>
+
+    <!-- Step 1: Role picker -->
+    <div id="aq-step-role">
+      <div class="aq-logo">&#x1F680;</div>
+      <h2>Welcome to AI Quest</h2>
+      <p>Who are you signing in as today?</p>
+      <div class="aq-role-cards">
+        <button class="aq-role-card aq-role-user" id="aq-pick-user">
+          <div class="aq-role-icon">&#x1F393;</div>
+          <div class="aq-role-label">I'm a Learner</div>
+          <div class="aq-role-sub">Access courses &amp; modules</div>
+        </button>
+        <button class="aq-role-card aq-role-manager" id="aq-pick-manager">
+          <div class="aq-role-icon">&#x1F4CA;</div>
+          <div class="aq-role-label">I'm a Manager</div>
+          <div class="aq-role-sub">Track team progress</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Login form -->
+    <div id="aq-step-form" style="display:none">
+      <div class="aq-logo" id="aq-form-icon">&#x1F393;</div>
+      <h2 id="aq-login-title">Learner Sign In</h2>
+      <p id="aq-login-subtitle">Enter your organisation code and full name</p>
+      <input id="aq-org-input"  type="password" placeholder="Organisation code…"  autocomplete="off" />
+      <input id="aq-name-input" type="text"     placeholder="Your full name…"     autocomplete="off" spellcheck="false" />
+      <button id="aq-login-btn">Sign In &#x2192;</button>
+      <div id="aq-login-error"></div>
+      <button class="aq-back-btn" id="aq-back-btn">&#x2190; Choose a different role</button>
+    </div>
+
   </div>
 </div>
 
@@ -436,7 +516,7 @@
   window._aqDB = db;
 
   // ──────────────────────────────────────────────────────────────────
-  // LOGIN — Org Code + Name lookup
+  // LOGIN — Role picker → Org Code + Name lookup
   // ──────────────────────────────────────────────────────────────────
   const ORG_CODE = "Celonis2026";
 
@@ -445,6 +525,41 @@
   const nameInput = document.getElementById("aq-name-input");
   const loginBtn  = document.getElementById("aq-login-btn");
   const errorEl   = document.getElementById("aq-login-error");
+  const stepRole  = document.getElementById("aq-step-role");
+  const stepForm  = document.getElementById("aq-step-form");
+
+  let selectedRole = "user";
+
+  // ── Role picker ──
+  function pickRole(role) {
+    selectedRole = role;
+    stepRole.style.display = "none";
+    stepForm.style.display = "block";
+    if (role === "manager") {
+      document.getElementById("aq-form-icon").textContent   = "📊";
+      document.getElementById("aq-login-title").textContent = "Manager Sign In";
+      document.getElementById("aq-login-subtitle").textContent = "Enter your organisation code and full name";
+      loginBtn.textContent = "Access Dashboard →";
+    } else {
+      document.getElementById("aq-form-icon").textContent   = "🎓";
+      document.getElementById("aq-login-title").textContent = "Learner Sign In";
+      document.getElementById("aq-login-subtitle").textContent = "Enter your organisation code and full name";
+      loginBtn.textContent = "Start Learning →";
+    }
+    errorEl.textContent = "";
+    orgInput.value = ""; nameInput.value = "";
+    orgInput.focus();
+  }
+
+  function backToRolePicker() {
+    stepForm.style.display = "none";
+    stepRole.style.display = "block";
+    errorEl.textContent = "";
+  }
+
+  document.getElementById("aq-pick-user").addEventListener("click",    () => pickRole("user"));
+  document.getElementById("aq-pick-manager").addEventListener("click", () => pickRole("manager"));
+  document.getElementById("aq-back-btn").addEventListener("click", backToRolePicker);
 
   function showOverlayError(msg) { errorEl.textContent = msg; }
 
@@ -467,12 +582,22 @@
       const snap = await getDoc(doc(db, "users", name));
       if (!snap.exists()) {
         showOverlayError("Name not recognised. Please contact your manager to be added.");
-        loginBtn.disabled = false; loginBtn.textContent = "Enter AI Quest →"; return;
+        loginBtn.disabled = false; loginBtn.textContent = selectedRole === "manager" ? "Access Dashboard →" : "Start Learning →"; return;
       }
-      completeLogin(name, snap.data().role || "user");
+      const dbRole = snap.data().role || "user";
+      // Warn if role mismatch
+      if (selectedRole === "manager" && dbRole !== "manager") {
+        showOverlayError("You are not registered as a manager. Please sign in as a Learner.");
+        loginBtn.disabled = false; loginBtn.textContent = "Access Dashboard →"; return;
+      }
+      if (selectedRole === "user" && dbRole === "manager") {
+        showOverlayError("You're a manager! Please go back and choose 'I'm a Manager'.");
+        loginBtn.disabled = false; loginBtn.textContent = "Start Learning →"; return;
+      }
+      completeLogin(name, dbRole);
     } catch (err) {
       showOverlayError("Connection error. Please try again.");
-      loginBtn.disabled = false; loginBtn.textContent = "Enter AI Quest →";
+      loginBtn.disabled = false; loginBtn.textContent = selectedRole === "manager" ? "Access Dashboard →" : "Start Learning →";
       console.error("[AQ Login]", err);
     }
   }
@@ -480,6 +605,19 @@
   loginBtn.addEventListener("click", aqDoLogin);
   [orgInput, nameInput].forEach(el =>
     el.addEventListener("keydown", e => { if (e.key === "Enter") aqDoLogin(); }));
+
+  // ── Top nav bar helpers ──
+  function showTopbar(name) {
+    const bar = document.getElementById("aq-topbar");
+    if (!bar) return;
+    bar.classList.add("visible");
+    document.getElementById("aq-topbar-user").innerHTML = `Hi, <strong>${name}</strong>`;
+  }
+
+  document.getElementById("aq-topbar-logout").addEventListener("click", () => {
+    ["aq_user","currentUser","aq_role","ai_quest_user"].forEach(k => localStorage.removeItem(k));
+    window.location.reload();
+  });
 
   function completeLogin(name, role) {
     localStorage.setItem("aq_user",       name);
@@ -491,7 +629,7 @@
       return;
     }
     dismissOverlay();
-    applyRoleUI(role);
+    showTopbar(name);
     showGreeting(name);
   }
 
@@ -499,16 +637,15 @@
   const storedUser = localStorage.getItem("aq_user") || localStorage.getItem("currentUser");
   const storedRole = localStorage.getItem("aq_role");
   if (storedUser) {
-    // Ensure both keys are in sync
     localStorage.setItem("aq_user", storedUser);
     localStorage.setItem("currentUser", storedUser);
     overlay.style.display = "none";
-    applyRoleUI(storedRole || "user");
+    showTopbar(storedUser);
     setTimeout(() => showGreeting(storedUser), 300);
   }
 
   function applyRoleUI(role) {
-    // Manager UI handled via manager.html — no FAB needed
+    // Manager UI handled via manager.html
   }
 
   // ──────────────────────────────────────────────────────────────────

@@ -461,7 +461,7 @@ function init(){
   try{var _cu=window.getCurrentUser&&window.getCurrentUser();var _uk='ce_v1_'+(_cu||'_local');var _us=localStorage.getItem(_uk);if(_us){S=JSON.parse(_us);}else{var _legacy=localStorage.getItem('ce_v1');if(_legacy){var _ls=JSON.parse(_legacy);if(_ls.user===_cu){S=_ls;localStorage.setItem(_uk,_legacy);}}}if(_cu)S.user=_cu;}catch(e){}
   var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
-  else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}
+  else{var _au=window.getCurrentUser&&window.getCurrentUser();if(_au){S.user=_au;save();document.getElementById('wm').style.display='none';refresh();}}
 }
 function save(){localStorage.setItem('ce_v1_'+(S.user||'_local'),JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();}

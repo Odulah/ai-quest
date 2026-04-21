@@ -271,6 +271,38 @@ footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;fo
 }
 
   /* ── COMPLETION BANNER ── */
+  /* ── FAST TRACK ── */
+  #ftBanner{background:linear-gradient(135deg,var(--accent-light) 0%,#fff 100%);border:1.5px solid var(--accent);border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .ft-badge-txt{font-size:14px;font-weight:800;color:var(--accent);display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+  .ft-desc{font-size:12.5px;color:var(--text2);line-height:1.5;}
+  .ft-launch-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity 0.15s;}
+  .ft-launch-btn:hover{opacity:0.85;}
+  #ftModal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;}
+  #ftModal.show{display:flex;}
+  .ft-inner{background:#fff;border-radius:20px;padding:28px 30px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.22);}
+  .ft-prog-lbl{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;display:flex;justify-content:space-between;}
+  .ft-prog-track{height:4px;background:var(--bg3);border-radius:100px;margin-bottom:16px;overflow:hidden;}
+  .ft-prog-fill{height:100%;border-radius:100px;background:var(--accent);transition:width 0.4s ease;}
+  .ft-topic-tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px solid var(--tb, #f5c8a0);padding:2px 10px;border-radius:5px;display:inline-block;margin-bottom:10px;}
+  .ft-q{font-size:15.5px;font-weight:700;line-height:1.5;margin-bottom:14px;}
+  .ft-opts{display:flex;flex-direction:column;gap:8px;}
+  .ft-opt{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:13.5px;font-weight:500;text-align:left;font-family:var(--sans);transition:all 0.13s;display:flex;align-items:center;gap:10px;color:var(--text);}
+  .ft-opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light);}
+  .ft-opt.correct{border-color:var(--accent3)!important;background:var(--accent3-light)!important;color:#15803d!important;}
+  .ft-opt.wrong{border-color:#ef4444!important;background:#fef2f2!important;color:#b91c1c!important;}
+  .ft-opt-k{width:22px;height:22px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .ft-fb{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:13px;display:none;line-height:1.5;font-weight:500;}
+  .ft-fb.show{display:block;}
+  .ft-fb.ok{background:var(--accent3-light);border:1px solid #a7f3c0;color:#166534;}
+  .ft-fb.bad{background:#fef2f2;border:1px solid #fca5a5;color:#9b1e2b;}
+  .ft-nav{display:flex;justify-content:flex-end;margin-top:14px;}
+  .ft-result{text-align:center;padding:10px 0 4px;}
+  .ft-result-emoji{font-size:52px;line-height:1;margin-bottom:12px;}
+  .ft-result-title{font-size:22px;font-weight:800;margin-bottom:8px;}
+  .ft-result-score{font-size:34px;font-weight:800;color:var(--accent);font-family:var(--mono);margin:6px 0 12px;}
+  .ft-result-sub{font-size:13.5px;color:var(--text2);line-height:1.65;margin-bottom:22px;}
+  .ft-secondary-btn{background:var(--bg3);border:none;border-radius:10px;padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);margin-top:8px;width:100%;}
+
   #completion-banner{position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
   #completion-banner.show{display:flex;}
   #completion-inner{background:#fff;border-radius:24px;padding:44px 36px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:cpop 0.45s cubic-bezier(0.34,1.56,0.64,1);}
@@ -346,6 +378,13 @@ footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;fo
 <!-- MAIN -->
 <div class="main">
   <div class="section-label">8 Topics — Click Any Card</div>
+  <div id="ftBanner" style="display:none;">
+    <div>
+      <div class="ft-badge-txt">⚡ Fast Track Available</div>
+      <p class="ft-desc">Already know SQL? Take an 8-question assessment to fast-track and earn all 400 XP instantly.</p>
+    </div>
+    <button class="ft-launch-btn" onclick="startFastTrack()">⚡ Fast Track — I already know this</button>
+  </div>
   <div class="topics-grid" id="topicsGrid"></div>
 
   <div class="section-label">Live SQL Playgrounds &amp; Resources</div>
@@ -464,6 +503,13 @@ footer{border-top:1px solid var(--border);padding:20px 32px;text-align:center;fo
         <div id="resList"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- FAST TRACK MODAL -->
+<div id="ftModal" onclick="if(event.target===this)closeFTModal()">
+  <div class="ft-inner" onclick="event.stopPropagation()">
+    <div id="ftContent"></div>
   </div>
 </div>
 
@@ -1016,12 +1062,17 @@ function prepQuiz(qs){return shuffleArr(qs).map(q=>{const idx=shuffleArr([0,1,2,
 
 function init(){
   try{const s=localStorage.getItem('sql_v1');if(s)S=JSON.parse(s);}catch(e){}
-  if(!S.user){const u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}
+  var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }
 function save(){localStorage.setItem('sql_v1',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
-function refresh(){updateNav();renderCards();updateProg();}
+function refresh(){updateNav();renderCards();updateProg();updateFTBanner();}
+function updateFTBanner(){
+  var allDone=TOPICS.every(function(t){return S.done[t.id];});
+  var b=document.getElementById('ftBanner');
+  if(b) b.style.display=allDone?'none':'flex';
+}
 
 function startJourney(){
   const n=document.getElementById('nameInput').value.trim();if(!n)return;
@@ -1290,6 +1341,103 @@ function showCompletionBanner(xp){
   document.getElementById('completion-xp').textContent='⚡ +'+xp+' XP earned!';
   document.getElementById('completion-banner').classList.add('show');
 }
+
+// ── FAST TRACK ──────────────────────────────────────────────────────
+var _ftQs=[],_ftIdx=0,_ftCorrect=0,_ftAnswered=false;
+var _ftK=['A','B','C','D'];
+
+function startFastTrack(){
+  _ftQs=TOPICS.map(function(t){
+    var pool=t.quiz.slice();
+    var raw=pool[Math.floor(Math.random()*pool.length)];
+    var idx=shuffleArr([0,1,2,3]);
+    return {title:t.title,q:raw.q,o:idx.map(function(i){return raw.o[i];}),c:idx.indexOf(raw.c),e:raw.e};
+  });
+  _ftIdx=0;_ftCorrect=0;
+  document.getElementById('ftModal').classList.add('show');
+  _ftRender();
+}
+
+function _ftRender(){
+  var q=_ftQs[_ftIdx];
+  var total=_ftQs.length;
+  var pct=Math.round(_ftIdx/total*100);
+  document.getElementById('ftContent').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'+
+      '<span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Question '+(_ftIdx+1)+' of '+total+'</span>'+
+      '<button onclick="closeFTModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);line-height:1;">✕</button>'+
+    '</div>'+
+    '<div class="ft-prog-track"><div class="ft-prog-fill" style="width:'+pct+'%"></div></div>'+
+    '<div class="ft-topic-tag">'+q.title+'</div>'+
+    '<div class="ft-q">'+q.q+'</div>'+
+    '<div class="ft-opts">'+
+      q.o.map(function(o,i){
+        return '<button class="ft-opt" onclick="_ftAns('+i+')" id="fto'+i+'">'+
+          '<span class="ft-opt-k">'+_ftK[i]+'</span>'+o+'</button>';
+      }).join('')+
+    '</div>'+
+    '<div class="ft-fb" id="ftfb"></div>'+
+    '<div class="ft-nav" id="ftNav" style="display:none;">'+
+      '<button class="ft-launch-btn" onclick="_ftNext()">'+(_ftIdx===total-1?'See Results →':'Next →')+'</button>'+
+    '</div>';
+  _ftAnswered=false;
+}
+
+function _ftAns(i){
+  if(_ftAnswered)return;
+  _ftAnswered=true;
+  var q=_ftQs[_ftIdx];
+  document.querySelectorAll('.ft-opt').forEach(function(o){o.disabled=true;o.style.pointerEvents='none';});
+  if(i===q.c){
+    _ftCorrect++;
+    document.getElementById('fto'+i).classList.add('correct');
+    var fb=document.getElementById('ftfb');
+    fb.className='ft-fb ok show';fb.textContent='✓ Correct! '+q.e;
+  }else{
+    document.getElementById('fto'+i).classList.add('wrong');
+    document.getElementById('fto'+q.c).classList.add('correct');
+    var fb=document.getElementById('ftfb');
+    fb.className='ft-fb bad show';fb.textContent='✗ '+q.e;
+  }
+  document.getElementById('ftNav').style.display='flex';
+}
+
+function _ftNext(){
+  _ftIdx++;
+  if(_ftIdx>=_ftQs.length){_ftResult();}else{_ftRender();}
+}
+
+function _ftResult(){
+  var total=_ftQs.length;
+  var pct=Math.round(_ftCorrect/total*100);
+  var pass=pct>=70;
+  var html;
+  if(pass){
+    var xpEarned=0;
+    TOPICS.forEach(function(t){if(!S.done[t.id]){S.done[t.id]=true;S.xp=(S.xp||0)+t.xp;xpEarned+=t.xp;}});
+    save();refresh();
+    html='<div class="ft-result">'+
+      '<div class="ft-result-emoji">🏆</div>'+
+      '<div class="ft-result-title">Fast Track Complete!</div>'+
+      '<div class="ft-result-score">'+_ftCorrect+'/'+total+' · '+pct+'%</div>'+
+      '<div class="ft-result-sub">Outstanding! You\'ve demonstrated solid SQL knowledge. All 8 topics are marked complete and <strong>'+xpEarned+' XP</strong> has been credited to your profile.</div>'+
+      '<button class="ft-launch-btn" onclick="closeFTModal()" style="width:100%;">🎉 View My Progress</button>'+
+    '</div>';
+  }else{
+    html='<div class="ft-result">'+
+      '<div class="ft-result-emoji">📘</div>'+
+      '<div class="ft-result-title">Keep Exploring</div>'+
+      '<div class="ft-result-score">'+_ftCorrect+'/'+total+' · '+pct+'%</div>'+
+      '<div class="ft-result-sub">Good effort! You need 70%+ to fast-track. Work through the individual topics to lock in your SQL knowledge — you\'ll fly through them.</div>'+
+      '<button class="ft-launch-btn" onclick="closeFTModal()" style="width:100%;margin-bottom:10px;">📚 Continue Learning</button>'+
+      '<button class="ft-secondary-btn" onclick="startFastTrack()">↺ Try Again</button>'+
+    '</div>';
+  }
+  document.getElementById('ftContent').innerHTML=html;
+}
+
+function closeFTModal(){document.getElementById('ftModal').classList.remove('show');}
+
 init();
 </script>
 </body>

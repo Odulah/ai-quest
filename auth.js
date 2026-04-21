@@ -89,9 +89,13 @@ async function _aqDoSync() {
 
     AQ_MODULE_REGISTRY.forEach(function (mod) {
       try {
-        var raw = localStorage.getItem(mod.key);
+        // Use per-user key (mod.key + '_' + userName) — falls back to legacy shared key
+        var perUserKey = mod.key + '_' + userName;
+        var raw = localStorage.getItem(perUserKey) || localStorage.getItem(mod.key);
         if (!raw) return;
         var state    = JSON.parse(raw);
+        // Only count progress that belongs to this user (guard against legacy shared data)
+        if (state.user && state.user !== userName) return;
         var done     = state.done || {};
         var doneCnt  = Object.keys(done).filter(function(k){ return done[k]; }).length;
         totalDone   += doneCnt;

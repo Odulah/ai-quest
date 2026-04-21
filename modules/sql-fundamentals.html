@@ -1061,12 +1061,12 @@ function shuffleArr(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=M
 function prepQuiz(qs){return shuffleArr(qs).map(q=>{const idx=shuffleArr([0,1,2,3]);return{q:q.q,o:idx.map(i=>q.o[i]),c:idx.indexOf(q.c),e:q.e};});}
 
 function init(){
-  try{const s=localStorage.getItem('sql_v1');if(s)S=JSON.parse(s);}catch(e){}
+  try{var _cu=window.getCurrentUser&&window.getCurrentUser();var _uk='sql_v1_'+(_cu||'_local');var _us=localStorage.getItem(_uk);if(_us){S=JSON.parse(_us);}else{var _legacy=localStorage.getItem('sql_v1');if(_legacy){var _ls=JSON.parse(_legacy);if(_ls.user===_cu){S=_ls;localStorage.setItem(_uk,_legacy);}}}if(_cu)S.user=_cu;}catch(e){}
   var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }
-function save(){localStorage.setItem('sql_v1',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
+function save(){localStorage.setItem('sql_v1_'+(S.user||'_local'),JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();updateFTBanner();}
 function updateFTBanner(){
   var allDone=TOPICS.every(function(t){return S.done[t.id];});

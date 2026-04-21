@@ -631,7 +631,7 @@ const TOPICS=[
   quiz:[
     {q:'Keyword to define a function?',o:['func','define','def','function'],c:2,e:'"def" is Python\'s function declaration keyword.'},
     {q:'Return value without a return statement?',o:['0','""','None','Error'],c:2,e:'Python implicitly returns None when no return specified.'},
-    {q:'In def f(a, b=5), what is b?',o:['Keyword arg','Default parameter','Both B and C','Mandatory arg'],c:2,e:'b=5 defines b as an optional default parameter.'},
+    {q:'In def f(a, b=5), what is b?',o:['A mandatory positional arg','A default parameter — optional with preset value 5','A keyword-only arg','A global variable'],c:1,e:'b=5 makes b a default parameter: it\'s optional — if the caller omits it, Python uses 5.'},
     {q:'What does *args collect?',o:['Dict of kwargs','Positional args as tuple','List of defaults','Nothing'],c:1,e:'*args gathers extra positional arguments into a tuple.'},
     {q:'Can a function return multiple values?',o:['No','Yes, as a tuple','Yes, max 2','Only with lists'],c:1,e:'return a, b returns a tuple. Python natively supports this.'},
   ],
@@ -746,12 +746,12 @@ function shuffleArr(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=M
 function prepQuiz(qs){return shuffleArr(qs).map(q=>{const idx=shuffleArr([0,1,2,3]);return{q:q.q,o:idx.map(i=>q.o[i]),c:idx.indexOf(q.c),e:q.e};});}
 
 function init(){
-  try{const s=localStorage.getItem('py_v3');if(s)S=JSON.parse(s);}catch(e){}
+  try{var _cu=window.getCurrentUser&&window.getCurrentUser();var _uk='py_v3_'+(_cu||'_local');var _us=localStorage.getItem(_uk);if(_us){S=JSON.parse(_us);}else{var _legacy=localStorage.getItem('py_v3');if(_legacy){var _ls=JSON.parse(_legacy);if(_ls.user===_cu){S=_ls;localStorage.setItem(_uk,_legacy);}}}if(_cu)S.user=_cu;}catch(e){}
   var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }
-function save(){localStorage.setItem('py_v3',JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
+function save(){localStorage.setItem('py_v3_'+(S.user||'_local'),JSON.stringify(S));window.syncProgressToFirestore&&window.syncProgressToFirestore();}
 function refresh(){updateNav();renderCards();updateProg();updateFTBanner();}
 function updateFTBanner(){
   var allDone=TOPICS.every(function(t){return S.done[t.id];});

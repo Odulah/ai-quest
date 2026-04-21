@@ -465,7 +465,7 @@ function prepQuiz(qs){return shuffleArr(qs).map(function(q){var idx=shuffleArr([
 
 function init(){
   try{var s=localStorage.getItem('pe_v1');if(s)S=JSON.parse(s);}catch(e){}
-  if(!S.user){var u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}
+  var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=function(ev){if(ev.key==='Enter')startJourney();};}
 }

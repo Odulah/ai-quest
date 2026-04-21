@@ -846,7 +846,7 @@ function prepQuiz(qs){return shuffleArr(qs).map(q=>{const idx=shuffleArr([0,1,2,
 
 function init(){
   try{const s=localStorage.getItem('api_v1');if(s)S=JSON.parse(s);}catch(e){}
-  if(!S.user){const u=window.getCurrentUser&&window.getCurrentUser();if(u){S.user=u;save();}}
+  var _u=window.getCurrentUser&&window.getCurrentUser();if(_u&&_u!==S.user){S.user=_u;save();}
   if(S.user){document.getElementById('wm').style.display='none';refresh();}
   else{document.getElementById('nameInput').onkeydown=e=>{if(e.key==='Enter')startJourney();};}
 }

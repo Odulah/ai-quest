@@ -714,7 +714,7 @@ WHERE duration BETWEEN 3600 AND 7200`,
       {t:'<strong>MIN(col) and MAX(col)</strong> find the smallest and largest values. Ideal for finding the fastest and slowest process cases.'},
       {t:'<strong>COUNT(DISTINCT col)</strong> counts unique values. <code>COUNT(DISTINCT customer)</code> tells you how many unique customers have cases — different from COUNT(*).'},
     ],
-    vid:'7yeOuNsFgKo', vidNote:'▶ SQL Aggregate Functions — Alex the Analyst. COUNT, SUM, AVG explained with real examples.',
+    vid:'U9emihZRA5c', vidNote:'▶ SQL Aggregate Functions — Alex the Analyst. COUNT, SUM, AVG explained with real examples.',
     sqlCode:`-- Total cases
 SELECT COUNT(*) AS total_cases FROM cases;
 
@@ -813,7 +813,7 @@ HAVING COUNT(*) >= 2;`,
       {t:'<strong>FULL OUTER JOIN</strong>: returns all rows from both tables. Non-matching rows get NULLs on the other side. Useful for finding orphaned records in process logs.'},
       {t:'<strong>Table aliases</strong> make JOINs readable. <code>FROM cases c JOIN activities a</code> — then use <code>c.case_id</code> and <code>a.case_id</code> to avoid ambiguity.'},
     ],
-    vid:'9yeOuNsFgKo', vidNote:'▶ SQL Joins Explained — Programming with Mosh. Visual diagrams for every join type.',
+    vid:'aY7z4HcHm5M', vidNote:'▶ SQL Joins Explained — Programming with Mosh. Visual diagrams for every join type.',
     sqlCode:`-- INNER JOIN: matched rows only
 SELECT c.case_id, c.customer,
        a.activity, a.resource
@@ -862,7 +862,7 @@ LEFT JOIN activities a
       {t:'<strong>Multiple CTEs</strong>: chain several WITH clauses. Define open_cases, then breach_cases, then join them — each step is readable and testable independently.'},
       {t:'<strong>When to use CTE vs subquery</strong>: use CTEs when you reference the same subresult multiple times, or when the query gets complex — readability over brevity.'},
     ],
-    vid:'i5acpV68QyQ', vidNote:'▶ SQL CTEs — Alex the Analyst. Clear explanation of WITH clauses and when to use them.',
+    vid:'ZaFMM-vNlvc', vidNote:'▶ SQL CTEs — Alex the Analyst. Clear explanation of WITH clauses and when to use them.',
     sqlCode:`-- Subquery: above-average duration cases
 SELECT case_id, customer, duration
 FROM cases
@@ -912,7 +912,7 @@ JOIN activities a ON c.case_id = a.case_id;`,
       {t:'<strong>LAG(col, n)</strong>: returns the value of col from n rows back in the partition. Great for comparing a case\'s duration to the previous case — trend analysis.'},
       {t:'<strong>LEAD(col, n)</strong>: opposite of LAG — returns the value from n rows ahead. Use LAG and LEAD together to compute the time gap between consecutive process events.'},
     ],
-    vid:'H6OTMoXjNiI', vidNote:'▶ SQL Window Functions — Alex the Analyst. ROW_NUMBER, RANK, LAG, LEAD with real examples.',
+    vid:'gMymeinwF8A', vidNote:'▶ SQL Window Functions — Alex the Analyst. ROW_NUMBER, RANK, LAG, LEAD with real examples.',
     sqlCode:`-- Rank cases by duration within each region
 SELECT
   case_id, customer, region,
@@ -964,7 +964,7 @@ FROM cases;`,
       {t:'<strong>Window functions for ML features</strong>: compute rolling averages, running totals, and sequential patterns that capture process behaviour over time.'},
       {t:'<strong>Celonis PQL</strong>: Process Query Language extends SQL with process-specific functions. <code>FILTER MATCH_PROCESS(activity, "Approve" → "Pay")</code> — sequence filtering unique to Celonis.'},
     ],
-    vid:'qfyynHBFR_A', vidNote:'▶ SQL for Data Science — freeCodeCamp. Data preparation and feature engineering with SQL.',
+    vid:'rIcB4zMYMas', vidNote:'▶ SQL for Data Science — freeCodeCamp. Data preparation and feature engineering with SQL.',
     sqlCode:`-- Feature engineering for AI
 SELECT
   case_id,

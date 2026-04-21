@@ -623,7 +623,7 @@ const TOPICS = [
       {t:'<strong>Serialising</strong> (Python → JSON): <code>json.dumps(my_dict, indent=2)</code> — converts a Python dict into a JSON string ready to send as a request body.'},
       {t:'<strong>Claude API response</strong> is JSON. The model\'s text is at <code>response["content"][0]["text"]</code> — always parse before using!'},
     ],
-    vid:'iiADhChRriI', vidNote:'▶ JSON Crash Course — Traversy Media. Everything you need to know about JSON in 30 minutes.',
+    vid:'wI1CWzNtE-M', vidNote:'▶ JSON Crash Course — Traversy Media. Everything you need to know about JSON in 30 minutes.',
     demo:{
       title:'Claude API Response Structure',
       items:[
@@ -668,7 +668,7 @@ const TOPICS = [
       {t:'<strong>Rate limiting</strong>: APIs restrict how many calls you can make per minute/day. Handle 429 responses with exponential backoff retry logic.'},
       {t:'<strong>HTTPS only</strong>: always use <code>https://</code> URLs. HTTP sends data in plaintext — your API key would be exposed on the network.'},
     ],
-    vid:'x_cPg8MjYCM', vidNote:'▶ API Authentication — Web Dev Simplified. Covers API keys, tokens, OAuth clearly.',
+    vid:'GcVtElYa17s', vidNote:'▶ API Authentication — Web Dev Simplified. Covers API keys, tokens, OAuth clearly.',
     demo:{
       title:'Claude API Auth Header',
       items:[
@@ -712,7 +712,7 @@ const TOPICS = [
       {t:'<strong>Claude API parameters</strong>: <code>model</code>, <code>max_tokens</code>, <code>temperature</code> (0–1), <code>system</code> prompt, <code>messages</code> array.'},
       {t:'<strong>Pagination</strong>: APIs limit results per page. Use <code>limit</code> and <code>offset</code> (or <code>cursor</code>) to iterate through large datasets like Celonis event logs.'},
     ],
-    vid:'KUP11j1mMuQ', vidNote:'▶ REST API Query Parameters — Programming with Mosh. Path vs query params explained clearly.',
+    vid:'AshgAVeuSGM', vidNote:'▶ REST API Query Parameters — Programming with Mosh. Path vs query params explained clearly.',
     demo:{
       title:'Parameter Types in Action',
       items:[
@@ -756,7 +756,7 @@ const TOPICS = [
       {t:'<strong>System prompt</strong>: sets Claude\'s persona and constraints BEFORE the conversation. This is where you define "You are a Celonis process mining expert..."'},
       {t:'<strong>Prompt caching</strong>: add <code>cache_control: {"type":"ephemeral"}</code> to large static context (e.g. a 100-page process document) to save up to 90% on repeated API costs.'},
     ],
-    vid:'nv0G6_DZUPI', vidNote:'▶ Claude API Tutorial — Anthropic Developer Relations. Official walkthrough of the Messages API.',
+    vid:'OfUn6HjwXhI', vidNote:'▶ Claude API Tutorial — Anthropic Developer Relations. Official walkthrough of the Messages API.',
     demo:{
       title:'Claude API Request Anatomy',
       items:[
@@ -801,7 +801,7 @@ const TOPICS = [
       {t:'<strong>Timeout handling</strong>: always set request timeouts. A hanging request blocks your entire application. Use <code>requests.get(url, timeout=30)</code>.'},
       {t:'<strong>Logging</strong>: log all API errors with timestamp, status code, and request ID. Anthropic returns a <code>request-id</code> header useful for support tickets.'},
     ],
-    vid:'pPVoSHXZJLc', vidNote:'▶ REST API Error Handling — Fireship. Modern patterns for resilient API integrations.',
+    vid:'Gly94hp3Eec', vidNote:'▶ REST API Error Handling — Fireship. Modern patterns for resilient API integrations.',
     demo:{
       title:'Error Handling Decision Tree',
       items:[

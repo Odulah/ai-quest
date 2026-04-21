@@ -974,11 +974,32 @@ function showCompletionBanner(xp){
 var _ftQs=[],_ftIdx=0,_ftCorrect=0,_ftAnswered=false;
 var _ftK=['A','B','C','D'];
 
+// Deterministic hash of a string → unsigned 32-bit int
+function _ftHash(str){
+  var h=5381;
+  for(var i=0;i<str.length;i++) h=((h<<5)+h+str.charCodeAt(i))|0;
+  return h>>>0;
+}
+// Seeded LCG pseudo-random generator — returns a function that yields [0,1)
+function _ftRandMake(seed){
+  var s=(seed>>>0)||1;
+  return function(){s=(Math.imul(1664525,s)+1013904223)>>>0;return s/0x100000000;};
+}
+// Fisher-Yates shuffle using a supplied rand function
+function _ftShuffleWith(arr,rand){
+  var b=arr.slice();
+  for(var i=b.length-1;i>0;i--){var j=Math.floor(rand()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}
+  return b;
+}
+
 function startFastTrack(){
+  // Seed from username so every user gets a unique, reproducible question set
+  var seed=_ftHash(S.user||'anon');
+  var rand=_ftRandMake(seed);
   _ftQs=TOPICS.map(function(t){
     var pool=t.quiz.slice();
-    var raw=pool[Math.floor(Math.random()*pool.length)];
-    var idx=shuffleArr([0,1,2,3]);
+    var raw=pool[Math.floor(rand()*pool.length)];
+    var idx=_ftShuffleWith([0,1,2,3],rand);
     return {title:t.title,q:raw.q,o:idx.map(function(i){return raw.o[i];}),c:idx.indexOf(raw.c),e:raw.e};
   });
   _ftIdx=0;_ftCorrect=0;

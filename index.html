@@ -628,7 +628,15 @@
       window.location.replace("manager.html");
       return;
     }
-    window.location.reload();
+    // Restore any module progress from Firestore before reloading,
+    // so the user never sees 0% after a cache clear or device switch.
+    if (window.restoreProgressFromFirestore) {
+      window.restoreProgressFromFirestore().finally(function() {
+        window.location.reload();
+      });
+    } else {
+      window.location.reload();
+    }
   }
 
   // ── Skip overlay if already logged in ──────────────────────────

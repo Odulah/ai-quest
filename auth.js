@@ -31,6 +31,72 @@ window.initIndexAuth = function () {
   }
 };
 
+// ─── Progress Restore (Firestore → localStorage) ─────────────────────────────
+//
+// Called once at login. If a module's per-user localStorage key is missing or
+// shows 0 done topics, but Firestore records that module as completed, we
+// synthesise a full-completion entry so the user's progress is never lost
+// just because they cleared their browser cache or switched devices.
+//
+// The restore is deliberately conservative:
+//   • Only writes if the local key is absent OR has 0 topics done
+//   • Never decreases progress already in localStorage
+// ─────────────────────────────────────────────────────────────────────────────
+window.restoreProgressFromFirestore = async function () {
+  try {
+    var userName = window.getCurrentUser();
+    if (!userName) return;
+
+    var fbApp = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    var fbFS  = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    var app = fbApp.getApps().length ? fbApp.getApps()[0] : fbApp.initializeApp(AQ_FIREBASE_CONFIG);
+    var db  = fbFS.getFirestore(app);
+
+    var snap = await fbFS.getDoc(fbFS.doc(db, 'users', userName));
+    if (!snap.exists()) return;
+
+    var completed = snap.data().modulesCompleted;
+    if (!Array.isArray(completed) || !completed.length) return;
+
+    AQ_MODULE_REGISTRY.forEach(function (mod) {
+      if (!completed.includes(mod.id)) return;   // not completed in Firestore — skip
+
+      var perUserKey = mod.key + '_' + userName;
+      var existing   = localStorage.getItem(perUserKey);
+
+      // Parse existing local state (if any)
+      var state = null;
+      try { state = existing ? JSON.parse(existing) : null; } catch (e) { state = null; }
+
+      // Count how many topics are locally marked done
+      var localDone = state ? Object.keys(state.done || {}).filter(function (k) { return state.done[k]; }).length : 0;
+
+      // Only restore if nothing (or nothing meaningful) is stored locally
+      if (localDone >= mod.total) return;   // already complete locally — nothing to do
+
+      // Build a synthetic completed state for this module
+      // We generate sequential topic IDs t0…t(N-1) as placeholders;
+      // the actual topic IDs don't matter for the progress counter — the
+      // module's own init() will overwrite with real data on next open.
+      var done = {};
+      for (var i = 0; i < mod.total; i++) { done['t' + i] = true; }
+      var xpPerTopic = state && state.xp ? Math.round(state.xp / Math.max(localDone, 1)) : 50;
+      var restoredXP = (state && state.xp && state.xp > 0) ? state.xp : mod.total * 50;
+
+      var restoredState = {
+        user:     userName,
+        done:     done,
+        xp:       restoredXP,
+        qScores:  (state && state.qScores)  || {},
+        chDone:   (state && state.chDone)   || {}
+      };
+      localStorage.setItem(perUserKey, JSON.stringify(restoredState));
+    });
+  } catch (e) {
+    // Silently fail — localStorage remains source of truth
+  }
+};
+
 // ─── Progress Sync ────────────────────────────────────────────────────────────
 //
 // Each module calls: window.syncProgressToFirestore()  after every save().

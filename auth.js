@@ -60,6 +60,26 @@ window.restoreProgressFromFirestore = async function () {
     var completed = Array.isArray(data.modulesCompleted) ? data.modulesCompleted : [];
     var AQ_TOTAL  = AQ_MODULE_REGISTRY.reduce(function (s, m) { return s + m.total; }, 0);
 
+    // ── Pre-step: snapshot real per-user localStorage BEFORE any synthetic restore ──
+    // This is the only reliable ground truth: what the user actually has on this device.
+    // We capture it before step 1 writes synthetic entries, so step 2's correction
+    // is based on real data — not the synthetic placeholders we're about to create.
+    var preRestoreDone = 0;
+    var preRestoreCompleted = [];
+    AQ_MODULE_REGISTRY.forEach(function (mod) {
+      try {
+        var raw = localStorage.getItem(mod.key + '_' + userName);
+        if (!raw) return;
+        var s = JSON.parse(raw);
+        if (s.user && s.user !== userName) return;
+        if (s.synthetic) return;   // ignore synthetic placeholders from prior restores
+        var d = s.done || {};
+        var cnt = Object.keys(d).filter(function (k) { return d[k]; }).length;
+        preRestoreDone += cnt;
+        if (cnt >= mod.total) preRestoreCompleted.push(mod.id);
+      } catch (e) { /* skip */ }
+    });
+
     // ── Step 1: Restore completed-module localStorage entries ─────────────────
     // For any module marked complete in Firestore but absent (or empty) in
     // localStorage, synthesise a full-completion entry so the user never
@@ -83,45 +103,37 @@ window.restoreProgressFromFirestore = async function () {
       var restoredXP = (state && state.xp && state.xp > 0) ? state.xp : mod.total * 50;
 
       localStorage.setItem(perUserKey, JSON.stringify({
-        user:    userName,
-        done:    done,
-        xp:      restoredXP,
-        qScores: (state && state.qScores) || {},
-        chDone:  (state && state.chDone)  || {}
+        user:      userName,
+        done:      done,
+        xp:        restoredXP,
+        qScores:   (state && state.qScores) || {},
+        chDone:    (state && state.chDone)  || {},
+        synthetic: true   // restored from Firestore — not from real module interaction
       }));
     });
 
-    // ── Step 2: Correct inflated Firestore progress ───────────────────────────
-    // After the restore above, recalculate progress from per-user localStorage.
-    // If the stored Firestore value is higher than what's actually justified
-    // (e.g. inflated by the legacy shared-key bug), correct it now so the
-    // Manager dashboard shows accurate numbers immediately.
-    var totalDone = 0;
-    AQ_MODULE_REGISTRY.forEach(function (mod) {
-      try {
-        var raw = localStorage.getItem(mod.key + '_' + userName);
-        if (!raw) return;
-        var s = JSON.parse(raw);
-        if (s.user && s.user !== userName) return;
-        var d = s.done || {};
-        totalDone += Object.keys(d).filter(function (k) { return d[k]; }).length;
-      } catch (e) { /* skip corrupt */ }
-    });
+    // ── Step 2: Correct inflated Firestore progress & modulesCompleted ──────────
+    // We can ONLY safely auto-correct Firestore when the user has real per-user
+    // localStorage data on this device (preRestoreDone > 0). That data is
+    // authoritative: it was written by the user's actual module interactions with
+    // the correct per-user key, so we know it is not legacy shared-key data.
+    //
+    // If preRestoreDone === 0 (empty localStorage — either cache cleared, or the
+    // user never actually progressed), we CANNOT distinguish these two cases
+    // automatically. Overwriting Firestore with 0 would wipe legitimate progress
+    // for a user who simply cleared their cache. Leave Firestore untouched;
+    // the manager can use the "Reset" button in the dashboard to fix specific users
+    // whose Firestore data is known to be wrong.
+    if (preRestoreDone > 0) {
+      var recalcProgress = AQ_TOTAL > 0 ? Math.round(preRestoreDone / AQ_TOTAL * 100) : 0;
+      var storedProg     = typeof data.progress === 'number' ? data.progress : 0;
 
-    var recalcProgress = AQ_TOTAL > 0 ? Math.round(totalDone / AQ_TOTAL * 100) : 0;
-
-    // Floor: minimum guaranteed by confirmed-completed modules (never go below this)
-    var completedTopics = completed.reduce(function (sum, modId) {
-      var m = AQ_MODULE_REGISTRY.filter(function (m) { return m.id === modId; })[0];
-      return sum + (m ? m.total : 0);
-    }, 0);
-    var completedFloor  = AQ_TOTAL > 0 ? Math.round(completedTopics / AQ_TOTAL * 100) : 0;
-    var correctProgress = Math.max(completedFloor, recalcProgress);
-
-    var storedProg = typeof data.progress === 'number' ? data.progress : 0;
-    if (storedProg > correctProgress) {
-      // Stored value is inflated — correct it
-      await fbFS.updateDoc(ref, { progress: correctProgress });
+      if (storedProg > recalcProgress || preRestoreCompleted.length < completed.length) {
+        await fbFS.updateDoc(ref, {
+          progress:         recalcProgress,
+          modulesCompleted: preRestoreCompleted
+        });
+      }
     }
 
   } catch (e) {
@@ -196,6 +208,10 @@ async function _aqDoSync() {
         var state    = JSON.parse(raw);
         // Guard: skip entries that belong to a different user
         if (state.user && state.user !== userName) return;
+        // Guard: skip synthetic restore placeholders — they are not real user activity.
+        // Once the user opens the module and marks a topic done, the synthetic flag
+        // is cleared and the entry counts as real progress.
+        if (state.synthetic) return;
         var done     = state.done || {};
         var doneCnt  = Object.keys(done).filter(function(k){ return done[k]; }).length;
         totalDone   += doneCnt;

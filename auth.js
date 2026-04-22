@@ -52,46 +52,78 @@ window.restoreProgressFromFirestore = async function () {
     var app = fbApp.getApps().length ? fbApp.getApps()[0] : fbApp.initializeApp(AQ_FIREBASE_CONFIG);
     var db  = fbFS.getFirestore(app);
 
-    var snap = await fbFS.getDoc(fbFS.doc(db, 'users', userName));
+    var ref  = fbFS.doc(db, 'users', userName);
+    var snap = await fbFS.getDoc(ref);
     if (!snap.exists()) return;
 
-    var completed = snap.data().modulesCompleted;
-    if (!Array.isArray(completed) || !completed.length) return;
+    var data      = snap.data();
+    var completed = Array.isArray(data.modulesCompleted) ? data.modulesCompleted : [];
+    var AQ_TOTAL  = AQ_MODULE_REGISTRY.reduce(function (s, m) { return s + m.total; }, 0);
 
-    AQ_MODULE_REGISTRY.forEach(function (mod) {
-      if (!completed.includes(mod.id)) return;   // not completed in Firestore — skip
+    // ── Step 1: Restore completed-module localStorage entries ─────────────────
+    // For any module marked complete in Firestore but absent (or empty) in
+    // localStorage, synthesise a full-completion entry so the user never
+    // perceives progress loss after clearing cache or switching devices.
+    completed.forEach(function (modId) {
+      var mod = AQ_MODULE_REGISTRY.filter(function (m) { return m.id === modId; })[0];
+      if (!mod) return;
 
       var perUserKey = mod.key + '_' + userName;
       var existing   = localStorage.getItem(perUserKey);
 
-      // Parse existing local state (if any)
       var state = null;
       try { state = existing ? JSON.parse(existing) : null; } catch (e) { state = null; }
 
-      // Count how many topics are locally marked done
       var localDone = state ? Object.keys(state.done || {}).filter(function (k) { return state.done[k]; }).length : 0;
-
-      // Only restore if nothing (or nothing meaningful) is stored locally
       if (localDone >= mod.total) return;   // already complete locally — nothing to do
 
-      // Build a synthetic completed state for this module
-      // We generate sequential topic IDs t0…t(N-1) as placeholders;
-      // the actual topic IDs don't matter for the progress counter — the
-      // module's own init() will overwrite with real data on next open.
+      // Placeholder keys t0…t(N-1); the module's own init() overwrites on next open.
       var done = {};
       for (var i = 0; i < mod.total; i++) { done['t' + i] = true; }
-      var xpPerTopic = state && state.xp ? Math.round(state.xp / Math.max(localDone, 1)) : 50;
       var restoredXP = (state && state.xp && state.xp > 0) ? state.xp : mod.total * 50;
 
-      var restoredState = {
-        user:     userName,
-        done:     done,
-        xp:       restoredXP,
-        qScores:  (state && state.qScores)  || {},
-        chDone:   (state && state.chDone)   || {}
-      };
-      localStorage.setItem(perUserKey, JSON.stringify(restoredState));
+      localStorage.setItem(perUserKey, JSON.stringify({
+        user:    userName,
+        done:    done,
+        xp:      restoredXP,
+        qScores: (state && state.qScores) || {},
+        chDone:  (state && state.chDone)  || {}
+      }));
     });
+
+    // ── Step 2: Correct inflated Firestore progress ───────────────────────────
+    // After the restore above, recalculate progress from per-user localStorage.
+    // If the stored Firestore value is higher than what's actually justified
+    // (e.g. inflated by the legacy shared-key bug), correct it now so the
+    // Manager dashboard shows accurate numbers immediately.
+    var totalDone = 0;
+    AQ_MODULE_REGISTRY.forEach(function (mod) {
+      try {
+        var raw = localStorage.getItem(mod.key + '_' + userName);
+        if (!raw) return;
+        var s = JSON.parse(raw);
+        if (s.user && s.user !== userName) return;
+        var d = s.done || {};
+        totalDone += Object.keys(d).filter(function (k) { return d[k]; }).length;
+      } catch (e) { /* skip corrupt */ }
+    });
+
+    var recalcProgress = AQ_TOTAL > 0 ? Math.round(totalDone / AQ_TOTAL * 100) : 0;
+
+    // Floor: minimum guaranteed by confirmed-completed modules (never go below this)
+    var completedTopics = completed.reduce(function (sum, modId) {
+      var m = AQ_MODULE_REGISTRY.filter(function (m) { return m.id === modId; })[0];
+      return sum + (m ? m.total : 0);
+    }, 0);
+    var completedFloor  = AQ_TOTAL > 0 ? Math.round(completedTopics / AQ_TOTAL * 100) : 0;
+    var correctProgress = Math.max(completedFloor, recalcProgress);
+
+    var storedProg = typeof data.progress === 'number' ? data.progress : 0;
+    if (storedProg > correctProgress) {
+      // Stored value is inflated — correct it
+      await fbFS.updateDoc(ref, { progress: correctProgress });
+    }
+
   } catch (e) {
     // Silently fail — localStorage remains source of truth
   }
@@ -155,12 +187,14 @@ async function _aqDoSync() {
 
     AQ_MODULE_REGISTRY.forEach(function (mod) {
       try {
-        // Use per-user key (mod.key + '_' + userName) — falls back to legacy shared key
+        // Only read the per-user key — never fall back to the shared legacy key.
+        // The shared key has no `user` field, so any shared data would pass the
+        // guard below and inflate progress for every user who logs in.
         var perUserKey = mod.key + '_' + userName;
-        var raw = localStorage.getItem(perUserKey) || localStorage.getItem(mod.key);
+        var raw = localStorage.getItem(perUserKey);
         if (!raw) return;
         var state    = JSON.parse(raw);
-        // Only count progress that belongs to this user (guard against legacy shared data)
+        // Guard: skip entries that belong to a different user
         if (state.user && state.user !== userName) return;
         var done     = state.done || {};
         var doneCnt  = Object.keys(done).filter(function(k){ return done[k]; }).length;
@@ -189,9 +223,20 @@ async function _aqDoSync() {
     var existingProg    = typeof existing.progress === 'number' ? existing.progress : 0;
     var existingMods    = Array.isArray(existing.modulesCompleted) ? existing.modulesCompleted : [];
 
-    // ── 4. Merge: only ever increase — never decrease ─────────────────────────
-    var mergedProg = Math.max(existingProg, newProgress);
+    // ── 4. Merge: keep all completed modules; allow progress corrections ─────────
     var mergedMods = Array.from(new Set(existingMods.concat(completedMods)));
+
+    // Floor progress at what's guaranteed by fully-completed modules.
+    // Using the completed-modules floor (rather than existingProg) means that
+    // if existingProg was inflated by the legacy shared-key bug, it can now
+    // be corrected downward — while still protecting against a cache-clear on a
+    // device that hasn't yet restored partial (non-complete) module progress.
+    var completedTopics = mergedMods.reduce(function (sum, modId) {
+      var entry = AQ_MODULE_REGISTRY.filter(function (m) { return m.id === modId; })[0];
+      return sum + (entry ? entry.total : 0);
+    }, 0);
+    var completedFloor = AQ_TOTAL > 0 ? Math.round(completedTopics / AQ_TOTAL * 100) : 0;
+    var mergedProg = Math.max(completedFloor, newProgress);
 
     // Skip Firestore write if nothing changed
     if (mergedProg === existingProg && mergedMods.length === existingMods.length) return;
